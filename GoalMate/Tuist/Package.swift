@@ -4,14 +4,14 @@
 #if TUIST
 @preconcurrency import ProjectDescription
 
+// staticframwork: 정적 링크
+// framework: 동적 링크
     let packageSettings = PackageSettings(
         productTypes: [:]
     )
 #endif
 
 let package = Package(
-    name: "GoalMate Package",
-    dependencies: [
-//        .package(url: "https://github.com/krzyzanowskim/CryptoSwift.git", .upToNextMajor(from: "1.8.2"))
-    ]
+    name: "GoalMate",
+    dependencies: []
 )

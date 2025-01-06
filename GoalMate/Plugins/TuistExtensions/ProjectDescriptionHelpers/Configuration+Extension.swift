@@ -32,22 +32,18 @@ public extension Configuration {
         }
     }
     
-    static func configure(isApp: Bool, configurations: [ConfigScheme]) -> [Configuration] {
+    static func createAppConfiguration(
+        configurations: [ConfigScheme]
+    ) -> [Configuration] {
         configurations.map { configScheme -> Configuration in
             let configName = configScheme.rawValue
-            var settings: SettingsDictionary = ["URL_SCHEMES": .string(configScheme.URLscheme)]
-            settings.merge(
-                isApp ? [
-                    "CODE_SIGN_STYLE": "Manual",
-                    "DEVELOPMENT_TEAM": "$(DEVELOPMENT_TEAM)",
-                    "PROVISIONING_PROFILE_SPECIFIER": "$(PROVISIONING_PROFILE_SPECIFIER)",
-                    "CODE_SIGN_IDENTITY": "$(CODE_SIGN_IDENTITY)",
-                ] : [
-                    "CODE_SIGN_STYLE": "Automatic",  // Manual 대신 Automatic 사용
-                    "CODE_SIGNING_REQUIRED": "NO",   // 코드 서명 요구사항 비활성화
-                    "CODE_SIGNING_ALLOWED": "NO"     // 코드 서명 허용하지 않음
-                ]
-            )
+            var settings: SettingsDictionary = [
+                "URL_SCHEMES": .string(configScheme.URLscheme),
+                "CODE_SIGN_STYLE": "Manual",
+                "DEVELOPMENT_TEAM": "$(DEVELOPMENT_TEAM)",
+                "PROVISIONING_PROFILE_SPECIFIER": "$(PROVISIONING_PROFILE_SPECIFIER)",
+                "CODE_SIGN_IDENTITY": "$(CODE_SIGN_IDENTITY)"
+            ]
             
             return configName == .release ?
                 .release(
@@ -61,5 +57,20 @@ public extension Configuration {
                     xcconfig: .xcconfigPath(configName.rawValue)
                 )
         }
+    }
+    
+    static func makeModuleConfiguration(
+    ) -> [Configuration] {
+        [
+            .debug(
+                name: "Debug",
+                xcconfig: .xcconfigPath("Module")
+            ),
+            release(
+                name: "Release",
+                xcconfig: .xcconfigPath("Module")
+            )
+        ]
+
     }
 }

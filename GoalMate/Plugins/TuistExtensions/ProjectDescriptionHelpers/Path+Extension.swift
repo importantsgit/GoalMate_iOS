@@ -19,4 +19,8 @@ extension Path {
     public static func entitlementPath(_ entitle: String) -> Path {
       return .relativeToRoot("SupportFiles/Entitlements/\(entitle).entitlements")
     }
+    
+    public static func scriptPath(_ scriptName: String) -> Path {
+      return .relativeToRoot("SupportFiles/Tools/\(scriptName)")
+    }
 }

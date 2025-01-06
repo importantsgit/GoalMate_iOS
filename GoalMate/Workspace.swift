@@ -38,7 +38,8 @@ let projects: [Path] = {
         paths += (Module.featureModules).map(\.path) + [
             .relativeToRoot("Projects/App"),
             .relativeToRoot("Projects/Demos/LoginFeatureDemo"),
-            .relativeToRoot("Projects/Demos/HomeFeatureDemo")
+            .relativeToRoot("Projects/Demos/HomeFeatureDemo"),
+            .relativeToRoot("Projects/Demos/IntroFeatureDemo"),
         ]
         
     default:

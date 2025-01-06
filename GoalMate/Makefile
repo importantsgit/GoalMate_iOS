@@ -1,17 +1,20 @@
 .PHONY: generate graph intro login home all
 
 # Generate 명령어들
+generate:
+	TUIST_ROOT_DIR=${PWD} tuist generate
+
 generate-all:
-	TUIST_TYPE=ALL tuist generate
+	TUIST_ROOT_DIR=${PWD} TUIST_TYPE=ALL tuist generate
 
 generate-intro:
-	TUIST_TYPE=INTRO tuist generate
+	TUIST_ROOT_DIR=${PWD} TUIST_TYPE=INTRO tuist generate
 
 generate-login:
-	TUIST_TYPE=LOGIN tuist generate
+	TUIST_ROOT_DIR=${PWD} TUIST_TYPE=LOGIN tuist generate
 
 generate-home:
-	TUIST_TYPE=HOME tuist generate
+	TUIST_ROOT_DIR=${PWD} TUIST_TYPE=HOME tuist generate
 
 # Graph 명령어들
 graph-all:

@@ -13,6 +13,9 @@ extension Project {
         product: Product,
         deploymentTargets: DeploymentTargets = Project.deployTarget,
         schemes: [Scheme] = [],
+        customTargets: [Target] = [],
+        packages: [Package] = [],
+        scripts: [TargetScript] = [],
         dependencies: [TargetDependency] = [],
         resources: ProjectDescription.ResourceFileElements? = nil
     ) -> Project {
@@ -31,11 +34,11 @@ extension Project {
                         infoPlist: .file(path: Path.plistPath("Info")),
                         sources: ["Sources/**"],
                         resources: resources,
-                        entitlements: .file(path: .entitlementPath("VIXPassM")),
+                        entitlements: .file(path: .entitlementPath("GoalMate")),
+                        scripts: scripts,
                         dependencies: dependencies,
                         settings: .settings(
-                            configurations: Configuration.configure(
-                                isApp: product == .app,
+                            configurations: Configuration.createAppConfiguration(
                                 configurations: Configuration.ConfigScheme.allCases
                             )
                         )
@@ -49,7 +52,11 @@ extension Project {
                         deploymentTargets: deploymentTargets,
                         sources: ["Sources/**"],
                         resources: resources,
-                        dependencies: dependencies
+                        scripts: scripts,
+                        dependencies: dependencies,
+                        settings: .settings(
+                            configurations: Configuration.makeModuleConfiguration()
+                        )
                     ),
                 // Test
                 .target(
@@ -61,10 +68,7 @@ extension Project {
                     sources: ["Tests/**"],
                     dependencies: [.target(name: name)],
                     settings: .settings(
-                        base: [
-                            "CODE_SIGN_STYLE": "Automatic",
-                            "DEVELOPMENT_TEAM": "$(DEVELOPMENT_TEAM)"
-                        ]
+                        configurations: Configuration.makeModuleConfiguration()
                     )
                 )
             ]
@@ -78,10 +82,7 @@ extension Project {
                     deploymentTargets: deploymentTargets,
                     resources: resources,
                     settings: .settings(
-                        base: [
-                            "CODE_SIGN_STYLE": "Manual",
-                            "DEVELOPMENT_TEAM": "$(DEVELOPMENT_TEAM)"
-                        ]
+                        configurations: Configuration.makeModuleConfiguration()
                     )
                 )
             ]
@@ -89,7 +90,8 @@ extension Project {
         }
         return .init(
             name: name,
-            targets: targets,
+            packages: packages,
+            targets: targets + customTargets,
             schemes: schemes,
             // 에셋만 필요
             resourceSynthesizers: [.assets()]
@@ -98,6 +100,8 @@ extension Project {
     
     public static func app(
         name: String,
+        customTargets: [Target] = [],
+        packages: [Package] = [],
         dependencies: [TargetDependency] = [],
         resources: ProjectDescription.ResourceFileElements? = nil
     ) -> Project {
@@ -105,6 +109,11 @@ extension Project {
             name: name,
             product: .app,
             deploymentTargets: self.deployTarget,
+            customTargets: customTargets,
+            packages: packages,
+            scripts: [
+                .prebuildScript(utility: .swiftLint, name: "Lint")
+            ],
             dependencies: dependencies,
             resources: resources
         )
@@ -112,6 +121,8 @@ extension Project {
     
     public static func framework(
         name: String,
+        customTargets: [Target] = [],
+        packages: [Package] = [],
         dependencies: [TargetDependency] = [],
         resources: ProjectDescription.ResourceFileElements? = nil
     ) -> Project {
@@ -119,6 +130,11 @@ extension Project {
             name: name,
             product: .framework,
             deploymentTargets: self.deployTarget,
+            customTargets: customTargets,
+            packages: packages,
+            scripts: [
+                .prebuildScript(utility: .swiftLint, name: "Lint")
+            ],
             dependencies: dependencies,
             resources: resources
         )
