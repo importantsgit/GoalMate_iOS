@@ -10,6 +10,6 @@ import ProjectDescription
 
 let resources = Project.bundle(
     name: Module.Resources.name,
-    resources: ["Resources/**"]
+    resources: .default
 )
 

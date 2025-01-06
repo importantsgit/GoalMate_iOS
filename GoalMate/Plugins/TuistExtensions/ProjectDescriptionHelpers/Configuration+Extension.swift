@@ -38,11 +38,7 @@ public extension Configuration {
         configurations.map { configScheme -> Configuration in
             let configName = configScheme.rawValue
             var settings: SettingsDictionary = [
-                "URL_SCHEMES": .string(configScheme.URLscheme),
-                "CODE_SIGN_STYLE": "Manual",
-                "DEVELOPMENT_TEAM": "$(DEVELOPMENT_TEAM)",
-                "PROVISIONING_PROFILE_SPECIFIER": "$(PROVISIONING_PROFILE_SPECIFIER)",
-                "CODE_SIGN_IDENTITY": "$(CODE_SIGN_IDENTITY)"
+                "URL_SCHEMES": .string(configScheme.URLscheme)
             ]
             
             return configName == .release ?

@@ -27,19 +27,11 @@
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(BUILD_NUMBER)</string>
-	<key>NFCReaderUsageDescription</key>
-	<string>NFC 기능을 사용하려면 권한이 필요합니다.</string>
 	<key>NSAppTransportSecurity</key>
 	<dict>
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>블루투스 기능을 사용하려면 권한이 필요합니다.</string>
-	<key>NSBluetoothPeripheralUsageDescription</key>
-	<string>블루투스 기능을 사용하려면 권한이 필요합니다.</string>
-	<key>NSCameraUsageDescription</key>
-	<string>QR 촬영 및 이미지 데이터 저장을 위해 사용합니다.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -59,10 +51,6 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-	</array>
-	<key>com.apple.developer.nfc.readersession.iso7816.select-identifiers</key>
-	<array>
-		<string>$(AID)</string>
 	</array>
 </dict>
 </plist>
