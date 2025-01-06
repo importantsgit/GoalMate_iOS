@@ -1,23 +1,27 @@
-.PHONY: generate GoalMate App
+.PHONY: generate graph intro login home all
 
-# make generate / intro / login / home / all 명령어 입력
-
-# 기본 generate
-generate:
-	tuist generate
-	
-# Main과 Demos 생성
-all:
+# Generate 명령어들
+generate-all:
 	TUIST_TYPE=ALL tuist generate
-	
-# Intro 데모만 생성
-intro:
+
+generate-intro:
 	TUIST_TYPE=INTRO tuist generate
 
-# Login 데모만 생성
-login:
+generate-login:
 	TUIST_TYPE=LOGIN tuist generate
 
-# Home 데모만 생성
-home:
+generate-home:
 	TUIST_TYPE=HOME tuist generate
+
+# Graph 명령어들
+graph-all:
+	TUIST_TYPE=ALL tuist graph
+
+graph-intro:
+	TUIST_TYPE=INTRO tuist graph
+
+graph-login:
+	TUIST_TYPE=LOGIN tuist graph
+
+graph-home:
+	TUIST_TYPE=HOME tuist graph
