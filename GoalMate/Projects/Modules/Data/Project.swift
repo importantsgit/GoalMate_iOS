@@ -11,7 +11,6 @@ import ProjectDescription
 let data = Project.framework(
     name: Module.Data.name,
     dependencies: [
-        Module.Utils.project,
-        Module.Resources.project
+        Module.Utils.project
     ]
 )

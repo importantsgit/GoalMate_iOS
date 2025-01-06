@@ -12,8 +12,6 @@ let featureHome = Project.framework(
     name: Module.feature(.Home).name,
     dependencies: [
         Module.feature(.Common).project,
-        Module.Domain.project,
-        Module.Utils.project,
-        Module.Resources.project
+        Module.Utils.project
     ]
 )

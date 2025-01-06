@@ -12,7 +12,6 @@ let domain = Project.framework(
     name: Module.Domain.name,
     dependencies: [
         Module.Data.project,
-        Module.Utils.project,
-        Module.Resources.project
+        Module.Utils.project
     ]
 )
