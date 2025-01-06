@@ -18,7 +18,7 @@ let featureCommon = Project.framework(
     ],
     dependencies: [
         Module.Domain.project,
-        Module.Utils.project,
         .package(product: "ComposableArchitecture", type: .runtime)
-    ]
+    ],
+    resources: .default
 )
