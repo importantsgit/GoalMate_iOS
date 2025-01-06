@@ -90,3 +90,4 @@ fastlane/test_output
 iOSInjectionProject/
 .DS_Store
 GoalMate/SupportFiles/XCConfigs/Base.xcconfig
+GoalMate/SupportFiles/ProvisioningProfile/GoalMate_Dev.mobileprovision
