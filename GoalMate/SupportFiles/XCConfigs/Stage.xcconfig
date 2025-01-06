@@ -14,5 +14,3 @@ DEVELOPMENT_TEAM                = $(STAGE_IDENTIFIER_PREFIX)
 
 GCC_PREPROCESSOR_DEFINITIONS    = $(inherited) $(APP_BUILD_DEFINITION)
 OTHER_SWIFT_FLAGS               = $(inherited) -D$(APP_BUILD_DEFINITION)
-
-AID                             = $(NFC_AID)
