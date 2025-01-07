@@ -18,3 +18,16 @@ struct FontModifier: ViewModifier {
             .foregroundStyle(color ?? .primary)
     }
 }
+
+struct LoadingModifier: ViewModifier {
+    @Binding var isLoading: Bool
+
+    func body(content: Content) -> some View {
+        content
+            .overlay {
+                if isLoading {
+                    LoadingView()
+                }
+            }
+    }
+}

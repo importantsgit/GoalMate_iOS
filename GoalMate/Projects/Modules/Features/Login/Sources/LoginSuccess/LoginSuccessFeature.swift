@@ -11,16 +11,16 @@ import ComposableArchitecture
 struct LoginSuccessFeature {
     @ObservableState
     struct State: Equatable {
-        var nickName: String = ""
+        var nickName: String = "임폴턴트"
     }
     enum Action {
-        case confirmButtonTapped
+        case startButtonTapped
     }
 
     var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-            case .confirmButtonTapped:
+            case .startButtonTapped:
                 return .none
             }
         }

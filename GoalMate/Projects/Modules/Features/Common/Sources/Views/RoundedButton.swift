@@ -112,23 +112,27 @@ RoundedButton
 public struct RoundedButton<Content: View, Style: RoundedButtonStyle>: View {
     let buttonType: Style
     let height: CGFloat
+    @Binding var isDisabled: Bool
     let buttonTapped: () -> Void
     let label: Content
 
     public init(
         buttonType: Style = FilledStyle(backgroundColor: .primary),
         height: CGFloat = 54,
+        isDisabled: Binding<Bool> = .constant(false),
         buttonTapped: @escaping () -> Void,
         @ViewBuilder label: () -> Content
     ) {
         self.buttonType = buttonType
         self.height = height
+        self._isDisabled = isDisabled
         self.buttonTapped = buttonTapped
         self.label = label()
     }
 
     public var body: some View {
         Button {
+            guard isDisabled == false else { return }
             buttonTapped()
         } label: {
             HStack {
@@ -137,7 +141,14 @@ public struct RoundedButton<Content: View, Style: RoundedButtonStyle>: View {
                 Spacer()
             }
             .frame(maxHeight: .infinity)
-            .background(buttonType.makeBackground())
+            .background {
+                if isDisabled == false {
+                    buttonType.makeBackground()
+                } else {
+                    Rectangle()
+                        .fill(Colors.gray300)
+                }
+            }
             .clipShape(.capsule)
             .frame(height: height)
         }
@@ -148,6 +159,16 @@ public struct RoundedButton<Content: View, Style: RoundedButtonStyle>: View {
 @available(iOS 17.0, *)
 #Preview {
     VStack {
+        RoundedButton(
+            buttonType: FilledStyle(backgroundColor: .primary),
+            height: 54,
+            isDisabled: .constant(true)
+        ) {
+            print("FilledStyle") // 액션 추가
+        } label: {
+            Text("hello")        // 라벨 추가
+                .pretendard(.semiBold, size: 16, color: .white)
+        }
         RoundedButton(
             buttonType: FilledStyle(backgroundColor: .primary),
             height: 54

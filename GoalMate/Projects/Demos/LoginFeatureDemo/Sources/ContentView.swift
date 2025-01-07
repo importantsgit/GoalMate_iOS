@@ -1,17 +1,28 @@
+//
+//  ContentView.swift
+//  Login
+//
+//  Created by Importants on 1/7/25.
+//
+
+import ComposableArchitecture
+import Login
 import SwiftUI
 
-public struct ContentView: View {
-    public init() {}
-
+struct ContentView: View {
     public var body: some View {
-        Text("Hello, World!")
-            .padding()
+        NicknameView(
+            store: Store(
+                initialState: NicknameFeature.State.init(),
+                reducer: {
+                    NicknameFeature()
+                }
+            )
+        )
     }
 }
 
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
-    }
+@available(iOS 17.0, *)
+#Preview {
+    ContentView()
 }

@@ -18,4 +18,20 @@ public extension View {
     ) -> some View {
         modifier(FontModifier(size: size, font: font, color: color))
     }
+
+    func loading(isLoading: Binding<Bool>) -> some View {
+        modifier(LoadingModifier(isLoading: isLoading))
+    }
+}
+
+public extension Text {
+    func pretendardStyle(
+        _ weight: IFont.Pretendard,
+        size: CGFloat,
+        color: Color
+    ) -> Text {
+        self
+            .font(weight.value.swiftUIFont(size: size))
+            .foregroundColor(color)
+    }
 }

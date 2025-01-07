@@ -16,30 +16,30 @@ struct LoginView: View {
         VStack(spacing: 0) {
             NavigationBar(
                 leftContent: {
-                    CommonImages.logoSub
+                    Images.logoSub
                         .resized(size: .init(width: 84, height: 32))
                 }
             )
             Spacer()
                 .frame(height: 40)
-            LoginProcessView()
+            LoginProcessView(processType: .signUp)
             Spacer()
                 .frame(height: 82)
-            CommonImages.loginBanner
+            Images.loginBanner
                 .resized(length: 320)
             Spacer()
                 .frame(height: 72)
             VStack(spacing: 12) {
                 RoundedButton(
-                    buttonType: FilledStyle(backgroundColor: .yellow),
+                    buttonType: FilledStyle(backgroundColor: Colors.kakaoBg),
                     height: 54
                 ) {
                     print("hello")
                 } label: {
-                    CommonImages.kakaoLogo
+                    Images.kakaoLogo
                         .resized(length: 16)
                     Text("카카오로 시작하기")
-                        .pretendard(.semiBold, size: 16, color: .black) // FIXME:
+                        .pretendard(.semiBold, size: 16, color: Colors.kakaoText)
                 }
                 RoundedButton(
                     buttonType: FilledStyle(backgroundColor: .black),

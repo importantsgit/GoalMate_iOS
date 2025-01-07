@@ -7,15 +7,28 @@
 
 import SwiftUI
 
-public extension CommonColors {
-    static let logoSub = Asset.Assets.logoSub.swiftUIImage
-    static let check = Asset.Assets.check.swiftUIImage
-    static let kakaoLogo = Asset.Assets.kakaoLogo.swiftUIImage
-    static let loginBanner = Asset.Assets.loginBanner.swiftUIImage
-    static let loginSuccessBanner = Asset.Assets.loginSuccessBanner.swiftUIImage
+public extension Colors {
+    static let primary = Asset.Assets.primary.swiftUIColor
+    static let primary100 = Asset.Assets.primary100.swiftUIColor
+
+    static let gray200 = Asset.Assets.gray200.swiftUIColor
+    static let gray300 = Asset.Assets.gray300.swiftUIColor
+    static let gray400 = Asset.Assets.gray400.swiftUIColor
+    static let gray600 = Asset.Assets.gray600.swiftUIColor
+    static let gray900 = Asset.Assets.gray900.swiftUIColor
+
+    static let error = Asset.Assets.error.swiftUIColor
+    static let success = Asset.Assets.success.swiftUIColor
+    static let focused = Asset.Assets.focused.swiftUIColor
+    
+    static let kakaoBg = Asset.Assets.kakaoBg.swiftUIColor
+    static let kakaoText = Asset.Assets.kakaoText.swiftUIColor
 }
 
 public extension Color {
+    init(appAsset: Colors) {
+        self.init(asset: appAsset)
+    }
     /**
      HEX 코드를 사용하여 SwiftUI의 `Color` 객체를 생성하는 초기화 메서드입니다.
      

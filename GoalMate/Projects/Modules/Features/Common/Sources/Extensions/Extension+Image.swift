@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-public extension CommonImages {
+public extension Images {
     static let logoSub = Asset.Assets.logoSub.swiftUIImage
     static let check = Asset.Assets.check.swiftUIImage
     static let kakaoLogo = Asset.Assets.kakaoLogo.swiftUIImage
@@ -16,7 +16,7 @@ public extension CommonImages {
 }
 
 public extension Image {
-    init(appAsset: CommonImages) {
+    init(appAsset: Images) {
         self.init(asset: appAsset)
     }
 
