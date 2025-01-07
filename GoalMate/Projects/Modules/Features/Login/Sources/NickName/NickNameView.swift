@@ -15,10 +15,8 @@ struct NickNameView: View {
     var body: some View {
         VStack {
             HStack {
-                Image(asset: CommonAsset.Assets.logoSub)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 84, height: 32)
+                CommonImages.logoSub
+                    .resized(length: 16)
                 Spacer()
             }
             Spacer()
@@ -39,8 +37,7 @@ struct NickNameView: View {
                             .overlay(
                                 ZStack {
                                     Text("1")
-                                        .font(CommonFontFamily.Pretendard.semiBold.swiftUIFont(size: 14))
-                                        .foregroundStyle(.black)
+                                        .pretendard(.semiBold, size: 14, color: .black)
                                 }
                             )
                             .frame(width: 24, height: 24)
@@ -50,14 +47,12 @@ struct NickNameView: View {
                             .overlay {
                                 ZStack {
                                     Text("2")
-                                        .font(CommonFontFamily.Pretendard.semiBold.swiftUIFont(size: 14))
-                                        .foregroundStyle(.black)
+                                        .pretendard(.semiBold, size: 14, color: .black)
                                     VStack(spacing: 16) {
                                         Spacer()
                                             .frame(height: 24)
                                         Text("닉네임 설정")
-                                            .font(CommonFontFamily.Pretendard.regular.swiftUIFont(size: 12))
-                                            .foregroundStyle(.gray)
+                                            .pretendard(.regular, size: 12, color: .gray)
                                             .frame(width: 100)
                                     }
                                     .offset(CGSize(width: 0, height: 6))
@@ -70,8 +65,7 @@ struct NickNameView: View {
                                     Circle()
                                         .stroke(Color.blue, lineWidth: 2)
                                     Text("3")
-                                        .font(CommonFontFamily.Pretendard.semiBold.swiftUIFont(size: 14))
-                                        .foregroundStyle(.black)
+                                        .pretendard(.semiBold, size: 14, color: .black)
                                 }
                             )
                             .frame(width: 24, height: 24)
@@ -81,8 +75,7 @@ struct NickNameView: View {
             Spacer()
                 .frame(height: 120)
             Text("앞으로 어떻게 불러드릴까요?")
-                .font(CommonFontFamily.Pretendard.semiBold.swiftUIFont(size: 18))
-                .foregroundStyle(.black)
+                .pretendard(.semiBold, size: 18, color: .black)
             Spacer()
                 .frame(height: 44)
             VStack(spacing: 10) {
@@ -99,8 +92,7 @@ struct NickNameView: View {
                 .frame(height: 44)
                 HStack {
                     Text("최소 2글자, 최대 5글자로 입력해주세요.")
-                        .font(CommonFontFamily.Pretendard.regular.swiftUIFont(size: 14))
-                        .foregroundStyle(.black)
+                        .pretendard(.regular, size: 14, color: .black)
                     Spacer()
                 }
                 Spacer()
@@ -112,10 +104,7 @@ struct NickNameView: View {
                         Text("골메이트 시작하기")
                         Spacer()
                     }
-                    .font(
-                        CommonFontFamily.Pretendard.semiBold.swiftUIFont(size: 16)
-                    )
-                    .foregroundStyle(.white)
+                    .pretendard(.semiBold, size: 16, color: .white)
                     .frame(height: 54)
                     .background(.green)
                     .clipShape(.capsule)

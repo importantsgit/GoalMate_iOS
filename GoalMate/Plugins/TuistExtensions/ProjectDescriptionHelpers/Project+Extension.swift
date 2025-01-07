@@ -96,7 +96,10 @@ extension Project {
             packages: packages,
             targets: targets + customTargets,
             schemes: schemes,
-            resourceSynthesizers: [.assets(), .fonts()]
+            resourceSynthesizers: [
+                .custom(name: "Assets", parser: .assets, extensions: ["xcassets"]),
+                .custom(name: "Fonts", parser: .fonts, extensions: ["otf"]),
+            ]
         )
     }
     

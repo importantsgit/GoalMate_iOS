@@ -14,10 +14,8 @@ struct LoginSuccessView: View {
     var body: some View {
         VStack {
             HStack {
-                Image(asset: CommonAsset.Assets.logoSub)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 84, height: 32)
+                CommonImages.logoSub
+                    .resized(length: 16)
                 Spacer()
             }
             Spacer()
@@ -39,18 +37,12 @@ struct LoginSuccessView: View {
                             .overlay {
                                 ZStack {
                                     Text("1")
-                                        .font(
-                                            CommonFontFamily.Pretendard.semiBold.swiftUIFont(size: 14)
-                                        )
-                                        .foregroundStyle(.black)
+                                        .pretendard(.semiBold, size: 14, color: .black)
                                     VStack(spacing: 16) {
                                         Spacer()
                                             .frame(height: 24)
                                         Text("회원가입")
-                                            .font(
-                                                CommonFontFamily.Pretendard.regular.swiftUIFont(size: 12)
-                                            )
-                                            .foregroundStyle(.gray)
+                                            .pretendard(.regular, size: 12, color: .gray)
                                             .frame(width: 100)
                                     }
                                     .offset(CGSize(width: 0, height: 6))
@@ -64,10 +56,7 @@ struct LoginSuccessView: View {
                                     Circle()
                                         .stroke(Color.blue, lineWidth: 2)
                                     Text("2")
-                                        .font(
-                                            CommonFontFamily.Pretendard.semiBold.swiftUIFont(size: 14)
-                                        )
-                                        .foregroundStyle(.black)
+                                        .pretendard(.semiBold, size: 14, color: .black)
                                 }
                             )
                             .frame(width: 24, height: 24)
@@ -78,10 +67,7 @@ struct LoginSuccessView: View {
                                     Circle()
                                         .stroke(Color.blue, lineWidth: 2)
                                     Text("3")
-                                        .font(
-                                            CommonFontFamily.Pretendard.semiBold.swiftUIFont(size: 14)
-                                        )
-                                        .foregroundStyle(.black)
+                                        .pretendard(.semiBold, size: 14, color: .black)
                                 }
                             )
                             .frame(width: 24, height: 24)
@@ -91,10 +77,8 @@ struct LoginSuccessView: View {
             }
             Spacer()
                 .frame(height: 82)
-            Image(asset: CommonAsset.Assets.loginSuccessBanner)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 320, height: 320)
+            CommonImages.loginSuccessBanner
+                .resized(length: 320)
                 .overlay {
                     VStack {
                         Spacer()
@@ -102,10 +86,7 @@ struct LoginSuccessView: View {
                         Text("축하해요\n\(store.nickName)님,\n바로 첫 목표를 시작해보세요!")
                             .lineLimit(nil)
                             .multilineTextAlignment(.center)
-                            .font(
-                                CommonFontFamily.Pretendard.semiBold.swiftUIFont(size: 18)
-                            )
-                            .foregroundStyle(.black)
+                            .pretendard(.semiBold, size: 18, color: .black)
                         Spacer()
                     }
                 }
@@ -118,10 +99,7 @@ struct LoginSuccessView: View {
                     Text("골메이트 시작하기")
                     Spacer()
                 }
-                .font(
-                    CommonFontFamily.Pretendard.semiBold.swiftUIFont(size: 16)
-                )
-                .foregroundStyle(.white)
+                .pretendard(.semiBold, size: 16, color: .white)
                 .frame(height: 54)
                 .background(.black)
                 .clipShape(.capsule)

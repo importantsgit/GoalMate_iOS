@@ -10,138 +10,52 @@ import ComposableArchitecture
 import SwiftUI
 
 struct LoginView: View {
-    let store: StoreOf<LoginFeature>
+    @State var store: StoreOf<LoginFeature>
 
-    var body: some View {
+    public var body: some View {
         VStack(spacing: 0) {
-            HStack {
-                Image(asset: CommonAsset.Assets.logoSub)
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 84, height: 32)
-                Spacer()
-            }
+            NavigationBar(
+                leftContent: {
+                    CommonImages.logoSub
+                        .resized(size: .init(width: 84, height: 32))
+                }
+            )
             Spacer()
                 .frame(height: 40)
-            HStack(spacing: 0) {
-                ZStack {
-                    HStack {
-                        Rectangle()
-                            .fill(.green)
-                            .frame(width: 75, height: 8)
-                        Rectangle()
-                            .fill(.green)
-                            .frame(width: 75, height: 8)
-                    }
-                    HStack(spacing: 51) {
-                        Circle()
-                            .fill(.green)
-                            .frame(width: 24, height: 24)
-                            .overlay {
-                                ZStack {
-                                    Text("1")
-                                        .font(
-                                            CommonFontFamily.Pretendard.semiBold.swiftUIFont(size: 14)
-                                        )
-                                        .foregroundStyle(.black)
-                                    VStack(spacing: 16) {
-                                        Spacer()
-                                            .frame(height: 24)
-                                        Text("회원가입")
-                                            .font(
-                                                CommonFontFamily.Pretendard.regular.swiftUIFont(size: 12)
-                                            )
-                                            .foregroundStyle(.gray)
-                                            .frame(width: 100)
-                                    }
-                                    .offset(CGSize(width: 0, height: 6))
-                                }
-
-                            }
-                        Circle()
-                            .fill(Color.white)
-                            .overlay(
-                                ZStack {
-                                    Circle()
-                                        .stroke(Color.blue, lineWidth: 2)
-                                    Text("2")
-                                        .font(
-                                            CommonFontFamily.Pretendard.semiBold.swiftUIFont(size: 14)
-                                        )
-                                        .foregroundStyle(.black)
-                                }
-                            )
-                            .frame(width: 24, height: 24)
-                        Circle()
-                            .fill(Color.white)
-                            .overlay(
-                                ZStack {
-                                    Circle()
-                                        .stroke(Color.blue, lineWidth: 2)
-                                    Text("3")
-                                        .font(
-                                            CommonFontFamily.Pretendard.semiBold.swiftUIFont(size: 14)
-                                        )
-                                        .foregroundStyle(.black)
-                                }
-                            )
-                            .frame(width: 24, height: 24)
-                    }
-
-                }
-            }
+            LoginProcessView()
             Spacer()
                 .frame(height: 82)
-            Image(asset: CommonAsset.Assets.loginBanner)
-                .resizable()
-                .aspectRatio(contentMode: .fit)
-                .frame(width: 320, height: 320)
+            CommonImages.loginBanner
+                .resized(length: 320)
             Spacer()
                 .frame(height: 72)
             VStack(spacing: 12) {
-                Button {
-                   // TODO: 카카오 로그인
+                RoundedButton(
+                    buttonType: FilledStyle(backgroundColor: .yellow),
+                    height: 54
+                ) {
+                    print("hello")
                 } label: {
-                    HStack(spacing: 5) {
-                        Spacer()
-                        Image(asset: CommonAsset.Assets.kakaoLogo)
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                            .frame(width: 16, height: 16)
-                        Text("카카오로 시작하기")
-                        Spacer()
-                    }
-                    .font(
-                        CommonFontFamily.Pretendard.semiBold.swiftUIFont(size: 16)
-                    )
-                    .foregroundStyle(.black) // FIXME:
-                    .frame(height: 54)
-                    .background(.yellow) // FIXME:
-                    .clipShape(.capsule)
+                    CommonImages.kakaoLogo
+                        .resized(length: 16)
+                    Text("카카오로 시작하기")
+                        .pretendard(.semiBold, size: 16, color: .black) // FIXME:
                 }
-                Button {
-                    // TODO: Apple 로그인
+                RoundedButton(
+                    buttonType: FilledStyle(backgroundColor: .black),
+                    height: 54
+                ) {
+                    print("hello")
                 } label: {
                     HStack(spacing: 5) {
-                        Spacer()
                         Text("")
                         Text("Apple로 시작하기")
-                        Spacer()
                     }
-                    .font(
-                        CommonFontFamily.Pretendard.semiBold.swiftUIFont(size: 16)
-                    )
-                    .foregroundStyle(.white)
-                    .frame(height: 54)
-                    .background(.black)
-                    .clipShape(.capsule)
+                    .pretendard(.semiBold, size: 16, color: .white) // FIXME:
                 }
             }
-            Spacer()
-                .frame(height: 44)
         }
-        .padding(.horizontal, 20)
-
+        .setMargin()
     }
 }
 
