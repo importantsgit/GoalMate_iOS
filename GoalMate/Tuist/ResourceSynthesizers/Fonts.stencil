@@ -32,11 +32,25 @@
 {% endfilter %}{% endmacro %}
 {{accessModifier}} enum IFont: Sendable {
   {% for family in families %}
-  {{accessModifier}} enum {{family.name|swiftIdentifier:"pretty"|escapeReservedKeywords}}: Sendable {
-    {% for font in family.fonts %}
-    {{accessModifier}} static let {{font.style|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}} = {{fontType}}(name: "{{font.name}}", family: "{{family.name}}", path: "{% call transformPath font.path %}")
-    {% endfor %}
-    {{accessModifier}} static let all: [{{fontType}}] = [{% for font in family.fonts %}{{font.style|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}}{{ ", " if not forloop.last }}{% endfor %}]
+  {{accessModifier}} enum {{family.name|swiftIdentifier:"pretty"|escapeReservedKeywords}} {
+    // 모든 폰트 weight를 case로 생성
+    case {% for font in family.fonts %} {{font.style|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}}{% if not forloop.last %}, {% endif %}{% endfor %}
+    
+    {{accessModifier}} var value: FontConvertible {
+        switch self {
+        {% for font in family.fonts %}
+        case .{{font.style|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}}: return Static.{{font.style|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}}
+        {% endfor %}
+        }
+    }
+    
+    private enum Static {
+        {% for font in family.fonts %}
+        static let {{font.style|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}} = {{fontType}}(name: "{{font.name}}", family: "{{family.name}}", path: "{% call transformPath font.path %}")
+        {% endfor %}
+    }
+    
+    {{accessModifier}} static let all: [{{fontType}}] = [{% for font in family.fonts %}Static.{{font.style|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}}{{ ", " if not forloop.last }}{% endfor %}]
   }
   {% endfor %}
   {{accessModifier}} static let allCustomFonts: [{{fontType}}] = [{% for family in families %}{{family.name|swiftIdentifier:"pretty"|escapeReservedKeywords}}.all{{ ", " if not forloop.last }}{% endfor %}].flatMap { $0 }
