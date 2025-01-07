@@ -36,7 +36,7 @@
     // 모든 폰트 weight를 case로 생성
     case {% for font in family.fonts %} {{font.style|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}}{% if not forloop.last %}, {% endif %}{% endfor %}
     
-    var value: FontConvertible {
+    {{accessModifier}} var value: FontConvertible {
         switch self {
         {% for font in family.fonts %}
         case .{{font.style|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}}: return Static.{{font.style|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}}
