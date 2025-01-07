@@ -8,15 +8,17 @@
 import ComposableArchitecture
 
 @Reducer
-struct LoginFeature {
+public struct LoginFeature {
     @ObservableState
-    struct State: Equatable {}
-    enum Action {
+    public struct State: Equatable {
+        public init() {}
+    }
+    public enum Action {
         case appleButtonTapped
         case kakaoButtonTapped
     }
 
-    var body: some Reducer<State, Action> {
+    public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
             case .appleButtonTapped:
