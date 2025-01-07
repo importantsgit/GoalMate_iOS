@@ -9,8 +9,5 @@ import TuistExtensions
 import ProjectDescription
 
 let utils = Project.framework(
-    name: Module.Utils.name,
-    dependencies: [
-        Module.Resources.project
-    ]
+    name: Module.Utils.name
 )

@@ -12,7 +12,6 @@ public enum Module {
     case Domain
     case Data
     case Utils
-    case Resources
     
     public enum FeatureType: String, CaseIterable {
         case Intro
@@ -31,8 +30,6 @@ public enum Module {
             return "Data"
         case .Utils:
             return "Utils"
-        case .Resources:
-            return "Resources"
         }
     }
     

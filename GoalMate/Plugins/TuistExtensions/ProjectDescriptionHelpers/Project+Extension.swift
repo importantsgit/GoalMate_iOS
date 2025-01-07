@@ -82,6 +82,9 @@ extension Project {
                     deploymentTargets: deploymentTargets,
                     resources: resources,
                     settings: .settings(
+                        base: [
+                            "GENERATE_ASSET_SYMBOLS": "YES"
+                        ],
                         configurations: Configuration.makeModuleConfiguration()
                     )
                 )
@@ -93,8 +96,7 @@ extension Project {
             packages: packages,
             targets: targets + customTargets,
             schemes: schemes,
-            // 에셋만 필요
-            resourceSynthesizers: [.assets()]
+            resourceSynthesizers: [.assets(), .fonts()]
         )
     }
     
