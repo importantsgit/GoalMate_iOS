@@ -9,29 +9,29 @@ import ComposableArchitecture
 import Foundation
 import UIKit
 
-final class AppDelegate: NSObject, UIApplicationDelegate {
-    let store = Store(
-        initialState: AppReducer.State()
-    ) {
-        AppReducer().transformDependency(\.sef) { dependency in
-            // 의존성 변환
-        }
-    }
-}
-
-
 @Reducer
 struct AppReducer {
     @Reducer(state: .encodable)
     public enum Destination {
-        case Login
+        case login
     }
     
     @ObservableState
     public struct State: Equatable {
         public var appDelegate: AppDelegateReducer.State
         @Presents public var destination: Destination.State?
-        public var home: Login.State
+        
+        init(
+            appDelegate: AppDelegateReducer.State,
+            destination: Destination.State? = nil
+        ) {
+            self.appDelegate = appDelegate
+            self.destination = destination
+        }
+    }
+    
+    public enum Action {
+        case appDelegate(AppDelegateReducer.Action)
     }
 }
 

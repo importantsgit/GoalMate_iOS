@@ -59,7 +59,7 @@ struct LoginSuccessView: View {
 #Preview {
     LoginSuccessView(
         store: Store(
-            initialState: LoginSuccessFeature.State.init(),
+            initialState: LoginSuccessFeature.State.init(nickName: "hello"),
             reducer: {
                 LoginSuccessFeature()
             }

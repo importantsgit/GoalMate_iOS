@@ -10,7 +10,7 @@ import ComposableArchitecture
 @Reducer
 public struct LoginFlowFeature {
     @Reducer(state: .equatable)
-    public enum Destination {
+    public enum Path {
         case login(LoginFeature)
         case signup(NicknameFeature)
         case success(LoginSuccessFeature)
@@ -18,19 +18,18 @@ public struct LoginFlowFeature {
 
     @ObservableState
     public struct State: Equatable {
-        @Presents public var destination: Destination.State?
-        
-        public init(destination: Destination.State? = nil) {
-            self.destination = destination
-        }
+        var path = StackState<Path.State>()
+
+        public init() {}
     }
 
     public enum Action {
-        
+        case path(StackActionOf<Path>)
     }
 
     public var body: some Reducer<State, Action> {
         self.core
+            .forEach(\.path, action: \.path)
     }
 
     @ReducerBuilder<State, Action>
