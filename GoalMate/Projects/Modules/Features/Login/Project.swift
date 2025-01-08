@@ -1,16 +1,20 @@
 //
 //  Project.swift
-//  Config
+//  AppManifests
 //
-//  Created by Importants on 1/2/25.
+//  Created by Importants on 1/3/25.
 //
 
 import TuistExtensions
 import ProjectDescription
 
-let featureLogin = Project.framework(
-    name: Module.feature(.Login).name,
-    dependencies: [
-        Module.feature(.Common).project,
-    ]
+let SignUpDependencies: [TargetDependency] = [
+    Module.feature(.SignUp).project,
+    Module.feature(.Common).project
+]
+
+let loginFeatureDemo = Project.app(
+    name: "DemoSignUpFeature",
+    dependencies: SignUpDependencies
 )
+

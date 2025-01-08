@@ -15,7 +15,7 @@ public enum Module {
     
     public enum FeatureType: String, CaseIterable {
         case Intro
-        case Login
+        case SignUp
         case Home
         case Common
     }
@@ -39,7 +39,17 @@ public enum Module {
     }
     
     public var project: TargetDependency {
-        .project(target: self.name, path: self.path)
+        let targetName: String
+        switch self {
+        case let .feature(feat):
+            targetName = "Feature" + self.name
+        default:
+            targetName = self.name
+        }
+        return .project(
+            target: targetName,
+            path: self.path
+        )
     }
     
     public static var featureModules: [Module] {
