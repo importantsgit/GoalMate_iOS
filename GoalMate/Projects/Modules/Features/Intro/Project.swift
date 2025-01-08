@@ -9,7 +9,7 @@ import TuistExtensions
 import ProjectDescription
 
 let featureIntro = Project.framework(
-    name: Module.feature(.Intro).name,
+    name: "Feature" + Module.feature(.Intro).name,
     dependencies: [
         Module.feature(.Common).project
     ]

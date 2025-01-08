@@ -1,4 +1,4 @@
-.PHONY: generate graph intro login home all
+.PHONY: generate graph intro signup home all
 
 # Generate 명령어들
 generate:
@@ -10,8 +10,8 @@ generate-all:
 generate-intro:
 	TUIST_ROOT_DIR=${PWD} TUIST_TYPE=INTRO tuist generate
 
-generate-login:
-	TUIST_ROOT_DIR=${PWD} TUIST_TYPE=LOGIN tuist generate
+generate-signup:
+	TUIST_ROOT_DIR=${PWD} TUIST_TYPE=SIGNUP tuist generate
 
 generate-home:
 	TUIST_ROOT_DIR=${PWD} TUIST_TYPE=HOME tuist generate
@@ -23,8 +23,8 @@ graph-all:
 graph-intro:
 	TUIST_TYPE=INTRO tuist graph
 
-graph-login:
-	TUIST_TYPE=LOGIN tuist graph
+graph-signup:
+	TUIST_TYPE=SIGNUP tuist graph
 
 graph-home:
 	TUIST_TYPE=HOME tuist graph

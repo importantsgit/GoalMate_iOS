@@ -15,4 +15,6 @@ public extension Project {
     static let deployTarget: DeploymentTargets = .iOS("16.0")
     
     static let teamId = "com.goalmate"
+    
+    static let appPath: ProjectDescription.Path = .relativeToRoot("Projects/App")
 }

@@ -17,34 +17,31 @@ let projects: [Path] = {
     
     switch demoType {
     case "INTRO":
-        paths += [
-            .relativeToRoot("Projects/Demos/IntroFeatureDemo"),
+        [
+            Demo.Intro.path,
             Module.feature(.Intro).path,
             Module.feature(.Common).path
         ]
-    case "LOGIN":
+    case "SIGNUP":
         paths += [
-            .relativeToRoot("Projects/Demos/LoginFeatureDemo"),
-            Module.feature(.Login).path,
+            Demo.SignUp.path,
+            Module.feature(.SignUp).path,
             Module.feature(.Common).path
         ]
     case "HOME":
         paths += [
-            .relativeToRoot("Projects/Demos/HomeFeatureDemo"),
+            Demo.Home.path,
             Module.feature(.Home).path,
             Module.feature(.Common).path
         ]
     case "ALL":
         paths += (Module.featureModules).map(\.path) + [
-            .relativeToRoot("Projects/App"),
-            .relativeToRoot("Projects/Demos/LoginFeatureDemo"),
-            .relativeToRoot("Projects/Demos/HomeFeatureDemo"),
-            .relativeToRoot("Projects/Demos/IntroFeatureDemo"),
+            Project.appPath
         ]
-        
+        paths += Demo.allCases.map(\.path)
     default:
         paths += (Module.featureModules).map(\.path) + [
-            .relativeToRoot("Projects/App")
+            Project.appPath
         ]
     }
     return paths
