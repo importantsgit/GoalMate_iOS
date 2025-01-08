@@ -1,6 +1,6 @@
 //
-//  LoginSuccessFeature.swift
-//  Login
+//  SignUpSuccessFeature.swift
+//  SignUp
 //
 //  Created by Importants on 1/7/25.
 //
@@ -8,11 +8,11 @@
 import ComposableArchitecture
 
 @Reducer
-public struct LoginSuccessFeature {
+public struct SignUpSuccessFeature {
     @ObservableState
     public struct State: Equatable {
         var nickName: String = "임폴턴트"
-        
+
         public init(nickName: String) {
             self.nickName = nickName
         }

@@ -5,8 +5,8 @@
 //  Created by 이재훈 on 1/8/25.
 //
 
+import FeatureSignUp
 import Foundation
-import Login
 import Sharing
 
 enum AppPath: Codable, Hashable {

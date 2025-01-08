@@ -1,6 +1,6 @@
 //
-//  LoginModifers.swift
-//  Login
+//  SignUpUI.swift
+//  SignUp
 //
 //  Created by 이재훈 on 1/7/25.
 //

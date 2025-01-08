@@ -152,6 +152,7 @@ public struct RoundedButton<Content: View, Style: RoundedButtonStyle>: View {
             .clipShape(.capsule)
             .frame(height: height)
         }
+        .disabled(isDisabled)
     }
 }
 

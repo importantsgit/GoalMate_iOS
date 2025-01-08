@@ -1,6 +1,6 @@
 //
 //  Extension+Image.swift
-//  Common
+//  FeatureCommon
 //
 //  Created by 이재훈 on 1/7/25.
 //

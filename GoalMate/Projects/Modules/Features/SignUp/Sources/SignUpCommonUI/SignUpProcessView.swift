@@ -1,14 +1,14 @@
 //
-//  LoginProcessView.swift
-//  Login
+//  SignUpProcessView.swift
+//  SignUp
 //
 //  Created by 이재훈 on 1/7/25.
 //
 
-import Common
+import FeatureCommon
 import SwiftUI
 
-internal struct LoginProcessView: View {
+internal struct SignUpProcessView: View {
     enum ProcessType {
         case signUp
         case nickname
@@ -118,11 +118,11 @@ fileprivate struct CircleView: View {
 @available(iOS 17.0, *)
 #Preview {
     VStack(spacing: 40) {
-        LoginProcessView(processType: .signUp)
+        SignUpProcessView(processType: .signUp)
             .frame(width: 175)
-        LoginProcessView(processType: .nickname)
+        SignUpProcessView(processType: .nickname)
             .frame(width: 175)
-        LoginProcessView(processType: .complete)
+        SignUpProcessView(processType: .complete)
             .frame(width: 175)
         HStack {
             CircleView(type: .complete, config: .init(subTitle: "", number: 1))
