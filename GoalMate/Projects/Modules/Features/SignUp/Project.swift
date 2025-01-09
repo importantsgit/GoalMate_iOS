@@ -1,16 +1,16 @@
 //
 //  Project.swift
-//  Config
+//  AppManifests
 //
-//  Created by Importants on 1/2/25.
+//  Created by Importants on 1/3/25.
 //
 
 import TuistExtensions
 import ProjectDescription
 
-let featureLogin = Project.framework(
+let featureIntro = Project.framework(
     name: "Feature" + Module.feature(.SignUp).name,
     dependencies: [
-        Module.feature(.Common).project,
+        Module.feature(.Common).project
     ]
 )
