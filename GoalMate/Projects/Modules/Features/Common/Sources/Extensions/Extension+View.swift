@@ -28,10 +28,10 @@ public extension Text {
     func pretendardStyle(
         _ weight: IFont.Pretendard,
         size: CGFloat,
-        color: Color
+        color: Color? = nil
     ) -> Text {
         self
             .font(weight.value.swiftUIFont(size: size))
-            .foregroundColor(color)
+            .foregroundColor(color ?? .black)
     }
 }

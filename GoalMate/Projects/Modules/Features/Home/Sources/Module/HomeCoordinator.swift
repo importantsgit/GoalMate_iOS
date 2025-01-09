@@ -15,6 +15,7 @@ public struct HomeCoordinator {
     @Reducer(state: .equatable)
     public enum Screen {
         case home(HomeFeature)
+        case goalDetail(GoalDetailFeature)
     }
 
     @ObservableState
@@ -41,12 +42,12 @@ public struct HomeCoordinator {
     var core: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-//            case .router(.routeAction(_, action: .signUp(.signUpSucceeded))):
-//                print("move to NicknameView")
-//                state.routes.push(.nickname(.init()))
-//            case let .router(.routeAction(_, action: .nickname(.nicknameSubmitted(nickname)))):
-//                print("move to SuccessView")
-//                state.routes.push(.success(.init(nickName: nickname)))
+            case let .router(.routeAction(_, action: .home(.contentTapped(contentId)))):
+                state.routes.push(.goalDetail(.init(contentId: contentId)))
+                return .none
+            case .router(.routeAction(_, action: .goalDetail(.backButtonTapped))):
+                state.routes.pop()
+                return .none
             default: return .none
             }
         }
@@ -66,6 +67,9 @@ public struct HomeCoordinatorView: View {
             switch screen.case {
             case let .home(store):
                 HomeView(store: store)
+                    .toolbar(.hidden)
+            case let .goalDetail(store):
+                GoalDetailView(store: store)
                     .toolbar(.hidden)
             }
         }

@@ -10,17 +10,19 @@ import SwiftUI
 public extension Colors {
     static let primary = Asset.Assets.primary.swiftUIColor
     static let primary100 = Asset.Assets.primary100.swiftUIColor
+    static let primary800 = Asset.Assets.primary800.swiftUIColor
 
     static let gray200 = Asset.Assets.gray200.swiftUIColor
     static let gray300 = Asset.Assets.gray300.swiftUIColor
     static let gray400 = Asset.Assets.gray400.swiftUIColor
     static let gray600 = Asset.Assets.gray600.swiftUIColor
+    static let gray700 = Asset.Assets.gray700.swiftUIColor
     static let gray900 = Asset.Assets.gray900.swiftUIColor
 
     static let error = Asset.Assets.error.swiftUIColor
     static let success = Asset.Assets.success.swiftUIColor
     static let focused = Asset.Assets.focused.swiftUIColor
-    
+
     static let kakaoBg = Asset.Assets.kakaoBg.swiftUIColor
     static let kakaoText = Asset.Assets.kakaoText.swiftUIColor
 }

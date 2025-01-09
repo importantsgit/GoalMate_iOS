@@ -40,7 +40,7 @@ public struct BorderStyle: RoundedButtonStyle {
         var color: Color
         var width: CGFloat
 
-        init(color: Color, width: CGFloat) {
+        public init(color: Color, width: CGFloat) {
             self.color = color
             self.width = width
         }
@@ -110,8 +110,11 @@ RoundedButton
  ```
 */
 public struct RoundedButton<Content: View, Style: RoundedButtonStyle>: View {
+    
     let buttonType: Style
     let height: CGFloat
+    let horizontalPadding: CGFloat?
+    let verticalPadding: CGFloat?
     @Binding var isDisabled: Bool
     let buttonTapped: () -> Void
     let label: Content
@@ -119,6 +122,8 @@ public struct RoundedButton<Content: View, Style: RoundedButtonStyle>: View {
     public init(
         buttonType: Style = FilledStyle(backgroundColor: .primary),
         height: CGFloat = 54,
+        horizontalPadding: CGFloat? = nil,
+        verticalPadding: CGFloat? = nil,
         isDisabled: Binding<Bool> = .constant(false),
         buttonTapped: @escaping () -> Void,
         @ViewBuilder label: () -> Content
@@ -128,6 +133,8 @@ public struct RoundedButton<Content: View, Style: RoundedButtonStyle>: View {
         self._isDisabled = isDisabled
         self.buttonTapped = buttonTapped
         self.label = label()
+        self.horizontalPadding = horizontalPadding
+        self.verticalPadding = verticalPadding
     }
 
     public var body: some View {
@@ -135,12 +142,20 @@ public struct RoundedButton<Content: View, Style: RoundedButtonStyle>: View {
             guard isDisabled == false else { return }
             buttonTapped()
         } label: {
-            HStack {
-                Spacer()
-                label
-                Spacer()
+            Group {
+                if let horizontalPadding {
+                    label
+                        .padding(.horizontal, horizontalPadding)
+                } else {
+                    HStack {
+                        Spacer()
+                        label
+                        Spacer()
+                    }
+                        .frame(maxHeight: .infinity)
+                }
             }
-            .frame(maxHeight: .infinity)
+            .padding(.vertical, verticalPadding ?? 0)
             .background {
                 if isDisabled == false {
                     buttonType.makeBackground()
