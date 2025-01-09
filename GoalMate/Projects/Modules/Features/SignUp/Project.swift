@@ -8,7 +8,7 @@
 import TuistExtensions
 import ProjectDescription
 
-let featureIntro = Project.framework(
+let featureSignUp = Project.framework(
     name: "Feature" + Module.feature(.SignUp).name,
     dependencies: [
         Module.feature(.Common).project

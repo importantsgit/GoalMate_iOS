@@ -7,7 +7,7 @@
 
 {% if families %}
 {% set accessModifier %}{% if param.publicAccess %}public{% else %}internal{% endif %}{% endset %}
-{% set fontType %}{{param.name}}FontConvertible{% endset %}
+{% set fontType %}FontConvertible{% endset %}
 #if os(macOS)
   import AppKit.NSFont
 #elseif os(iOS) || os(tvOS) || os(watchOS) || os(visionOS)
@@ -53,6 +53,7 @@
     {{accessModifier}} static let all: [{{fontType}}] = [{% for font in family.fonts %}Static.{{font.style|swiftIdentifier:"pretty"|lowerFirstWord|escapeReservedKeywords}}{{ ", " if not forloop.last }}{% endfor %}]
   }
   {% endfor %}
+  
   {{accessModifier}} static let allCustomFonts: [{{fontType}}] = [{% for family in families %}{{family.name|swiftIdentifier:"pretty"|escapeReservedKeywords}}.all{{ ", " if not forloop.last }}{% endfor %}].flatMap { $0 }
   {{accessModifier}} static func registerAllCustomFonts() {
     allCustomFonts.forEach { $0.register() }
