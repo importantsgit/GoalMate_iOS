@@ -13,6 +13,11 @@ public extension Images {
     static let kakaoLogo = Asset.Assets.kakaoLogo.swiftUIImage
     static let loginBanner = Asset.Assets.loginBanner.swiftUIImage
     static let loginSuccessBanner = Asset.Assets.loginSuccessBanner.swiftUIImage
+    static let alarm = Asset.Assets.alarm.swiftUIImage
+    static let goal = Asset.Assets.goal.swiftUIImage
+    static let home = Asset.Assets.home.swiftUIImage
+    static let myPage = Asset.Assets.myPage.swiftUIImage
+    
 }
 
 public extension Image {
