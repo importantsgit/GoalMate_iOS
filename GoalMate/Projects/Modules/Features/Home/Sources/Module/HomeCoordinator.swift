@@ -22,7 +22,7 @@ public struct HomeCoordinator {
         var routes: [Route<Screen.State>]
 
         public init(
-            routes: [Route<Screen.State>] = [.root(.home(.init())), embedInNavigationView: true)]
+            routes: [Route<Screen.State>] = [.root(.home(.init()), embedInNavigationView: true)]
         ) {
             self.routes = routes
         }
@@ -47,9 +47,8 @@ public struct HomeCoordinator {
 //            case let .router(.routeAction(_, action: .nickname(.nicknameSubmitted(nickname)))):
 //                print("move to SuccessView")
 //                state.routes.push(.success(.init(nickName: nickname)))
-//            default: break
-//            }
-            return .none
+            default: return .none
+            }
         }
         .forEachRoute(\.routes, action: \.router)
     }
@@ -66,8 +65,9 @@ public struct HomeCoordinatorView: View {
         TCARouter(store.scope(state: \.routes, action: \.router)) { screen in
             switch screen.case {
             case let .home(store):
-                HomeView(store: store
+                HomeView(store: store)
                     .toolbar(.hidden)
+            }
         }
     }
 }

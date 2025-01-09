@@ -15,7 +15,7 @@ struct AppCoordinator {
     // MARK: - Coordinator 작성
     @Reducer(state: .equatable)
     public enum Screen {
-        case home(IntroCoordinator)
+        case home(HomeCoordinator)
     }
 
     @ObservableState
@@ -25,7 +25,7 @@ struct AppCoordinator {
 
         init(
             appDelegate: AppDelegateReducer.State = AppDelegateReducer.State(),
-            routes: [Route<Screen.State>] = [.root(.signUp(.init()))]
+            routes: [Route<Screen.State>] = [.root(.home(.init()))]
         ) {
             self.appDelegate = appDelegate
             self.routes = routes
