@@ -1,5 +1,7 @@
 .PHONY: generate graph intro signup home all
 
+PROJECT_TYPE ?= "APP"
+
 # Generate 명령어들
 generate:
 	TUIST_ROOT_DIR=${PWD} tuist generate
@@ -18,16 +20,16 @@ generate-home:
 
 # Graph 명령어들
 graph-all:
-	TUIST_TYPE=ALL tuist graph
+	TUIST_TYPE=ALL PROJECT_TYPE=ALL tuist graph
 
 graph-intro:
-	TUIST_TYPE=INTRO tuist graph
+	TUIST_TYPE=INTRO PROJECT_TYPE=INTRO tuist graph
 
 graph-signup:
-	TUIST_TYPE=SIGNUP tuist graph
+	TUIST_TYPE=SIGNUP tuist PROJECT_TYPE=SIGNUP graph
 
 graph-home:
-	TUIST_TYPE=HOME tuist graph
+	TUIST_TYPE=HOME PROJECT_TYPE=HOME tuist graph
 
 APP_DIR = ${PWD}/Projects/App
 
@@ -43,16 +45,17 @@ clean-generate-all: clean generate-all
 clean-generate: clean generate
 
 clean:
-	echo "Closing Xcode..."
-	killall Xcode || true
-	echo "Cleaning Xcode projects in App directory..."
-	cd $(APP_DIR) && rm -rf *.xcodeproj
-	cd $(APP_DIR) && rm -rf Derived/
-	cd $(APP_DIR) && rm -rf Tuist/Dependencies/
-	echo "Clean completed ✨"
-	tuist clean
-
-generate:
-	@echo "Generating Xcode projects..."
-	@tuist generate
-	@echo "Generation completed 🚀"
+	@echo "Closing Xcode..."
+	@killall Xcode || true
+	@echo "Cleaning other Xcode projects except $(PROJECT_TYPE)..."
+	@if [ "$(PROJECT_TYPE)" = "HOME" ]; then \
+		rm -rf $(TUIST_ROOT_DIR)/Projects/App/DemoSignUpFeature.xcodeproj; \
+		rm -rf $(TUIST_ROOT_DIR)/Projects/App/DemoIntroFeature.xcodeproj; \
+	elif [ "$(PROJECT_TYPE)" = "SIGNUP" ]; then \
+		rm -rf $(TUIST_ROOT_DIR)/Projects/App/DemoHomeFeature.xcodeproj; \
+		rm -rf $(TUIST_ROOT_DIR)/Projects/App/DemoIntroFeature.xcodeproj; \
+	elif [ "$(PROJECT_TYPE)" = "INTRO" ]; then \
+		rm -rf $(TUIST_ROOT_DIR)/Projects/App/DemoHomeFeature.xcodeproj; \
+		rm -rf $(TUIST_ROOT_DIR)/Projects/App/DemoSignUpFeature.xcodeproj; \
+	fi
+	@rm -rf $(TUIST_ROOT_DIR)/Projects/App/Derived

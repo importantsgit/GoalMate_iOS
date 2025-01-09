@@ -46,6 +46,7 @@ public struct ProjectType {
     
     public static func getConfig() -> Config {
         let value = projectType
+        print(value)
         switch value {
         case "SIGNUP":
             return Config(
