@@ -9,7 +9,7 @@ struct GoalMateApp: App {
 
     var body: some Scene {
         WindowGroup {
-            AppView(store: self.appDelegate.store)
+            AppCoordinatorView(store: self.appDelegate.store)
         }
         .onChange(of: self.scenePhase) { newPhase in
           self.appDelegate.store.send(.didChangeScenePhase(newPhase))

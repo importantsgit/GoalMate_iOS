@@ -57,12 +57,11 @@ struct AppCoordinator {
             case .didChangeScenePhase:
                 return .none
             }
-            return .none
         }
     }
 }
 
-struct AppView: View {
+struct AppCoordinatorView: View {
     let store: StoreOf<AppCoordinator>
 
     public var body: some View {
@@ -77,7 +76,7 @@ struct AppView: View {
 
 @available(iOS 17.0, *)
 #Preview {
-    AppView(
+    AppCoordinatorView(
         store: Store(
             initialState: AppCoordinator.State.init(),
             reducer: {
