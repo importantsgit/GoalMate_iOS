@@ -24,7 +24,7 @@ extension Project {
                         bundleId: "$(APP_IDENTIFIER)",
                         deploymentTargets: config.deploymentTargets,
                         infoPlist: .file(path: Path.plistPath("Info")),
-                        sources: ["Sources/**"],
+                        sources: config.sources,
                         resources: config.resources,
                         entitlements: .file(path: .entitlementPath("GoalMate")),
                         scripts: config.scripts,
@@ -57,7 +57,7 @@ extension Project {
                     product: .unitTests,
                     bundleId: self.teamId + ".\(config.name)Tests",
                     deploymentTargets: config.deploymentTargets,
-                    sources: ["Tests/**"],
+                    sources: config.testSources,
                     dependencies: [.target(name: config.name)],
                     settings: .settings(
                         configurations: Configuration.makeModuleConfiguration()
