@@ -1,8 +1,8 @@
 //
 //  Project.swift
-//  Config
+//  AppManifests
 //
-//  Created by Importants on 1/2/25.
+//  Created by Importants on 1/3/25.
 //
 
 import TuistExtensions
