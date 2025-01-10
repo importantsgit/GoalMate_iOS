@@ -95,7 +95,8 @@ public struct NicknameView: View {
     @ViewBuilder
     var textField: some View {
         let state = store.textFieldState
-        let error = store.textFieldState == .duplicate || state == .invalid
+        let error = store.textFieldState == .duplicate ||
+                    state == .invalid
         VStack(spacing: 10) {
             ZStack {
                 RoundedRectangle(cornerRadius: 22)

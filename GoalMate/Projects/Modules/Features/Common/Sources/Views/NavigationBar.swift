@@ -7,19 +7,20 @@
 
 import SwiftUI
 
-public struct NavigationBar<LeftContent: View, CenterContent: View, RightContent: View>: View {
-    let verticalPadding: CGFloat
+public struct NavigationBar<
+    LeftContent: View,
+    CenterContent: View,
+    RightContent: View
+>: View {
     let leftContent: LeftContent
     let centerContent: CenterContent
     let rightContent: RightContent
 
     public init(
-        verticalPadding: CGFloat = 0,
         @ViewBuilder leftContent: () -> LeftContent = { Spacer() },
         @ViewBuilder centerContent: () -> CenterContent = { Spacer() },
         @ViewBuilder rightContent: () -> RightContent = { Spacer() }
     ) {
-        self.verticalPadding = verticalPadding
         self.leftContent = leftContent()
         self.centerContent = centerContent()
         self.rightContent = rightContent()
@@ -35,7 +36,6 @@ public struct NavigationBar<LeftContent: View, CenterContent: View, RightContent
                 .frame(maxWidth: .infinity, alignment: .trailing)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, verticalPadding)
     }
 }
 
