@@ -16,11 +16,12 @@ enum FocusableField: Hashable {
 public struct NicknameView: View {
     @State public var store: StoreOf<NicknameFeature>
     @FocusState private var focusedField: FocusableField?
-
+    @State private var keyboardHeight: CGFloat = 0
+    
     public init(store: StoreOf<NicknameFeature>) {
         self.store = store
     }
-
+    
     public var body: some View {
         WithPerceptionTracking {
             VStack {
@@ -41,21 +42,23 @@ public struct NicknameView: View {
                     .frame(height: 44)
                 textField
                 Spacer()
-                RoundedButton(
-                    buttonType: FilledStyle(backgroundColor: Colors.primary),
-                    height: 54,
-                    isDisabled: $store.isSubmitButtonDisabled
-                ) {
-                    store.send(.submitButtonTapped)
-                } label: {
-                    Text("닉네임 입력완료")
-                        .pretendard(
-                            .semiBold,
-                            size: 16,
-                            color: store.isSubmitButtonDisabled ? .white : .black
-                        )
+                if keyboardHeight != 0 {
+                    RoundedButton(
+                        buttonType: FilledStyle(backgroundColor: Colors.primary),
+                        height: 54,
+                        isDisabled: $store.isSubmitButtonDisabled
+                    ) {
+                        store.send(.submitButtonTapped)
+                    } label: {
+                        Text("닉네임 입력완료")
+                            .pretendard(
+                                .semiBold,
+                                size: 16,
+                                color: store.isSubmitButtonDisabled ? .white : .black
+                            )
+                    }
+                    .ignoresSafeArea(.keyboard)  // 전체 키보드 영역 무시
                 }
-                .ignoresSafeArea(.keyboard)  // 전체 키보드 영역 무시
             }
             .background {
                 Color.clear
@@ -64,9 +67,31 @@ public struct NicknameView: View {
             }
             .setMargin()
             .loading(isLoading: $store.isLoading)
+            .onAppear {
+                focusedField = .nickname
+            }
+            .onReceive(
+                NotificationCenter
+                    .default
+                    .publisher(
+                        for: UIResponder.keyboardWillShowNotification
+                    )
+            ) { notification in
+                guard let userInfo = notification.userInfo,
+                      let keyboardRect = userInfo[
+                        UIResponder.keyboardFrameEndUserInfoKey
+                      ] as? CGRect
+                else { return }
+                Task {
+                    print("keyboardHeight: \(keyboardRect)")
+                    await MainActor.run {
+                        self.keyboardHeight = keyboardRect.height
+                    }
+                }
+            }
         }
     }
-
+    
     @ViewBuilder
     var textField: some View {
         let state = store.textFieldState
@@ -77,9 +102,9 @@ public struct NicknameView: View {
                     .stroke(lineWidth: 1)
                     .foregroundStyle(
                         error ?
-                            Colors.error :
+                        Colors.error :
                             (state == .valid ?
-                                Colors.focused :
+                             Colors.focused :
                                 Colors.gray400
                             )
                     )
@@ -94,9 +119,9 @@ public struct NicknameView: View {
                         .regular,
                         size: 16,
                         color: error ?
-                            Colors.error :
+                        Colors.error :
                             (store.textFieldState == .valid ?
-                                Colors.focused :
+                             Colors.focused :
                                 Colors.gray900
                             )
                     )
@@ -110,14 +135,14 @@ public struct NicknameView: View {
                                 .medium,
                                 size: 12,
                                 color: store.isDuplicateCheckButtonDisabled ?
-                                        .white :
+                                    .white :
                                         .black
                             )
                             .padding(.vertical, 6)
                             .padding(.horizontal, 10)
                             .background(
                                 store.isDuplicateCheckButtonDisabled ?
-                                    Colors.gray300 :
+                                Colors.gray300 :
                                     Colors.primary
                             )
                             .clipShape(.capsule)
@@ -136,14 +161,14 @@ public struct NicknameView: View {
                                 .regular,
                                 size: 14,
                                 color: error ?
-                                    Colors.error :
+                                Colors.error :
                                     Colors.focused
                             )
                         Spacer()
                     }
                 }
             }
-
+            
         }
     }
 }
