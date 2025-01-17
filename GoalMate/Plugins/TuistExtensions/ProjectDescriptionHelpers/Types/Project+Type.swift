@@ -42,7 +42,6 @@ public struct ProjectType {
             return ""
         }
     }
-        
     
     public static func getConfig() -> Config {
         let value = projectType
