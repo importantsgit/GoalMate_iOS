@@ -1,5 +1,5 @@
 //
-//  HomeUI.swift
+//  GoalUI.swift
 //  Home
 //
 //  Created by 이재훈 on 1/7/25.

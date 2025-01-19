@@ -11,6 +11,8 @@ import ProjectDescription
 let featureHome = Project.framework(
     name: "Feature" + Module.feature(.Home).name,
     dependencies: [
-        Module.feature(.Common).project
+        Module.feature(.Goal).project,
+        Module.feature(.MyGoal).project,
+        Module.feature(.Profile).project
     ]
 )

@@ -1,6 +1,6 @@
 //
 //  GoalDetailView.swift
-//  FeatureHome
+//  FeatureGoal
 //
 //  Created by 이재훈 on 1/9/25.
 //

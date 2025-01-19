@@ -1,6 +1,6 @@
 //
-//  HomeFeature.swift
-//  Home
+//  GoalFeature.swift
+//  FeatureGoal
 //
 //  Created by Importants on 1/7/25.
 //
