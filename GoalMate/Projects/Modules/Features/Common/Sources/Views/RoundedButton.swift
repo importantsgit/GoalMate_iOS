@@ -110,7 +110,7 @@ RoundedButton
  ```
 */
 public struct RoundedButton<Content: View, Style: RoundedButtonStyle>: View {
-    
+
     let buttonType: Style
     let height: CGFloat
     let horizontalPadding: CGFloat?
@@ -161,7 +161,7 @@ public struct RoundedButton<Content: View, Style: RoundedButtonStyle>: View {
                     buttonType.makeBackground()
                 } else {
                     Rectangle()
-                        .fill(Colors.gray300)
+                        .fill(Colors.grey300)
                 }
             }
             .clipShape(.capsule)

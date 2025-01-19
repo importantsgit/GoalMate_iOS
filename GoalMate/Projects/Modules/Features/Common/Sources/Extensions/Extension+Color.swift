@@ -8,23 +8,36 @@
 import SwiftUI
 
 public extension Colors {
-    static let primary = Asset.Assets.primary.swiftUIColor
-    static let primary100 = Asset.Assets.primary100.swiftUIColor
-    static let primary800 = Asset.Assets.primary800.swiftUIColor
+    static let primary = Asset.Assets.Primary.primary.swiftUIColor
+    static let primary50 = Asset.Assets.Primary.primary50.swiftUIColor
+    static let primary100 = Asset.Assets.Primary.primary100.swiftUIColor
+    static let primary700 = Asset.Assets.Primary.primary700.swiftUIColor
+    static let primary800 = Asset.Assets.Primary.primary800.swiftUIColor
+    static let primary900 = Asset.Assets.Primary.primary900.swiftUIColor
 
-    static let secondaryP = Asset.Assets.secondaryP.swiftUIColor
+    static let secondaryP = Asset.Assets.SecondaryP.secondaryP.swiftUIColor
+    static let secondaryP50 = Asset.Assets.SecondaryP.secondaryP50.swiftUIColor
+    static let secondaryP400 = Asset.Assets.SecondaryP.secondaryP400.swiftUIColor
 
-    static let gray200 = Asset.Assets.gray200.swiftUIColor
-    static let gray300 = Asset.Assets.gray300.swiftUIColor
-    static let gray400 = Asset.Assets.gray400.swiftUIColor
-    static let gray500 = Asset.Assets.gray500.swiftUIColor
-    static let gray600 = Asset.Assets.gray600.swiftUIColor
-    static let gray700 = Asset.Assets.gray700.swiftUIColor
-    static let gray900 = Asset.Assets.gray900.swiftUIColor
+    static let secondaryY50 = Asset.Assets.SecondaryY.secondaryY50.swiftUIColor
+    static let secondaryY700 = Asset.Assets.SecondaryY.secondaryY700.swiftUIColor
+    static let secondaryY800 = Asset.Assets.SecondaryY.secondaryY800.swiftUIColor
 
-    static let error = Asset.Assets.error.swiftUIColor
-    static let success = Asset.Assets.success.swiftUIColor
-    static let focused = Asset.Assets.focused.swiftUIColor
+    static let grey50 = Asset.Assets.Grey.grey50.swiftUIColor
+    static let grey100 = Asset.Assets.Grey.grey100.swiftUIColor
+    static let grey200 = Asset.Assets.Grey.grey200.swiftUIColor
+    static let grey300 = Asset.Assets.Grey.grey300.swiftUIColor
+    static let grey400 = Asset.Assets.Grey.grey400.swiftUIColor
+    static let grey500 = Asset.Assets.Grey.grey500.swiftUIColor
+    static let grey600 = Asset.Assets.Grey.grey600.swiftUIColor
+    static let grey700 = Asset.Assets.Grey.grey700.swiftUIColor
+    static let grey800 = Asset.Assets.Grey.grey800.swiftUIColor
+    static let grey900 = Asset.Assets.Grey.grey900.swiftUIColor
+
+    static let warn = Asset.Assets.System.warn.swiftUIColor
+    static let error = Asset.Assets.System.error.swiftUIColor
+    static let success = Asset.Assets.System.success.swiftUIColor
+    static let focused = Asset.Assets.System.focused.swiftUIColor
 
     static let kakaoBg = Asset.Assets.kakaoBg.swiftUIColor
     static let kakaoText = Asset.Assets.kakaoText.swiftUIColor

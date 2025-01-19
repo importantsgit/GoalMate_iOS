@@ -16,6 +16,7 @@ public struct HomeCoordinator {
     public enum Screen {
         case home(HomeFeature)
         case goalDetail(GoalDetailFeature)
+        case paymentCompleted(PaymentCompletedFeature)
     }
 
     @ObservableState
@@ -43,13 +44,35 @@ public struct HomeCoordinator {
         Reduce { state, action in
             switch action {
             case let .router(.routeAction(_, action: .home(.contentTapped(contentId)))):
-                state.routes.push(.goalDetail(.init(contentId: contentId)))
-                return .none
+                state.routes.push(
+                    .goalDetail(
+                        .init(
+                            contentId: contentId
+                        )
+                    )
+                )
             case .router(.routeAction(_, action: .goalDetail(.backButtonTapped))):
                 state.routes.pop()
-                return .none
+            case let .router(.routeAction(_, action: .goalDetail(.showPaymentCompleted(content)))):
+                state.routes.push(
+                    .paymentCompleted(.init(
+                        content: .init(
+                            id: content.id,
+                            goalSubject: content.details.goalSubject,
+                            mentor: content.details.mentor,
+                            originalPrice: content.originalPrice,
+                            discountedPrice: content.discountedPrice
+                        )
+                    ))
+                )
+            case .router(.routeAction(_, action: .paymentCompleted(.backButtonTapped))):
+                state.routes.pop()
+            case .router(.routeAction(_, action: .paymentCompleted(.startButtonTapped))):
+                // TODO: 로직 수행
+                break
             default: return .none
             }
+            return .none
         }
         .forEachRoute(\.routes, action: \.router)
     }
@@ -64,14 +87,17 @@ public struct HomeCoordinatorView: View {
 
     public var body: some View {
         TCARouter(store.scope(state: \.routes, action: \.router)) { screen in
-            switch screen.case {
-            case let .home(store):
-                HomeView(store: store)
-                    .toolbar(.hidden)
-            case let .goalDetail(store):
-                GoalDetailView(store: store)
-                    .toolbar(.hidden)
+            Group {
+                switch screen.case {
+                case let .home(store):
+                    HomeView(store: store)
+                case let .goalDetail(store):
+                    GoalDetailView(store: store)
+                case let .paymentCompleted(store):
+                    PaymentCompletedView(store: store)
+                }
             }
+            .toolbar(.hidden)
         }
     }
 }

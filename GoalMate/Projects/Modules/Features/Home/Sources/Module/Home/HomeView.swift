@@ -35,85 +35,7 @@ struct HomeView: View {
                             Button {
                                 store.send(.contentTapped(content.id))
                             } label: {
-                                VStack(spacing: 10) {
-                                    CachedImageView(
-                                        store: .init(
-                                            initialState: CachedImageFeature.State.init(
-                                                url: content.imageURL
-                                            ),
-                                            reducer: {
-                                                CachedImageFeature()
-                                            }
-                                        )
-                                    )
-                                    .aspectRatio(158.0/118.0, contentMode: .fit)
-                                    VStack(spacing: 8) {
-                                        Text(content.title)
-                                            .lineLimit(2)
-                                            .truncationMode(.tail)
-                                            .pretendard(.semiBold, size: 18, color: Colors.gray900)
-                                            .frame(maxWidth: .infinity, alignment: .leading)
-                                        VStack(spacing: 4) {
-                                            HStack(spacing: 4) {
-                                                HStack(spacing: 0) {
-                                                    Text(
-                                                        content.discountPercentage,
-                                                        format: .number.precision(.fractionLength(0))
-                                                    )
-                                                    Text("%")
-                                                }
-                                                .pretendard(.semiBold, size: 14, color: Colors.gray400)
-                                                Text("\(content.originalPrice)")
-                                                    .pretendardStyle(
-                                                        .semiBold,
-                                                        size: 13,
-                                                        color: Colors.gray400
-                                                    )
-                                                    .strikethrough(color: Colors.gray400)
-                                                Spacer()
-                                            }
-                                            Text("\(content.discountedPrice)원")
-                                                .pretendardStyle(
-                                                    .medium,
-                                                    size: 18,
-                                                    color: Colors.gray900
-                                                )
-                                                .frame(maxWidth: .infinity, alignment: .leading)
-                                        }
-                                        HStack(spacing: 4) {
-                                            Images.alarm
-                                                .resized(length: 16)
-                                            Text("무료 참여")
-                                                .pretendardStyle(
-                                                    .medium,
-                                                    size: 14,
-                                                    color: Colors.gray700
-                                                )
-                                            HStack(spacing: 0) {
-                                                Text("\(content.currentFreeParticipants)")
-                                                    .pretendardStyle(
-                                                        .medium,
-                                                        size: 14,
-                                                        color: Colors.primary800
-                                                    )
-                                                Text("/\(content.maxFreeParticipants)")
-                                                    .pretendardStyle(
-                                                        .medium,
-                                                        size: 14,
-                                                        color: Colors.gray400
-                                                    )
-                                                Text("명")
-                                                    .pretendardStyle(
-                                                        .medium,
-                                                        size: 14,
-                                                        color: Colors.gray400
-                                                    )
-                                            }
-                                        }
-                                        .frame(maxWidth: .infinity, alignment: .leading)
-                                    }
-                                    Spacer()
-                                }
+                                getGoalContentCell(content: content)
                             }
                         }
                     }
@@ -123,6 +45,90 @@ struct HomeView: View {
             .onAppear {
                 store.send(.onAppear)
             }
+        }
+    }
+
+    @ViewBuilder
+    func getGoalContentCell(content: GoalContent) -> some View {
+        VStack(spacing: 10) {
+            ZStack {
+                CachedImageView(
+                    store: .init(
+                        initialState: CachedImageFeature.State.init(
+                            url: content.imageURL
+                        ),
+                        reducer: {
+                            CachedImageFeature()
+                        }
+                    )
+                )
+                if content.remainingCapacity == 0 {
+                    Colors.grey300
+                        .overlay {
+                            Images.comingSoon
+                                .resizable()
+                                .aspectRatio(158/64, contentMode: .fit)
+                        }
+                }
+            }
+            .clipShape(.rect(cornerRadius: 4))
+            .aspectRatio(158.0/118.0, contentMode: .fit)
+
+            VStack(alignment: .leading, spacing: 8) {
+                Text(content.title.splitCharacters())
+                    .lineLimit(2)
+                    .truncationMode(.tail)
+                    .multilineTextAlignment(.leading)
+                    .pretendard(.semiBold, size: 18, color: Colors.grey900)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                AvailableTagView(
+                    remainingCapacity: content.remainingCapacity,
+                    currentParticipants: content.currentParticipants,
+                    size: .small
+                )
+                if 1...10 ~= content.remainingCapacity {
+                    TagView(
+                        title: "마감임박",
+                        backgroundColor: Colors.secondaryY700
+                    )
+                }
+
+                VStack(spacing: 4) {
+                    HStack(spacing: 4) {
+                        HStack(spacing: 0) {
+                            Text(
+                                content.discountPercentage,
+                                format: .number
+                                    .precision(
+                                        .fractionLength(0)
+                                    )
+                            )
+                            Text("%")
+                        }
+                        .pretendard(
+                            .medium,
+                            size: 12,
+                            color: Colors.secondaryP
+                        )
+                        Text("\(content.originalPrice)")
+                            .pretendardStyle(
+                                .regular,
+                                size: 12,
+                                color: Colors.grey500
+                            )
+                            .strikethrough(color: Colors.grey400)
+                        Spacer()
+                    }
+                    Text("\(content.discountedPrice)원")
+                        .pretendardStyle(
+                            .regular,
+                            size: 16,
+                            color: Colors.grey900
+                        )
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+            }
+            Spacer()
         }
     }
 }

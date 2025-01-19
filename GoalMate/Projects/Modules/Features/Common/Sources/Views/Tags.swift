@@ -8,39 +8,80 @@
 import SwiftUI
 
 public struct AvailableTagView: View {
-    let capacity: Int
-    let available: Int
+    public enum Size {
+        case small
+        case large
+    }
+    let remainingCapacity: Int
+    let currentParticipants: Int
+    let size: Size
 
-    public init(capacity: Int, available: Int) {
-        self.capacity = capacity
-        self.available = available
+    public init(
+        remainingCapacity: Int,
+        currentParticipants: Int,
+        size: Size = .small
+    ) {
+        self.remainingCapacity = remainingCapacity
+        self.currentParticipants = currentParticipants
+        self.size = size
     }
 
     public var body: some View {
-        HStack(spacing: 2) {
+        let hasNoCapacity: Bool = remainingCapacity == 0
+        let isLarge = size == .large
+        HStack(spacing: isLarge ? 4 : 2) {
             HStack(spacing: 2) {
-                Text("\(capacity)")
-                    .pretendardStyle(.bold, size: 14, color: .white)
+                Text("\(remainingCapacity)")
+                    .pretendardStyle(
+                        .medium,
+                        size: isLarge ? 17 : 14,
+                        color: .white
+                    )
                 Text("잔여")
-                    .pretendardStyle(.medium, size: 13, color: .white)
+                    .pretendardStyle(
+                        .medium,
+                        size: isLarge ? 13 : 11,
+                        color: .white
+                    )
             }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 5)
+            .padding(.leading, 8)
+            .padding(.trailing, isLarge ? 10 : 8)
+            .padding(.vertical, 3)
             .background {
                 GeometryReader { geometry in
                     makeBackgroundPath(in: geometry)
-                        .fill(Colors.secondaryP)
+                        .fill(
+                            hasNoCapacity ?
+                                Colors.grey500 :
+                                Colors.secondaryP400
+                        )
                 }
             }
             HStack(spacing: 2) {
-                Text("\(available)")
-                    .pretendardStyle(.bold, size: 14, color: Colors.secondaryP)
+                Text("\(currentParticipants)")
+                    .pretendardStyle(
+                        .medium,
+                        size: isLarge ? 17 : 14,
+                        color: hasNoCapacity ?
+                            Colors.grey600 :
+                            Colors.secondaryP
+                    )
                 Text("참여중")
-                    .pretendardStyle(.medium, size: 13, color: Colors.secondaryP)
+                    .pretendardStyle(
+                        .medium,
+                        size: isLarge ? 13 : 11,
+                        color: hasNoCapacity ?
+                            Colors.grey600 :
+                            Colors.secondaryP
+                    )
             }
         }
         .padding(.trailing, 8)
-        .background(Color.purple.opacity(0.2))
+        .background(
+            hasNoCapacity ?
+                Colors.grey200 :
+                Colors.secondaryP50
+        )
         .clipShape(.rect(cornerRadius: 6))
     }
 
@@ -89,13 +130,20 @@ public struct TagView: View {
 
 @available(iOS 17.0, *)
 #Preview {
-    AvailableTagView(
-        capacity: 10,
-        available: 20
-    )
-
-    TagView(
-        title: "마감임박",
-        backgroundColor: .blue
-    )
+    VStack {
+        AvailableTagView(
+            remainingCapacity: 10,
+            currentParticipants: 20,
+            size: .small
+        )
+        AvailableTagView(
+            remainingCapacity: 0,
+            currentParticipants: 20,
+            size: .large
+        )
+        TagView(
+            title: "마감임박",
+            backgroundColor: Colors.secondaryY700
+        )
+    }
 }

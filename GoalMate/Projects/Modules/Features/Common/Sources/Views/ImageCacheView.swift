@@ -119,11 +119,11 @@ public struct CachedImageView: View {
                 } else if store.isLoading {
                     ProgressView()
                 } else {
-                    Colors.gray200
+                    Colors.grey200
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(Colors.gray200)
+            .background(Colors.grey200)
             .onAppear {
                 store.send(.onAppear)
             }

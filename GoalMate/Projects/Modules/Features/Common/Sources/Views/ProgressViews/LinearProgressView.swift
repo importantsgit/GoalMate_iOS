@@ -33,7 +33,7 @@ public struct LinearProgressView: View {
             if let title {
                 HStack {
                     Text(title)
-                        .pretendardStyle(.semiBold, size: 16, color: Colors.gray700)
+                        .pretendardStyle(.semiBold, size: 16, color: Colors.grey700)
                     Spacer()
                 }
             }
@@ -63,7 +63,7 @@ public struct LinearProgressView: View {
                 HStack {
                     Spacer()
                     Text("\(Int(calculateProgress(progress) * 100))%")
-                        .pretendardStyle(.semiBold, size: 16, color: Colors.gray700)
+                        .pretendardStyle(.semiBold, size: 16, color: Colors.grey700)
                 }
             }
         }

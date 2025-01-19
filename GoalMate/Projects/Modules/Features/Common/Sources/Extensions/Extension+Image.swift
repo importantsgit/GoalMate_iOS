@@ -20,6 +20,10 @@ public extension Images {
     static let placeholder = Asset.Assets.placeholder.swiftUIImage
     static let back = Asset.Assets.back.swiftUIImage
     static let bell = Asset.Assets.bell.swiftUIImage
+    static let comingSoon = Asset.Assets.comingSoon.swiftUIImage
+    static let paymentCompleted = Asset.Assets.paymentCompleted.swiftUIImage
+    static let warning = Asset.Assets.warning.swiftUIImage
+    static let danger = Asset.Assets.danger.swiftUIImage
 }
 
 public extension Image {

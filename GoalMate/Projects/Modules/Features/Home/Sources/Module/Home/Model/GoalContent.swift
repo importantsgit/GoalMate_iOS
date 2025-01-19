@@ -15,9 +15,9 @@ public struct GoalContent: Identifiable, Equatable {
     public let originalPrice: Int         // 원래 가격
     public let discountedPrice: Int       // 할인된 가격
 
-    // 무료 참여 인원 관련
-    public let maxFreeParticipants: Int      // 최대 무료 참여 가능 인원
-    public let currentFreeParticipants: Int  // 현재 무료 참여 인원
+    public let maxOccupancy: Int           // 최대 인원수
+    public let remainingCapacity: Int      // 참가 가능한 인원수
+    public let currentParticipants: Int    // 참여하고 있는 인원 수
 
     public let imageURL: String
 
@@ -27,8 +27,9 @@ public struct GoalContent: Identifiable, Equatable {
         discountPercentage: Double,
         originalPrice: Int,
         discountedPrice: Int,
-        maxFreeParticipants: Int,
-        currentFreeParticipants: Int,
+        maxOccupancy: Int,
+        remainingCapacity: Int,
+        currentParticipants: Int,
         imageURL: String
     ) {
         self.id = id
@@ -36,8 +37,9 @@ public struct GoalContent: Identifiable, Equatable {
         self.discountPercentage = discountPercentage
         self.originalPrice = originalPrice
         self.discountedPrice = discountedPrice
-        self.maxFreeParticipants = maxFreeParticipants
-        self.currentFreeParticipants = currentFreeParticipants
+        self.maxOccupancy = maxOccupancy
+        self.remainingCapacity = remainingCapacity
+        self.currentParticipants = currentParticipants
         self.imageURL = imageURL
     }
 }
@@ -48,7 +50,9 @@ extension GoalContent {
                let originalPrice = [15000, 20000, 25000, 30000, 40000].randomElement() ?? 100000
                let discountPercentage = [0, 10, 15, 20, 30].randomElement() ?? 10
                let discountedPrice = originalPrice - (originalPrice * discountPercentage / 100)
-               let maxFree = [30, 50, 100, 150, 200].randomElement() ?? 100
+               let maxOccupancy = [30, 50, 100, 150, 200].randomElement() ?? 100
+               let remainingCapacity = Int.random(in: 0...maxOccupancy)
+
                return .init(
                    id: "\(index)",
                    title: [
@@ -62,8 +66,9 @@ extension GoalContent {
                    discountPercentage: Double(discountPercentage),
                    originalPrice: originalPrice,
                    discountedPrice: Int(discountedPrice),
-                   maxFreeParticipants: maxFree,
-                   currentFreeParticipants: Int.random(in: 0...maxFree),
+                   maxOccupancy: maxOccupancy,
+                   remainingCapacity: remainingCapacity,
+                   currentParticipants: maxOccupancy - remainingCapacity,
                    imageURL: [
                     "https://picsum.photos/seed/picsum/200/300",
                     "https://picsum.photos/seed/picsum/200/300",
