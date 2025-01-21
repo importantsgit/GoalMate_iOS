@@ -10,7 +10,7 @@ import ProjectDescription
 
 let homeDependencies: [TargetDependency] = [
     Module.feature(.Home).project,
-    Module.feature(.Common).project
+    Module.Utils.project
 ]
 
 let homeFeatureDemo = Project.app(

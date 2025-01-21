@@ -13,6 +13,7 @@ let featureHome = Project.framework(
     dependencies: [
         Module.feature(.Goal).project,
         Module.feature(.MyGoal).project,
-        Module.feature(.Profile).project
+        Module.feature(.Profile).project,
+        Module.Utils.project
     ]
 )
