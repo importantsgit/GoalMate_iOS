@@ -1,6 +1,6 @@
 //
 //  AppCoordinator.swift
-//  DemoSignUpFeature
+//  DemoHomeFeature
 //
 //  Created by Importants on 1/8/25.
 //

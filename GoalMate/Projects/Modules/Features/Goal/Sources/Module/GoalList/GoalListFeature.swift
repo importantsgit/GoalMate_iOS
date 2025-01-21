@@ -1,5 +1,5 @@
 //
-//  GoalFeature.swift
+//  GoalListFeature.swift
 //  FeatureGoal
 //
 //  Created by Importants on 1/7/25.
@@ -8,7 +8,7 @@
 import ComposableArchitecture
 
 @Reducer
-public struct HomeFeature {
+public struct GoalListFeature {
     public init() {}
     @ObservableState
     public struct State: Equatable {

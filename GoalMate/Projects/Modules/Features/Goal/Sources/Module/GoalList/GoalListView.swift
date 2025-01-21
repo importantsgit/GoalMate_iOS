@@ -1,6 +1,6 @@
 //
-//  HomeView.swift
-//  Home
+//  GoalListView.swift
+//  FeatureGoal
 //
 //  Created by Importants on 1/7/25.
 //
@@ -10,8 +10,8 @@ import FeatureCommon
 import SwiftUI
 import Utils
 
-struct HomeView: View {
-    @State var store: StoreOf<HomeFeature>
+struct GoalListView: View {
+    @State var store: StoreOf<GoalListFeature>
 
     var body: some View {
         WithPerceptionTracking {
@@ -135,13 +135,13 @@ struct HomeView: View {
 
 @available(iOS 17.0, *)
 #Preview {
-    HomeView(
+    GoalListView(
         store: Store(
-            initialState: HomeFeature.State.init(
+            initialState: GoalListFeature.State.init(
                 goalContents: GoalContent.dummies
             ),
             reducer: {
-                HomeFeature()
+                GoalListFeature()
             }
         )
     )

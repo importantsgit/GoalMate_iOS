@@ -1,11 +1,14 @@
 //
 //  HomeCoordinator.swift
-//  SignUp
+//  Home
 //
 //  Created by Importants on 1/8/25.
 //
 
 import ComposableArchitecture
+import FeatureGoal
+import FeatureMyGoal
+import FeatureProfile
 import SwiftUI
 import TCACoordinators
 
@@ -14,9 +17,8 @@ public struct HomeCoordinator {
     public init() {}
     @Reducer(state: .equatable)
     public enum Screen {
-        case home(HomeFeature)
-        case goalDetail(GoalDetailFeature)
-        case paymentCompleted(PaymentCompletedFeature)
+        case goal(GoalCoordinator)
+        case myGoal(MyGoalCoordinator)
     }
 
     @ObservableState
@@ -24,7 +26,7 @@ public struct HomeCoordinator {
         var routes: [Route<Screen.State>]
 
         public init(
-            routes: [Route<Screen.State>] = [.root(.home(.init()), embedInNavigationView: true)]
+            routes: [Route<Screen.State>] = [.root(.goal(.init()), embedInNavigationView: true)]
         ) {
             self.routes = routes
         }
@@ -43,7 +45,7 @@ public struct HomeCoordinator {
     var core: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-            case let .router(.routeAction(_, action: .home(.contentTapped(contentId)))):
+            case let .router(.routeAction(_, action: .goal(.contentTapped(contentId)))):
                 state.routes.push(
                     .goalDetail(
                         .init(
@@ -89,12 +91,10 @@ public struct HomeCoordinatorView: View {
         TCARouter(store.scope(state: \.routes, action: \.router)) { screen in
             Group {
                 switch screen.case {
-                case let .home(store):
-                    HomeView(store: store)
-                case let .goalDetail(store):
-                    GoalDetailView(store: store)
-                case let .paymentCompleted(store):
-                    PaymentCompletedView(store: store)
+                case let .goal(store):
+                    GoalCoordinatorView(store: store)
+                case let .myGoal(store):
+                    MyGoalCoordinatorView(store: store)
                 }
             }
             .toolbar(.hidden)
