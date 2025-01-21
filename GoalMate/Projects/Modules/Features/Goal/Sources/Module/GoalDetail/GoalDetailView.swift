@@ -9,10 +9,17 @@ import ComposableArchitecture
 import FeatureCommon
 import SwiftUI
 
-struct GoalDetailView: View {
-    @State var progress = 0.1
+public struct GoalDetailView: View {
+    @State var progress: Double
     @State var store: StoreOf<GoalDetailFeature>
-    var body: some View {
+    init(
+        progress: Double = 0.1,
+        store: StoreOf<GoalDetailFeature>
+    ) {
+        self.progress = progress
+        self.store = store
+    }
+    public var body: some View {
         WithPerceptionTracking {
             ZStack {
                 VStack {

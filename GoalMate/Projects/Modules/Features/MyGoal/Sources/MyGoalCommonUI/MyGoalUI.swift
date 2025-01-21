@@ -1,5 +1,5 @@
 //
-//  GoalUI.swift
+//  MyGoalUI.swift
 //  Goal
 //
 //  Created by 이재훈 on 1/7/25.
@@ -12,8 +12,7 @@ internal extension View {
     func setMargin() -> some View {
         self.modifier(
             MarginModifier(
-                horizontal: 20,
-                bottom: 16
+                horizontal: 20
             )
         )
     }

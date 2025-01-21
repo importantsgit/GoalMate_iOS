@@ -1,12 +1,12 @@
 //
 //  AppCoordinator.swift
-//  DemoHomeFeature
+//  DemoSignUpFeature
 //
 //  Created by Importants on 1/8/25.
 //
 
 import ComposableArchitecture
-import FeatureHome
+import FeatureSignUp
 import SwiftUI
 import TCACoordinators
 
@@ -15,7 +15,7 @@ struct AppCoordinator {
     // MARK: - Coordinator 작성
     @Reducer(state: .equatable)
     public enum Screen {
-        case home(TabCoordinator)
+        case signUp(SignUpCoordinator)
     }
 
     @ObservableState
@@ -23,9 +23,9 @@ struct AppCoordinator {
         public var appDelegate: AppDelegateReducer.State
         var routes: [Route<Screen.State>]
 
-        public init(
+        init(
             appDelegate: AppDelegateReducer.State = AppDelegateReducer.State(),
-            routes: [Route<Screen.State>] = [.root(.home(.init()), embedInNavigationView: true)]
+            routes: [Route<Screen.State>] = [.root(.signUp(.init()))]
         ) {
             self.appDelegate = appDelegate
             self.routes = routes
@@ -67,8 +67,8 @@ struct AppCoordinatorView: View {
     public var body: some View {
         TCARouter(store.scope(state: \.routes, action: \.router)) { screen in
             switch screen.case {
-            case let .home(store):
-                TabCoordinatorView(store: store)
+            case let .signUp(store):
+                SignUpCoordinatorView(store: store)
             }
         }
     }

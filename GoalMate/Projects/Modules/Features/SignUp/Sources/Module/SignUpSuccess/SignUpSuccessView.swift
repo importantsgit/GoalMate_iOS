@@ -36,7 +36,7 @@ struct SignUpSuccessView: View {
                             Text("축하해요\n\(store.nickName)님,\n바로 첫 목표를 시작해보세요!")
                                 .lineLimit(nil)
                                 .multilineTextAlignment(.center)
-                                .pretendard(.semiBold, size: 18, color: Colors.gray900)
+                                .pretendard(.semiBold, size: 18, color: Colors.grey900)
                             Spacer()
                         }
                     }

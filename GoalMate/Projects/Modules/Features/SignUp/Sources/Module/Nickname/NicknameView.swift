@@ -106,7 +106,7 @@ public struct NicknameView: View {
                         Colors.error :
                             (state == .valid ?
                              Colors.focused :
-                                Colors.gray400
+                                Colors.grey400
                             )
                     )
                 HStack {
@@ -114,7 +114,7 @@ public struct NicknameView: View {
                         "",
                         text: $store.nickname,
                         prompt: Text("2~5글자 닉네임을 입력해주세요.")
-                            .pretendardStyle(.regular, size: 16, color: Colors.gray400)
+                            .pretendardStyle(.regular, size: 16, color: Colors.grey400)
                     )
                     .pretendard(
                         .regular,
@@ -123,7 +123,7 @@ public struct NicknameView: View {
                         Colors.error :
                             (store.textFieldState == .valid ?
                              Colors.focused :
-                                Colors.gray900
+                                Colors.grey900
                             )
                     )
                     .labelsHidden()
@@ -143,7 +143,7 @@ public struct NicknameView: View {
                             .padding(.horizontal, 10)
                             .background(
                                 store.isDuplicateCheckButtonDisabled ?
-                                Colors.gray300 :
+                                Colors.grey300 :
                                     Colors.primary
                             )
                             .clipShape(.capsule)

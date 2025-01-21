@@ -38,6 +38,10 @@ public struct ProjectType {
             return "../Demos/IntroFeatureDemo/"
         case "HOME":
             return "../Demos/HomeFeatureDemo/"
+        case "MYGOAL":
+            return "../Demos/MyGoalFeatureDemo/"
+        case "GOAL":
+            return "../Demos/GoalFeatureDemo/"
         default:
             return ""
         }
@@ -80,6 +84,34 @@ public struct ProjectType {
                 name: "DemoHomeFeature",
                 dependencies: [
                     Module.feature(.Home).project,
+                    Module.feature(.Common).project
+                ],
+                sources: [
+                    "\(getSourcePath(value))Sources/**",
+                ],
+                testSources: [
+                    "\(getSourcePath(value))Tests/**",
+                ]
+            )
+        case "GOAL":
+            return Config(
+                name: "DemoGoalFeature",
+                dependencies: [
+                    Module.feature(.Goal).project,
+                    Module.feature(.Common).project
+                ],
+                sources: [
+                    "\(getSourcePath(value))Sources/**",
+                ],
+                testSources: [
+                    "\(getSourcePath(value))Tests/**",
+                ]
+            )
+        case "MYGOAL":
+            return Config(
+                name: "DemoMyGoalFeature",
+                dependencies: [
+                    Module.feature(.MyGoal).project,
                     Module.feature(.Common).project
                 ],
                 sources: [

@@ -23,10 +23,11 @@ let goal = MyGoalContent(
     progress: 30,
     startDate: Date(),
     endDate: Date().addingTimeInterval(86400 * 30)
+    imageURL: "sdsds"
 )
 ```
 */
-public struct MyGoalContent: Identifiable {
+public struct MyGoalContent: Identifiable, Equatable {
     public let id: Int
     /**
       목표의 제목
@@ -45,6 +46,9 @@ public struct MyGoalContent: Identifiable {
      목표 마감일
      */
     let endDate: Date
+
+    let imageURL: String
+
     /**
      목표의 기간 만료 여부
      
@@ -66,13 +70,15 @@ public struct MyGoalContent: Identifiable {
         title: String,
         progress: CGFloat,
         startDate: Date,
-        endDate: Date
+        endDate: Date,
+        imageURL: String
     ) {
         self.id = id
         self.title = title
         self.progress = progress
         self.startDate = startDate
         self.endDate = endDate
+        self.imageURL = imageURL
     }
 }
 
@@ -84,51 +90,58 @@ extension MyGoalContent {
             title: "매일 30분 운동하기",
             progress: 0,
             startDate: Date(),
-            endDate: Date().addingTimeInterval(86400 * 30)
+            endDate: Date().addingTimeInterval(86400 * 30),
+            imageURL: "https://picsum.photos/seed/picsum/200/300"
         ),
         MyGoalContent(
             id: 2,
             title: "책 10권 읽기",
-            progress: 50,
+            progress: 0.4,
             startDate: Date().addingTimeInterval(-86400 * 15),
-            endDate: Date().addingTimeInterval(86400 * 15)
+            endDate: Date().addingTimeInterval(86400 * 15),
+            imageURL: "https://picsum.photos/seed/picsum/200/300"
         ),
         MyGoalContent(
             id: 3,
             title: "프로그래밍 공부",
-            progress: 90,
+            progress: 0.6,
             startDate: Date().addingTimeInterval(-86400 * 25),
-            endDate: Date().addingTimeInterval(86400 * 5)
+            endDate: Date().addingTimeInterval(86400 * 5),
+            imageURL: "https://picsum.photos/seed/picsum/200/300"
         ),
         // 완료된 목표들
         MyGoalContent(
             id: 4,
             title: "건강한 식단 관리",
-            progress: 100,
+            progress: 0.2,
             startDate: Date().addingTimeInterval(-86400 * 60),
-            endDate: Date().addingTimeInterval(-86400 * 30)
+            endDate: Date().addingTimeInterval(-86400 * 30),
+            imageURL: "https://picsum.photos/seed/picsum/200/300"
         ),
         MyGoalContent(
             id: 5,
             title: "아침 명상하기",
-            progress: 100,
+            progress: 0.7,
             startDate: Date().addingTimeInterval(-86400 * 45),
-            endDate: Date().addingTimeInterval(-86400 * 15)
+            endDate: Date().addingTimeInterval(-86400 * 15),
+            imageURL: "https://picsum.photos/seed/picsum/200/300"
         ),
         // 만료된 목표들
         MyGoalContent(
             id: 6,
             title: "블로그 작성하기",
-            progress: 60,
+            progress: 0.4,
             startDate: Date().addingTimeInterval(-86400 * 40),
-            endDate: Date().addingTimeInterval(-86400 * 10)
+            endDate: Date().addingTimeInterval(-86400 * 10),
+            imageURL: "https://picsum.photos/seed/picsum/200/300"
         ),
         MyGoalContent(
             id: 7,
             title: "새 언어 배우기",
-            progress: 30,
+            progress: 1,
             startDate: Date().addingTimeInterval(-86400 * 30),
-            endDate: Date().addingTimeInterval(-86400 * 5)
+            endDate: Date().addingTimeInterval(-86400 * 5),
+            imageURL: "https://picsum.photos/seed/picsum/200/300"
         )
     ]
 

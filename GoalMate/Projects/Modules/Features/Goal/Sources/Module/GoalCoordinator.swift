@@ -43,36 +43,36 @@ public struct GoalCoordinator {
     @ReducerBuilder<State, Action>
     var core: some Reducer<State, Action> {
         Reduce { state, action in
-//            switch action {
-//            case let .router(.routeAction(_, action: .home(.contentTapped(contentId)))):
-//                state.routes.push(
-//                    .goalDetail(
-//                        .init(
-//                            contentId: contentId
-//                        )
-//                    )
-//                )
-//            case .router(.routeAction(_, action: .goalDetail(.backButtonTapped))):
-//                state.routes.pop()
-//            case let .router(.routeAction(_, action: .goalDetail(.showPaymentCompleted(content)))):
-//                state.routes.push(
-//                    .paymentCompleted(.init(
-//                        content: .init(
-//                            id: content.id,
-//                            goalSubject: content.details.goalSubject,
-//                            mentor: content.details.mentor,
-//                            originalPrice: content.originalPrice,
-//                            discountedPrice: content.discountedPrice
-//                        )
-//                    ))
-//                )
-//            case .router(.routeAction(_, action: .paymentCompleted(.backButtonTapped))):
-//                state.routes.pop()
-//            case .router(.routeAction(_, action: .paymentCompleted(.startButtonTapped))):
-//                // TODO: 로직 수행
-//                break
-//            default: return .none
-//            }
+            switch action {
+            case let .router(.routeAction(_, action: .goalList(.contentTapped(contentId)))):
+                state.routes.push(
+                    .goalDetail(
+                        .init(
+                            contentId: contentId
+                        )
+                    )
+                )
+            case .router(.routeAction(_, action: .goalDetail(.backButtonTapped))):
+                state.routes.pop()
+            case let .router(.routeAction(_, action: .goalDetail(.showPaymentCompleted(content)))):
+                state.routes.push(
+                    .paymentCompleted(.init(
+                        content: .init(
+                            id: content.id,
+                            goalSubject: content.details.goalSubject,
+                            mentor: content.details.mentor,
+                            originalPrice: content.originalPrice,
+                            discountedPrice: content.discountedPrice
+                        )
+                    ))
+                )
+            case .router(.routeAction(_, action: .paymentCompleted(.backButtonTapped))):
+                state.routes.pop()
+            case .router(.routeAction(_, action: .paymentCompleted(.startButtonTapped))):
+                // TODO: 로직 수행
+                break
+            default: return .none
+            }
             return .none
         }
         .forEachRoute(\.routes, action: \.router)

@@ -50,85 +50,78 @@ struct GoalListView: View {
 
     @ViewBuilder
     func getGoalContentCell(content: GoalContent) -> some View {
-        VStack(spacing: 10) {
-            ZStack {
-                CachedImageView(
-                    store: .init(
-                        initialState: CachedImageFeature.State.init(
-                            url: content.imageURL
-                        ),
-                        reducer: {
-                            CachedImageFeature()
-                        }
-                    )
-                )
-                if content.remainingCapacity == 0 {
-                    Colors.grey300
-                        .overlay {
-                            Images.comingSoon
-                                .resizable()
-                                .aspectRatio(158/64, contentMode: .fit)
-                        }
+        WithPerceptionTracking {
+            VStack(spacing: 10) {
+                ZStack {
+                    CachedImageView(url: content.imageURL)
+                    if content.remainingCapacity == 0 {
+                        Colors.grey300
+                            .overlay {
+                                Images.comingSoon
+                                    .resizable()
+                                    .aspectRatio(158/64, contentMode: .fit)
+                            }
+                    }
                 }
-            }
-            .clipShape(.rect(cornerRadius: 4))
-            .aspectRatio(158.0/118.0, contentMode: .fit)
+                .clipShape(.rect(cornerRadius: 4))
+                .aspectRatio(158.0/118.0, contentMode: .fit)
 
-            VStack(alignment: .leading, spacing: 8) {
-                Text(content.title.splitCharacters())
-                    .lineLimit(2)
-                    .truncationMode(.tail)
-                    .multilineTextAlignment(.leading)
-                    .pretendard(.semiBold, size: 18, color: Colors.grey900)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                AvailableTagView(
-                    remainingCapacity: content.remainingCapacity,
-                    currentParticipants: content.currentParticipants,
-                    size: .small
-                )
-                if 1...10 ~= content.remainingCapacity {
-                    TagView(
-                        title: "마감임박",
-                        backgroundColor: Colors.secondaryY700
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(content.title.splitCharacters())
+                        .lineLimit(2)
+                        .truncationMode(.tail)
+                        .multilineTextAlignment(.leading)
+                        .pretendard(.semiBold, size: 18, color: Colors.grey900)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    AvailableTagView(
+                        remainingCapacity: content.remainingCapacity,
+                        currentParticipants: content.currentParticipants,
+                        size: .small
                     )
-                }
-
-                VStack(spacing: 4) {
-                    HStack(spacing: 4) {
-                        HStack(spacing: 0) {
-                            Text(
-                                content.discountPercentage,
-                                format: .number
-                                    .precision(
-                                        .fractionLength(0)
-                                    )
-                            )
-                            Text("%")
-                        }
-                        .pretendard(
-                            .medium,
-                            size: 12,
-                            color: Colors.secondaryP
+                    if 1...10 ~= content.remainingCapacity {
+                        TagView(
+                            title: "마감임박",
+                            backgroundColor: Colors.secondaryY700
                         )
-                        Text("\(content.originalPrice)")
+                    }
+
+                    VStack(spacing: 4) {
+                        HStack(spacing: 4) {
+                            HStack(spacing: 0) {
+                                Text(
+                                    content.discountPercentage,
+                                    format: .number
+                                        .precision(
+                                            .fractionLength(0)
+                                        )
+                                )
+                                Text("%")
+                            }
+                            .pretendard(
+                                .medium,
+                                size: 12,
+                                color: Colors.secondaryP
+                            )
+                            Text("\(content.originalPrice)")
+                                .pretendardStyle(
+                                    .regular,
+                                    size: 12,
+                                    color: Colors.grey500
+                                )
+                                .strikethrough(color: Colors.grey400)
+                            Spacer()
+                        }
+                        Text("\(content.discountedPrice)원")
                             .pretendardStyle(
                                 .regular,
-                                size: 12,
-                                color: Colors.grey500
+                                size: 16,
+                                color: Colors.grey900
                             )
-                            .strikethrough(color: Colors.grey400)
-                        Spacer()
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    Text("\(content.discountedPrice)원")
-                        .pretendardStyle(
-                            .regular,
-                            size: 16,
-                            color: Colors.grey900
-                        )
-                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
+                Spacer()
             }
-            Spacer()
         }
     }
 }

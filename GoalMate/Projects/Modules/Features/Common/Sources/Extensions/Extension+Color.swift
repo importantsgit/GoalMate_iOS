@@ -19,6 +19,7 @@ public extension Colors {
     static let secondaryP50 = Asset.Assets.SecondaryP.secondaryP50.swiftUIColor
     static let secondaryP400 = Asset.Assets.SecondaryP.secondaryP400.swiftUIColor
 
+    static let secondaryY = Asset.Assets.SecondaryY.secondaryY.swiftUIColor
     static let secondaryY50 = Asset.Assets.SecondaryY.secondaryY50.swiftUIColor
     static let secondaryY700 = Asset.Assets.SecondaryY.secondaryY700.swiftUIColor
     static let secondaryY800 = Asset.Assets.SecondaryY.secondaryY800.swiftUIColor

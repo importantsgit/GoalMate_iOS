@@ -101,8 +101,11 @@ public struct CachedImageFeature {
 public struct CachedImageView: View {
     let store: StoreOf<CachedImageFeature>
 
-    public init(store: StoreOf<CachedImageFeature>) {
-        self.store = store
+    public init(url: String) {
+        self.store = Store(
+            initialState: CachedImageFeature.State.init(url: url)) {
+                CachedImageFeature()
+            }
     }
 
     public var body: some View {
@@ -143,24 +146,8 @@ extension View {
 // MARK: - Preview
 #Preview {
     VStack {
-        CachedImageView(
-            store: Store(
-                initialState: CachedImageFeature.State(
-                    url: "https://picsum.photos/200"
-                )
-            ) {
-                CachedImageFeature()
-            }
-        )
-        CachedImageView(
-            store: Store(
-                initialState: CachedImageFeature.State(
-                    url: "https://picsum.photo"
-                )
-            ) {
-                CachedImageFeature()
-            }
-        )
+        CachedImageView(url: "https://picsum.photos/200")
+        CachedImageView(url: "https://picsum.photo")
     }
     .frame(width: 200)
 

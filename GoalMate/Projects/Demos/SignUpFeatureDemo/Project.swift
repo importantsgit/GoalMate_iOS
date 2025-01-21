@@ -10,7 +10,7 @@ import ProjectDescription
 
 let signUpDependencies: [TargetDependency] = [
     Module.feature(.SignUp).project,
-    Module.feature(.Common).project
+    Module.Utils.project
 ]
 
 let signUpFeatureDemo = Project.app(

@@ -21,10 +21,10 @@ internal struct SignUpProcessView: View {
             ZStack {
                 HStack(spacing: 0) {
                     Rectangle()
-                        .fill(processType == .signUp ? Colors.gray200 : Colors.primary100)
+                        .fill(processType == .signUp ? Colors.grey200 : Colors.primary100)
                         .frame(height: 8)
                     Rectangle()
-                        .fill(processType == .complete ? Colors.primary100 : Colors.gray200)
+                        .fill(processType == .complete ? Colors.primary100 : Colors.grey200)
                         .frame(height: 8)
                 }
                 .padding(.horizontal, 12)
@@ -88,7 +88,7 @@ fileprivate struct CircleView: View {
                 .frame(width: 25, height: 25)
         case .current:
             Text("\(config.number)")
-                .pretendard(.semiBold, size: 14, color: Colors.gray900)
+                .pretendard(.semiBold, size: 14, color: Colors.grey900)
                 .background {
                     Circle()
                         .fill(Colors.primary)
@@ -97,16 +97,16 @@ fileprivate struct CircleView: View {
                 .frame(width: 25, height: 25)
                 .overlay {
                     Text(config.subTitle)
-                        .pretendard(.regular, size: 12, color: Colors.gray600)
+                        .pretendard(.regular, size: 12, color: Colors.grey600)
                         .frame(width: 100)
                         .offset(x: 0, y: 24)
                 }
         case .pending:
             Text("\(config.number)")
-                .pretendard(.semiBold, size: 14, color: Colors.gray400)
+                .pretendard(.semiBold, size: 14, color: Colors.grey400)
                 .background(
                     Circle()
-                        .stroke(Colors.gray300, lineWidth: 1)
+                        .stroke(Colors.grey300, lineWidth: 1)
                         .frame(width: 25, height: 25)
                         .background(.white)
                 )
