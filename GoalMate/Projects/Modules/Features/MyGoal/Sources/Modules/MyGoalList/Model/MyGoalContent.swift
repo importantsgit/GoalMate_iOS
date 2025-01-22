@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import IdentifiedCollections
 
 /**
 목표 정보를 담는 모델
@@ -83,7 +84,7 @@ public struct MyGoalContent: Identifiable, Equatable {
 }
 
 extension MyGoalContent {
-    static let dummies: [MyGoalContent] = [
+    static let dummies: IdentifiedArrayOf<MyGoalContent> = [
         // 현재 진행 중인 목표들
         MyGoalContent(
             id: 1,

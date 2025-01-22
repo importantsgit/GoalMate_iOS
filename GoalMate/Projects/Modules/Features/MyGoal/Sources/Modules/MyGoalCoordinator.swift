@@ -33,6 +33,7 @@ public struct MyGoalCoordinator {
 
     public enum Action {
         case router(IndexedRouterActionOf<Screen>)
+        case showMyGoalDetail(Int)
         case coordinatorFinished
     }
 
@@ -43,7 +44,18 @@ public struct MyGoalCoordinator {
     @ReducerBuilder<State, Action>
     var core: some Reducer<State, Action> {
         Reduce { state, action in
-            return .none
+            switch action {
+            case let .router(.routeAction(_, action: .myGoalList(.showMyGoalDetail(data)))):
+                state.routes.push(.myGoalDetail(.init(
+                    id: data.id,
+                    startDate: data.startDate,
+                    endDate: data.endDate
+                )))
+                return .none
+            case let .router(.routeAction(_, action: .myGoalList(.showGoalDetail(id)))):
+                return .send(.showMyGoalDetail(id))
+            default: return .none
+            }
         }
         .forEachRoute(\.routes, action: \.router)
     }

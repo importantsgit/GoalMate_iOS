@@ -6,15 +6,27 @@
 //
 
 import ComposableArchitecture
+import Foundation
+
+public enum ButtonType {
+    case view(Int)
+    case restart(Int)
+}
+
+public struct MyGoalDetailData {
+    let id: Int
+    let startDate: Date
+    let endDate: Date
+}
 
 @Reducer
 public struct MyGoalListFeature {
     public init() {}
     @ObservableState
     public struct State: Equatable {
-        var myGoalList: [MyGoalContent]
+        var myGoalList: IdentifiedArrayOf<MyGoalContent>
         public init(
-            myGoalList: [MyGoalContent] = []
+            myGoalList: IdentifiedArrayOf<MyGoalContent> = []
         ) {
             self.myGoalList = myGoalList
         }
@@ -22,7 +34,10 @@ public struct MyGoalListFeature {
     public enum Action: BindableAction {
         case binding(BindingAction<State>)
         case onAppear
-        case fetchMyGoalContents(Result<[MyGoalContent], Error>)
+        case fetchMyGoalContents(Result<IdentifiedArrayOf<MyGoalContent>, Error>)
+        case buttonTapped(ButtonType)
+        case showMyGoalDetail(MyGoalDetailData)
+        case showGoalDetail(Int)
     }
     public var body: some Reducer<State, Action> {
         Reduce { state, action in
@@ -40,8 +55,22 @@ public struct MyGoalListFeature {
                     break
                 }
                 return .none
+            case let .buttonTapped(type):
+                switch type {
+                case let .restart(id):
+                    return .send(.showGoalDetail(id))
+                case let .view(id):
+                    guard let myGoal = state.myGoalList[id: id] else { break }
+                    return .send(.showMyGoalDetail(.init(
+                        id: id,
+                        startDate: myGoal.startDate,
+                        endDate: myGoal.endDate
+                    )))
+                }
+                return .none
             case .binding:
                 return .none
+            default: return .none
             }
         }
         BindingReducer()

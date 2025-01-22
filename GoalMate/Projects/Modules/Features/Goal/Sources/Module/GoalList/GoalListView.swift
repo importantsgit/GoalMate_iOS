@@ -12,7 +12,6 @@ import Utils
 
 struct GoalListView: View {
     @State var store: StoreOf<GoalListFeature>
-
     var body: some View {
         WithPerceptionTracking {
             VStack {
@@ -22,32 +21,34 @@ struct GoalListView: View {
                             .resized(size: .init(width: 84, height: 32))
                     }
                 )
+                .padding(.horizontal, 16)
                 ScrollView(.vertical) {
                     LazyVGrid(
-                      columns: [
-                        GridItem(.flexible(), spacing: .grid(2)),
-                        GridItem(.flexible())
-                      ],
-                      alignment: .center,
-                      spacing: 30
+                        columns: [
+                            GridItem(.flexible(), spacing: .grid(2)),
+                            GridItem(.flexible())
+                        ],
+                        alignment: .center,
+                        spacing: 30
                     ) {
                         ForEach(store.goalContents) { content in
-                            Button {
-                                store.send(.contentTapped(content.id))
-                            } label: {
-                                getGoalContentCell(content: content)
+                            WithPerceptionTracking {
+                                Button {
+                                    store.send(.contentTapped(content.id))
+                                } label: {
+                                    getGoalContentCell(content: content)
+                                }
                             }
                         }
                     }
                 }
-            }
-            .setMargin()
-            .onAppear {
-                store.send(.onAppear)
+                .setMargin()
+                .onAppear {
+                    store.send(.onAppear)
+                }
             }
         }
     }
-
     @ViewBuilder
     func getGoalContentCell(content: GoalContent) -> some View {
         WithPerceptionTracking {
