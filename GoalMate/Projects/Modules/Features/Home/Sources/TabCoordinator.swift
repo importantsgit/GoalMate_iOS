@@ -9,6 +9,7 @@ import ComposableArchitecture
 import FeatureCommon
 import FeatureGoal
 import FeatureMyGoal
+import FeatureProfile
 import SwiftUI
 import TCACoordinators
 
@@ -25,29 +26,29 @@ public struct TabCoordinator {
         public var selectedTab: Tab
         public var goal: GoalCoordinator.State
         public var myGoal: MyGoalCoordinator.State
+        public var profile: ProfileCoordinator.State
         public init(
             selectedTab: Tab = .goal,
             goal: GoalCoordinator.State = .init(),
-            myGoal: MyGoalCoordinator.State = .init()
+            myGoal: MyGoalCoordinator.State = .init(),
+            profile: ProfileCoordinator.State = .init()
         ) {
             self.selectedTab = selectedTab
             self.goal = goal
             self.myGoal = myGoal
+            self.profile = profile
         }
     }
     public enum Action: BindableAction {
-        case selectedTabChanged(Tab)
         case goal(GoalCoordinator.Action)
         case myGoal(MyGoalCoordinator.Action)
+        case profile(ProfileCoordinator.Action)
         case binding(BindingAction<State>)
     }
     public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-            case let .selectedTabChanged(tab):
-                state.selectedTab = tab
-                return .none
-            case .goal, .myGoal:
+            case .goal, .myGoal, .profile:
                 return .none
             case .binding:
                 return .none
@@ -59,20 +60,23 @@ public struct TabCoordinator {
         Scope(state: \.myGoal, action: \.myGoal) {
             MyGoalCoordinator()
         }
+        Scope(state: \.profile, action: \.profile) {
+            ProfileCoordinator()
+        }
+        BindingReducer()
     }
 }
 
 public struct TabCoordinatorView: View {
-    @Perception.Bindable var store: StoreOf<TabCoordinator>
+    @State var store: StoreOf<TabCoordinator>
     public init(store: StoreOf<TabCoordinator>) {
         self.store = store
     }
-
     public var body: some View {
-        TabView(
-            selection: $store.selectedTab.sending(\.selectedTabChanged)
-        ) {
-            WithPerceptionTracking {
+        WithPerceptionTracking {
+            TabView(
+                selection: $store.selectedTab
+            ) {
                 GoalCoordinatorView(
                     store: store.scope(
                         state: \.goal,
@@ -86,15 +90,13 @@ public struct TabCoordinatorView: View {
                                 .regular,
                                 size: 12
                             )
-
                     } icon: {
                         store.selectedTab == .goal ?
-                            Images.homeSelected :
-                            Images.home
+                        Images.homeSelected :
+                        Images.home
                     }
                 }
                 .tag(TabCoordinator.Tab.goal)
-
                 MyGoalCoordinatorView(
                     store: store.scope(
                         state: \.myGoal,
@@ -111,11 +113,10 @@ public struct TabCoordinatorView: View {
                     }
                 }
                 .tag(TabCoordinator.Tab.myGoal)
-                
-                MyGoalCoordinatorView(
+                ProfileCoordinatorView(
                     store: store.scope(
-                        state: \.myGoal,
-                        action: \.myGoal
+                        state: \.profile,
+                        action: \.profile
                     )
                 )
                 .tabItem {
@@ -129,8 +130,8 @@ public struct TabCoordinatorView: View {
                 }
                 .tag(TabCoordinator.Tab.profile)
             }
+            .tint(Colors.grey800)
         }
-        .tint(Colors.grey800)
     }
 }
 
