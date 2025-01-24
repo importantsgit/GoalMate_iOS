@@ -20,10 +20,11 @@ public struct MyGoalListView: View {
             VStack {
                 NavigationBar(
                     leftContent: {
-                        Images.logoSub
-                            .resized(size: .init(width: 84, height: 32))
+                        Text("나의 목표")
+                            .pretendardStyle(.semiBold, size: 20, color: Colors.grey900)
                     }
                 )
+                .frame(height: 64)
                 List {
                     ForEach(store.myGoalList) { content in
                         MyGoalContentItem(content: content) { type in
@@ -37,6 +38,7 @@ public struct MyGoalListView: View {
                 .listStyle(.plain)
                 .background(Color.clear)
                 .scrollContentBackground(.hidden)
+                .scrollIndicators(.hidden)
             }
             .padding(.horizontal, 20)
             .onAppear {
