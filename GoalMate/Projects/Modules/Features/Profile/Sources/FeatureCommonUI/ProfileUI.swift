@@ -1,6 +1,6 @@
 //
-//  MyGoalUI.swift
-//  Goal
+//  ProfileUI.swift
+//  Profile
 //
 //  Created by 이재훈 on 1/7/25.
 //
