@@ -79,7 +79,7 @@ clean:
 		rm -rf $(TUIST_ROOT_DIR)/Projects/App/DemoProfileFeature.xcodeproj; \
 	fi
 	@if [ "$(PROJECT_TYPE)" != "APP" ]; then \
-		echo "Cleaning PROFILE"; \
+		echo "Cleaning APP"; \
 		rm -rf $(TUIST_ROOT_DIR)/Projects/App/App.xcodeproj; \
 	fi
 	@rm -rf $(TUIST_ROOT_DIR)/Projects/App/Derived

@@ -42,6 +42,8 @@ public struct ProjectType {
             return "../Demos/MyGoalFeatureDemo/"
         case "GOAL":
             return "../Demos/GoalFeatureDemo/"
+        case "PROFILE":
+            return "../Demos/ProfileFeatureDemo/"
         default:
             return ""
         }
