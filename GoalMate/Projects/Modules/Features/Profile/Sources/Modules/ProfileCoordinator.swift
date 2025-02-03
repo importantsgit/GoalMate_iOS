@@ -15,6 +15,7 @@ public struct ProfileCoordinator {
     @Reducer(state: .equatable)
     public enum Screen {
         case profile(ProfileFeature)
+        case withdrawal(WithdrawalFeature)
     }
 
     @ObservableState
@@ -42,6 +43,17 @@ public struct ProfileCoordinator {
     @ReducerBuilder<State, Action>
     var core: some Reducer<State, Action> {
         Reduce { state, action in
+            switch action {
+            case .router(.routeAction(_, action: .profile(.withdrawalButtonTapped))):
+                state.routes.presentCover(
+                    .withdrawal(
+                        .init()
+                    )
+                )
+            case .router(.routeAction(_, action: .withdrawal(.backButtonTapped))):
+                state.routes.dismissAll()
+            default: return .none
+            }
             return .none
         }
         .forEachRoute(\.routes, action: \.router)
@@ -61,6 +73,8 @@ public struct ProfileCoordinatorView: View {
                 switch screen.case {
                 case let .profile(store):
                     ProfileView(store: store)
+                case let .withdrawal(store):
+                    WithdrawalView(store: store)
                 }
             }
             .toolbar(.hidden)
