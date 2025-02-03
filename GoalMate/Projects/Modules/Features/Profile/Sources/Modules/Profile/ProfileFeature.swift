@@ -18,6 +18,10 @@ public struct ProfileFeature {
     public enum Action: BindableAction {
         case binding(BindingAction<State>)
         case onAppear
+        case qnaButtonTapped
+        case privacyPolicyButtonTapped
+        case termsOfServiceButtonTapped
+        case withdrawalButtonTapped
         case fetchMyGoalCount(Result<ProfileContent, Error>)
     }
     public var body: some Reducer<State, Action> {
@@ -35,6 +39,11 @@ public struct ProfileFeature {
                 case let .failure(error):
                     break
                 }
+                return .none
+            case .withdrawalButtonTapped,
+                    .qnaButtonTapped,
+                    .termsOfServiceButtonTapped,
+                    .privacyPolicyButtonTapped:
                 return .none
             case .binding:
                 return .none
