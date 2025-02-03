@@ -30,7 +30,7 @@ public struct MyGoalDetailView: View {
             NavigationBar(
                 leftContent: {
                     Button {
-                        
+                        store.send(.backButtonTapped)
                     } label: {
                         Images.back
                             .resized(length: 24)

@@ -34,10 +34,13 @@ public struct MyGoalDetailFeature {
     }
     public enum Action: BindableAction {
         case binding(BindingAction<State>)
+        case backButtonTapped
     }
     public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
+            case .backButtonTapped:
+                return .none
             case .binding:
                 return .none
             }

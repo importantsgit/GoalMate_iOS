@@ -46,16 +46,19 @@ public struct MyGoalCoordinator {
         Reduce { state, action in
             switch action {
             case let .router(.routeAction(_, action: .myGoalList(.showMyGoalDetail(data)))):
-                state.routes.push(.myGoalDetail(.init(
+                state.routes.presentCover(.myGoalDetail(.init(
                     id: data.id,
                     startDate: data.startDate,
                     endDate: data.endDate
                 )))
-                return .none
             case let .router(.routeAction(_, action: .myGoalList(.showGoalDetail(id)))):
+                state.routes.dismissAll()
                 return .send(.showMyGoalDetail(id))
+            case .router(.routeAction(_, action: .myGoalDetail(.backButtonTapped))):
+                state.routes.dismissAll()
             default: return .none
             }
+            return .none
         }
         .forEachRoute(\.routes, action: \.router)
     }
