@@ -48,7 +48,14 @@ public struct TabCoordinator {
     public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-            case .goal, .myGoal, .profile:
+            case .goal(.showMyGoal):
+                state.selectedTab = .myGoal
+                return .none
+            case let .myGoal(.showMyGoalDetail(id)):
+                print("id: \(id)")
+                state.selectedTab = .goal
+                return .none
+            case .goal, .profile, .myGoal:
                 return .none
             case .binding:
                 return .none

@@ -33,6 +33,7 @@ public struct GoalCoordinator {
 
     public enum Action {
         case router(IndexedRouterActionOf<Screen>)
+        case showMyGoal
         case coordinatorFinished
     }
 
@@ -45,7 +46,7 @@ public struct GoalCoordinator {
         Reduce { state, action in
             switch action {
             case let .router(.routeAction(_, action: .goalList(.contentTapped(contentId)))):
-                state.routes.push(
+                state.routes.presentCover(
                     .goalDetail(
                         .init(
                             contentId: contentId
@@ -53,9 +54,9 @@ public struct GoalCoordinator {
                     )
                 )
             case .router(.routeAction(_, action: .goalDetail(.backButtonTapped))):
-                state.routes.pop()
+                state.routes.dismiss()
             case let .router(.routeAction(_, action: .goalDetail(.showPaymentCompleted(content)))):
-                state.routes.push(
+                state.routes.presentCover(
                     .paymentCompleted(.init(
                         content: .init(
                             id: content.id,
@@ -67,10 +68,10 @@ public struct GoalCoordinator {
                     ))
                 )
             case .router(.routeAction(_, action: .paymentCompleted(.backButtonTapped))):
-                state.routes.pop()
+                state.routes.dismiss()
             case .router(.routeAction(_, action: .paymentCompleted(.startButtonTapped))):
-                // TODO: 로직 수행
-                break
+                state.routes.dismissAll()
+                return .send(.showMyGoal)
             default: return .none
             }
             return .none

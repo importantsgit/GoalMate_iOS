@@ -42,7 +42,7 @@ struct GoalListView: View {
                         }
                     }
                 }
-                .setMargin()
+                .padding(.horizontal, 20)
                 .onAppear {
                     store.send(.onAppear)
                 }
