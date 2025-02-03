@@ -11,6 +11,7 @@ public extension Colors {
     static let primary = Asset.Assets.Primary.primary.swiftUIColor
     static let primary50 = Asset.Assets.Primary.primary50.swiftUIColor
     static let primary100 = Asset.Assets.Primary.primary100.swiftUIColor
+    static let primary200 = Asset.Assets.Primary.primary200.swiftUIColor
     static let primary700 = Asset.Assets.Primary.primary700.swiftUIColor
     static let primary800 = Asset.Assets.Primary.primary800.swiftUIColor
     static let primary900 = Asset.Assets.Primary.primary900.swiftUIColor
