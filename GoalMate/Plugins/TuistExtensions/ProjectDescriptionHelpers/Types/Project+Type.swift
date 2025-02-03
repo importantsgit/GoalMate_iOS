@@ -121,6 +121,20 @@ public struct ProjectType {
                     "\(getSourcePath(value))Tests/**",
                 ]
             )
+        case "PROFILE":
+            return Config(
+                name: "DemoProfileFeature",
+                dependencies: [
+                    Module.feature(.Profile).project,
+                    Module.feature(.Common).project
+                ],
+                sources: [
+                    "\(getSourcePath(value))Sources/**",
+                ],
+                testSources: [
+                    "\(getSourcePath(value))Tests/**",
+                ]
+            )
         default:
             return Config(
                 name: "App",
