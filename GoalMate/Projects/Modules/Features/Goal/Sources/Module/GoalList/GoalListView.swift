@@ -22,6 +22,7 @@ struct GoalListView: View {
                     }
                 )
                 .padding(.horizontal, 16)
+                .frame(height: 64)
                 ScrollView(.vertical) {
                     LazyVGrid(
                         columns: [
