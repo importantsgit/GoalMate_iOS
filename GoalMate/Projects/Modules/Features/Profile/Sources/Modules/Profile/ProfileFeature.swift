@@ -6,14 +6,18 @@
 //
 
 import ComposableArchitecture
+import Dependencies
+import Foundation
 
 @Reducer
 public struct ProfileFeature {
     public init() {}
     @ObservableState
     public struct State: Equatable {
-        var profile: ProfileContent? = nil
-        public init() {}
+        var profile: ProfileContent?
+        public init() {
+            profile = nil
+        }
     }
     public enum Action: BindableAction {
         case binding(BindingAction<State>)
@@ -24,6 +28,7 @@ public struct ProfileFeature {
         case withdrawalButtonTapped
         case fetchMyGoalCount(Result<ProfileContent, Error>)
     }
+    @Dependency(\.openURL) var openURL
     public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
@@ -40,10 +45,24 @@ public struct ProfileFeature {
                     break
                 }
                 return .none
+            case .termsOfServiceButtonTapped:
+                guard let url = URL(
+                    string: "https://ash-oregano-9dc.notion.site/f97185c23c5444b4ae3796928ae7f646?pvs=74"
+                )
+                else { return .none }
+                return .run { [url] _ in
+                    _ = await openURL(url)
+                }
+            case .privacyPolicyButtonTapped:
+                guard let url = URL(
+                    string: "https://ash-oregano-9dc.notion.site/997827990f694f63a60b06c06beb1468"
+                )
+                else { return .none }
+                return .run { [url] _ in
+                    _ = await openURL(url)
+                }
             case .withdrawalButtonTapped,
-                    .qnaButtonTapped,
-                    .termsOfServiceButtonTapped,
-                    .privacyPolicyButtonTapped:
+                    .qnaButtonTapped:
                 return .none
             case .binding:
                 return .none
