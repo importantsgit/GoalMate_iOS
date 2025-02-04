@@ -9,6 +9,8 @@ import ComposableArchitecture
 import Foundation
 import TCACoordinators
 import UIKit
+import Utils
+import KakaoSDKCommon
 
 @Reducer
 public struct AppDelegateReducer {
@@ -24,6 +26,7 @@ public struct AppDelegateReducer {
         Reduce { state, action in
             switch action {
             case .didFinishLaunching:
+                KakaoSDK.initSDK(appKey: Environment.kakaoKey)
                 return .run { send in
                     await withThrowingTaskGroup(of: Void.self) { group in
                         group.addTask {}

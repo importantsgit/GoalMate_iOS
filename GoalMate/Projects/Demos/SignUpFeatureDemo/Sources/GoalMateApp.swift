@@ -1,5 +1,6 @@
 
 import ComposableArchitecture
+import KakaoSDKAuth
 import SwiftUI
 
 @main
@@ -10,6 +11,12 @@ struct GoalMateApp: App {
     var body: some Scene {
         WindowGroup {
             AppCoordinatorView(store: self.appDelegate.store)
+                .onOpenURL { url in
+                    print("URL: \(url)")
+                    if AuthApi.isKakaoTalkLoginUrl(url) {
+                        _ = AuthController.handleOpenUrl(url: url)
+                    }
+                }
         }
         .onChange(of: self.scenePhase) { newPhase in
           self.appDelegate.store.send(.didChangeScenePhase(newPhase))
