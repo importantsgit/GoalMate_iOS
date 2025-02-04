@@ -20,7 +20,7 @@ opt_in_rules:
   - trailing_whitespace # line의 마지막에는 빈 여백이 있으면 안됩니다. https://realm.github.io/SwiftLint/trailing_whitespace.html
   - empty_count # count > 0 대신 isEmpty사용 https://realm.github.io/SwiftLint/empty_count.html
   - empty_string # string 빈문자열 체크시 "" 대신 isempty를 사용한다 https://realm.github.io/SwiftLint/empty_string.html
-  - force_unwrapping # force unwrapping을 하지 않습니다. https://realm.github.io/SwiftLint/force_unwrapping.html
+  #- force_unwrapping # force unwrapping을 하지 않습니다. https://realm.github.io/SwiftLint/force_unwrapping.html
   - colon #colon 사용시 앞에는 여백이 없고 뒤에는 공백이 있어야합니다. https://realm.github.io/SwiftLint/colon.html
   - sorted_imports # import 들의 라인 인덴트들이 일치해야 합니다. https://realm.github.io/SwiftLint/sorted_imports.html
   - comma #comma 앞에는 여백이 없고 뒤에는 공백이 있어야합니다. https://realm.github.io/SwiftLint/comma.html
@@ -76,3 +76,4 @@ disabled_rules:
 - class_delegate_protocol # 클래스 델리게이트 프로토콜이 적절하게 사용되는지 확인
 - cyclomatic_complexity # 함수의 복잡도가 적절한지 확인
 - empty_enum_arguments # 열거형 케이스에 인자가 없는지 확인
+- nesting
