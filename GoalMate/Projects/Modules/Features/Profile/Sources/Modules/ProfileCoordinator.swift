@@ -24,7 +24,7 @@ public struct ProfileCoordinator {
 
         public init(
             routes: [Route<Screen.State>] = [
-                .root(.profile(.init()), embedInNavigationView: true)
+                .root(.profile(.init()))
             ]
         ) {
             self.routes = routes
@@ -45,13 +45,13 @@ public struct ProfileCoordinator {
         Reduce { state, action in
             switch action {
             case .router(.routeAction(_, action: .profile(.withdrawalButtonTapped))):
-                state.routes.presentCover(
+                state.routes.push(
                     .withdrawal(
                         .init()
                     )
                 )
             case .router(.routeAction(_, action: .withdrawal(.backButtonTapped))):
-                state.routes.dismissAll()
+                state.routes.popToRoot()
             default: return .none
             }
             return .none

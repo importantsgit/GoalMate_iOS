@@ -78,6 +78,11 @@ public struct TabCoordinatorView: View {
     @State var store: StoreOf<TabCoordinator>
     public init(store: StoreOf<TabCoordinator>) {
         self.store = store
+        let appearance = UITabBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = .white
+        UITabBar.appearance().standardAppearance = appearance
+        UITabBar.appearance().scrollEdgeAppearance = appearance
     }
     public var body: some View {
         WithPerceptionTracking {

@@ -82,7 +82,8 @@ public struct GoalDetailView: View {
                     }
                 }
             }
-            .onAppear {
+            // onAppear로 동작 시, Concurrency하게 동작되지 않아 바로 Pop되는 현상 발생
+            .task {
                 store.send(.onAppear)
             }
             .sheet(isPresented: $store.isShowPurchaseView) {

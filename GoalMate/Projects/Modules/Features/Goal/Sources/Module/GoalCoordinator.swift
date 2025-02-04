@@ -25,7 +25,9 @@ public struct GoalCoordinator {
         var routes: [Route<Screen.State>]
 
         public init(
-            routes: [Route<Screen.State>] = [.root(.goalList(.init()), embedInNavigationView: true)]
+            routes: [Route<Screen.State>] = [
+                .root(.goalList(.init()))
+            ]
         ) {
             self.routes = routes
         }
@@ -46,7 +48,7 @@ public struct GoalCoordinator {
         Reduce { state, action in
             switch action {
             case let .router(.routeAction(_, action: .goalList(.contentTapped(contentId)))):
-                state.routes.presentCover(
+                state.routes.push(
                     .goalDetail(
                         .init(
                             contentId: contentId
@@ -54,9 +56,9 @@ public struct GoalCoordinator {
                     )
                 )
             case .router(.routeAction(_, action: .goalDetail(.backButtonTapped))):
-                state.routes.dismiss()
+                state.routes.pop()
             case let .router(.routeAction(_, action: .goalDetail(.showPaymentCompleted(content)))):
-                state.routes.presentCover(
+                state.routes.push(
                     .paymentCompleted(.init(
                         content: .init(
                             id: content.id,
@@ -68,9 +70,9 @@ public struct GoalCoordinator {
                     ))
                 )
             case .router(.routeAction(_, action: .paymentCompleted(.backButtonTapped))):
-                state.routes.dismiss()
+                state.routes.pop()
             case .router(.routeAction(_, action: .paymentCompleted(.startButtonTapped))):
-                state.routes.dismissAll()
+                state.routes.popToRoot()
                 return .send(.showMyGoal)
             default: return .none
             }

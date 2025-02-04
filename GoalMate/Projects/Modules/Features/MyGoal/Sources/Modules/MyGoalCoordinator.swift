@@ -24,7 +24,7 @@ public struct MyGoalCoordinator {
 
         public init(
             routes: [Route<Screen.State>] = [
-                .root(.myGoalList(.init()), embedInNavigationView: true)
+                .root(.myGoalList(.init()))
             ]
         ) {
             self.routes = routes
@@ -46,16 +46,16 @@ public struct MyGoalCoordinator {
         Reduce { state, action in
             switch action {
             case let .router(.routeAction(_, action: .myGoalList(.showMyGoalDetail(data)))):
-                state.routes.presentCover(.myGoalDetail(.init(
+                state.routes.push(.myGoalDetail(.init(
                     id: data.id,
                     startDate: data.startDate,
                     endDate: data.endDate
                 )))
             case let .router(.routeAction(_, action: .myGoalList(.showGoalDetail(id)))):
-                state.routes.dismissAll()
+                state.routes.pop()
                 return .send(.showMyGoalDetail(id))
             case .router(.routeAction(_, action: .myGoalDetail(.backButtonTapped))):
-                state.routes.dismissAll()
+                state.routes.popToRoot()
             default: return .none
             }
             return .none
