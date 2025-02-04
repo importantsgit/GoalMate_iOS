@@ -142,6 +142,12 @@ fileprivate struct ListButton: View {
         store: .init(
             initialState: .init()
         ) {
+            withDependencies {
+                $0.openURL = { .init { _ in true } }()
+            } operation: {
+                ProfileFeature()
+            }
+
             ProfileFeature()
         }
     )
