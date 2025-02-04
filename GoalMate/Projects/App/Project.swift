@@ -22,6 +22,4 @@ let rootProject = Project.app(
     sources: projectConfig.sources,
     testSources: projectConfig.testSources
 )
- 
-
 
