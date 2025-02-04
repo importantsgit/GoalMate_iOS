@@ -9,7 +9,6 @@ import ProjectDescription
 
 public enum Module {
     case feature(FeatureType)
-    case Domain
     case Data
     case Utils
     
@@ -27,8 +26,6 @@ public enum Module {
         switch self {
         case let .feature(feat):
             return feat.rawValue
-        case .Domain:
-            return "Domain"
         case .Data:
             return "Data"
         case .Utils:
@@ -60,6 +57,6 @@ public enum Module {
     }
     
     public static var defaultModules: [Module] {
-        [.Data, .Domain, .Utils]
+        [.Data, .Utils]
     }
 }

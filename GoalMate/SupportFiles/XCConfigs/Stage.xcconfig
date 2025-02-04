@@ -15,3 +15,5 @@ GCC_PREPROCESSOR_DEFINITIONS    = $(inherited) $(APP_BUILD_DEFINITION)
 OTHER_SWIFT_FLAGS               = $(inherited) -D$(APP_BUILD_DEFINITION)
 
 CODE_SIGN_STYLE                 = Manual
+KAKAO_APP_KEY                   = $(STAGE_KAKAO_APP_KEY)
+BASE_URL                        = $(STAGE_BASE_URL)

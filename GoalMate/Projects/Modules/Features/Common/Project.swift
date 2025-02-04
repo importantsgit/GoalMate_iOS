@@ -11,7 +11,7 @@ import ProjectDescription
 let featureCommon = Project.framework(
     name: "Feature" + Module.feature(.Common).name,
     dependencies: [
-        Module.Domain.project,
+        Module.Data.project,
         Module.Utils.project
     ],
     resources: .default

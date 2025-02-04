@@ -17,12 +17,16 @@ let utils = Project.framework(
         ),
         .remote(url: "https://github.com/johnpatrickmorgan/TCACoordinators",
                 requirement: .exact("0.10.0")),
+        .remote(url: "https://github.com/kakao/kakao-ios-sdk", requirement: .upToNextMajor(from: "2.23.0"))
 //        .remote(url: "https://github.com/pointfreeco/swift-composable-architecture", requirement: .exact("1.8.0")),
         
     ],
     dependencies: [
         .package(product: "TCACoordinators", type: .runtime),
         .package(product: "Sharing", type: .runtime),
+        .package(product: "KakaoSDKCommon", type: .runtime),
+        .package(product: "KakaoSDKAuth", type: .runtime),
+        .package(product: "KakaoSDKUser", type: .runtime),
 //        .package(product: "ComposableArchitecture", type: .runtime),
     ]
 )
