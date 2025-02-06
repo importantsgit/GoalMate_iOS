@@ -100,20 +100,27 @@ extension AuthClient: DependencyKey {
         )
     }
 
-    public static var testValue: AuthClient {
-        return .init(
-            kakaoLogin: { return .init(credential: "credential", nonce: "nonce") },
-            appleLogin: { return .init(credential: "credential", nonce: "nonce") },
-            authenticate: { _, _ in
-                return .init(accessToken: "access", refreshToken: "refresh")
-            },
-            refresh: { _ in
-                return .init(accessToken: "access", refreshToken: "refresh")
-            }
-        )
-    }
+    public static var testValue = AuthClient(
+        kakaoLogin: { return .init(credential: "credential", nonce: "nonce") },
+        appleLogin: { return .init(credential: "credential", nonce: "nonce") },
+        authenticate: { _, _ in
+            return .init(accessToken: "access", refreshToken: "refresh")
+        },
+        refresh: { _ in
+            return .init(accessToken: "access", refreshToken: "refresh")
+        }
+    )
 
-    public static var previewValue = AuthClient()
+    public static var previewValue = AuthClient(
+        kakaoLogin: { return .init(credential: "credential", nonce: "nonce") },
+        appleLogin: { return .init(credential: "credential", nonce: "nonce") },
+        authenticate: { _, _ in
+            return .init(accessToken: "access", refreshToken: "refresh")
+        },
+        refresh: { _ in
+            return .init(accessToken: "access", refreshToken: "refresh")
+        }
+    )
 }
 
 // MARK: - Dependencies Registration

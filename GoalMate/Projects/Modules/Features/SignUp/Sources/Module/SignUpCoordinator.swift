@@ -15,8 +15,6 @@ public struct SignUpCoordinator {
     @Reducer(state: .equatable)
     public enum Screen {
         case signUp(SignUpFeature)
-        case nickname(NicknameFeature)
-        case success(SignUpSuccessFeature)
     }
 
     @ObservableState
@@ -37,6 +35,7 @@ public struct SignUpCoordinator {
 
     public var body: some Reducer<State, Action> {
         self.core
+            .dependency(\.authClient, .previewValue)
     }
 
     @ReducerBuilder<State, Action>
@@ -45,10 +44,7 @@ public struct SignUpCoordinator {
             switch action {
             case .router(.routeAction(_, action: .signUp(.signUpSucceeded))):
                 print("move to NicknameView")
-                state.routes.push(.nickname(.init()))
-            case let .router(.routeAction(_, action: .nickname(.nicknameSubmitted(nickname)))):
-                print("move to SuccessView")
-                state.routes.push(.success(.init(nickName: nickname)))
+                return .send(.coordinatorFinished)
             default: break
             }
             return .none
@@ -69,13 +65,6 @@ public struct SignUpCoordinatorView: View {
             switch screen.case {
             case let .signUp(store):
                 SignUpView(store: store)
-                    .toolbar(.hidden)
-            case let .nickname(store):
-                NicknameView(store: store)
-                    .toolbar(.hidden)
-            case let .success(store):
-                SignUpSuccessView(store: store)
-                    .toolbar(.hidden)
             }
         }
     }
