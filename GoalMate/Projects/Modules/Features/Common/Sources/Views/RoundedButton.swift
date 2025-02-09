@@ -115,7 +115,7 @@ public struct RoundedButton<Content: View, Style: RoundedButtonStyle>: View {
     let height: CGFloat
     let horizontalPadding: CGFloat?
     let verticalPadding: CGFloat?
-    @Binding var isDisabled: Bool
+    var isDisabled: Bool
     let buttonTapped: () -> Void
     let label: Content
 
@@ -124,13 +124,13 @@ public struct RoundedButton<Content: View, Style: RoundedButtonStyle>: View {
         height: CGFloat = 54,
         horizontalPadding: CGFloat? = nil,
         verticalPadding: CGFloat? = nil,
-        isDisabled: Binding<Bool> = .constant(false),
+        isDisabled: Bool = false,
         buttonTapped: @escaping () -> Void,
         @ViewBuilder label: () -> Content
     ) {
         self.buttonType = buttonType
         self.height = height
-        self._isDisabled = isDisabled
+        self.isDisabled = isDisabled
         self.buttonTapped = buttonTapped
         self.label = label()
         self.horizontalPadding = horizontalPadding
@@ -178,7 +178,7 @@ public struct RoundedButton<Content: View, Style: RoundedButtonStyle>: View {
         RoundedButton(
             buttonType: FilledStyle(backgroundColor: .primary),
             height: 54,
-            isDisabled: .constant(true)
+            isDisabled: true
         ) {
             print("FilledStyle") // 액션 추가
         } label: {

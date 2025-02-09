@@ -22,6 +22,21 @@ public extension View {
     func loading(isLoading: Binding<Bool>) -> some View {
         modifier(LoadingModifier(isLoading: isLoading))
     }
+
+    func customSheet(
+        heights: [CGFloat] = [340],
+        radius: CGFloat,
+        corners: UIRectCorner
+    ) -> some View {
+        modifier(RoundSheetModifier(heights: heights, radius: radius, corners: corners))
+    }
+
+    func cornerRadius(
+        _ radius: CGFloat,
+        corners: UIRectCorner
+    ) -> some View {
+        modifier(CornerRoundedModifier(radius: radius, corners: corners))
+    }
 }
 
 public extension Text {
