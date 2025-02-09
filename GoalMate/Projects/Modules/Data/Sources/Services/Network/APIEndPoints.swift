@@ -7,11 +7,13 @@
 
 import Foundation
 
-struct APIEndPoints {
+struct APIEndpoints {
     // Path prefix에 / 제거
     enum APIPath: String {
         case authLogin          = "auth/login"
         case refreshLogin       = "auth/reissue"
+        case setNickname        = "mentees/my/name"
+        case checkNickname      = "mentees/my/validate"
 
         case goalDetail         = "goals/{goalId}"
 
@@ -24,33 +26,53 @@ struct APIEndPoints {
         }
     }
 
-    static func authLoginEndPoint(
+    static func authLoginEndpoint(
         with request: AuthLoginRequestDTO
-    ) -> EndPoint<AuthLoginResponseDTO> {
-        EndPoint(
+    ) -> Endpoint<AuthLoginResponseDTO> {
+        Endpoint(
             path: APIPath.authLogin,
             method: .get,
             queryParametersEncodable: request
         )
     }
 
-    static func refreshLoginEndPoint(
+    static func refreshLoginEndpoint(
         with request: RefreshLoginRequestDTO
-    ) -> EndPoint<AuthLoginResponseDTO> {
-        EndPoint(
+    ) -> Endpoint<AuthLoginResponseDTO> {
+        Endpoint(
             path: APIPath.refreshLogin,
             method: .get,
             queryParametersEncodable: request
         )
     }
 
-    static func goalDetailEndPoint(
+    static func goalDetailEndpoint(
         goalId: String,
         with request: TokenResponse
-    ) throws -> EndPoint<TokenResponse> {
-        try EndPoint(
+    ) throws -> Endpoint<TokenResponse> {
+        try Endpoint(
             path: APIPath.authLogin,
             pathParameters: ["goalId": goalId],
+            method: .get,
+            queryParametersEncodable: request
+        )
+    }
+
+    static func setNicknameEndpoint(
+        with request: SetNicknameRequestDTO
+    ) -> Endpoint<SetNicknameResponseDTO> {
+        Endpoint(
+            path: APIPath.setNickname,
+            method: .put,
+            queryParametersEncodable: request
+        )
+    }
+    
+    static func checkNicknameEndpoint(
+        with request: checkNicknameRequestDTO
+    ) -> Endpoint<checkNicknameResponseDTO> {
+        Endpoint(
+            path: APIPath.checkNickname,
             method: .get,
             queryParametersEncodable: request
         )
