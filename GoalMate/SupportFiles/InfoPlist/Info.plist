@@ -18,6 +18,10 @@
 	<string>$(KAKAO_APP_KEY)</string>
 	<key>BASE_URL</key>
 	<string>$(BASE_URL)</string>
+	<key>AES_KEY</key>
+	<string>$(AES_KEY)</string>
+	<key>AES_IV</key>
+	<string>$(AES_IV)</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
