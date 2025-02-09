@@ -62,10 +62,9 @@ public struct AuthClient {
 // MARK: - Live Implementation
 extension AuthClient: DependencyKey {
     public static var liveValue: AuthClient {
-        print(Environment.baseURL)
-        let networkService = NetworkService(
-            config: NetworkConfiguration(baseURL: URL(string: Environment.baseURL)!)
-        )
+        @Dependency(\.networkClient) var networkClient
+        @Dependency(\.dataStorageClient) var dataStorageClient
+
         return .init(
             kakaoLogin: {
                 let kakaoLoginService = KakaoLoginService()
@@ -81,8 +80,12 @@ extension AuthClient: DependencyKey {
                     nonce: response.nonce,
                     provider: type.path
                 )
-                let endPoint = APIEndPoints.authLoginEndPoint(with: requestDTO)
-                let response = try await networkService.asyncRequest(with: endPoint)
+                let endpoint = APIEndpoints.authLoginEndpoint(with: requestDTO)
+                let response = try await networkClient.asyncRequest(with: endpoint)
+                await dataStorageClient.setTokenInfo(.init(
+                    accessToken: response.data.accessToken,
+                    refreshToken: response.data.refreshToken
+                ))
                 return .init(
                     accessToken: response.data.accessToken,
                     refreshToken: response.data.refreshToken
@@ -90,8 +93,12 @@ extension AuthClient: DependencyKey {
             },
             refresh: { token in
                 let requestDTO: RefreshLoginRequestDTO = .init(refreshToken: token)
-                let endPoint = APIEndPoints.refreshLoginEndPoint(with: requestDTO)
-                let response = try await networkService.asyncRequest(with: endPoint)
+                let endpoint = APIEndpoints.refreshLoginEndpoint(with: requestDTO)
+                let response = try await networkClient.asyncRequest(with: endpoint)
+                await dataStorageClient.setTokenInfo(.init(
+                    accessToken: response.data.accessToken,
+                    refreshToken: response.data.refreshToken
+                ))
                 return .init(
                     accessToken: response.data.accessToken,
                     refreshToken: response.data.refreshToken

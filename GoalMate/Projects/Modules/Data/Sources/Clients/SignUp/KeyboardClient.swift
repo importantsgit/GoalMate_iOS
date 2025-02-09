@@ -5,7 +5,7 @@
 //  Created by Importants on 2/7/25.
 //
 
-import ComposableArchitecture
+import Dependencies
 import Foundation
 import UIKit
 
@@ -27,13 +27,14 @@ extension KeyboardClient: DependencyKey {
                         queue: .main
                     ) { notification in
                         guard let userInfo = notification.userInfo,
-                              let keyboardRect = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect
+                              let keyboardRect = userInfo[
+                                UIResponder.keyboardFrameEndUserInfoKey
+                              ] as? CGRect
                         else { return }
                         print("data: \(keyboardRect.height)")
                         continuation.yield(keyboardRect.height)
                         continuation.finish()  // 첫 번째 높이를 받은 후 즉시 종료
                     }
-                    
                     continuation.onTermination = { _ in
                         notificationCenter.removeObserver(observer)
                     }
@@ -41,7 +42,7 @@ extension KeyboardClient: DependencyKey {
             }
         )
     }()
-    
+
     public static let previewValue: Self = {
         return .init {
             AsyncStream { continuation in
