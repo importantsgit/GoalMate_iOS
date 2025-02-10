@@ -33,6 +33,7 @@ public extension Images {
     static let goalCompleted = Asset.Assets.goalCompleted.swiftUIImage
     static let flag = Asset.Assets.flag.swiftUIImage
     static let progress = Asset.Assets.progress.swiftUIImage
+    static let launchScreenLogo = Asset.Assets.launchScreenLogo.swiftUIImage
 }
 
 public extension Image {
