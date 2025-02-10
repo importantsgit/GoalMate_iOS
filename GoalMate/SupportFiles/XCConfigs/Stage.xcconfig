@@ -17,3 +17,6 @@ OTHER_SWIFT_FLAGS               = $(inherited) -D$(APP_BUILD_DEFINITION)
 CODE_SIGN_STYLE                 = Manual
 KAKAO_APP_KEY                   = $(STAGE_KAKAO_APP_KEY)
 BASE_URL                        = $(STAGE_BASE_URL)
+
+AES_KEY                         = $(STAGE_AES_KEY)
+AES_IV                          = $(STAGE_AES_IV)
