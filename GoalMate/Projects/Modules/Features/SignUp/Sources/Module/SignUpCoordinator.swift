@@ -9,54 +9,6 @@ import ComposableArchitecture
 import SwiftUI
 import TCACoordinators
 
-@Reducer
-public struct SignUpCoordinator {
-    public init() {}
-    @Reducer(state: .equatable)
-    public enum Screen {
-        case signUp(SignUpFeature)
-        case nickname(NicknameFeature)
-        case success(SignUpSuccessFeature)
-    }
-
-    @ObservableState
-    public struct State: Equatable {
-        var routes: [Route<Screen.State>]
-
-        public init(
-            routes: [Route<Screen.State>] = [.root(.signUp(.init()), embedInNavigationView: true)]
-        ) {
-            self.routes = routes
-        }
-    }
-
-    public enum Action {
-        case router(IndexedRouterActionOf<Screen>)
-        case coordinatorFinished
-    }
-
-    public var body: some Reducer<State, Action> {
-        self.core
-    }
-
-    @ReducerBuilder<State, Action>
-    var core: some Reducer<State, Action> {
-        Reduce { state, action in
-            switch action {
-            case .router(.routeAction(_, action: .signUp(.signUpSucceeded))):
-                print("move to NicknameView")
-                state.routes.push(.nickname(.init()))
-            case let .router(.routeAction(_, action: .nickname(.nicknameSubmitted(nickname)))):
-                print("move to SuccessView")
-                state.routes.push(.success(.init(nickName: nickname)))
-            default: break
-            }
-            return .none
-        }
-        .forEachRoute(\.routes, action: \.router)
-    }
-}
-
 public struct SignUpCoordinatorView: View {
     let store: StoreOf<SignUpCoordinator>
 
@@ -69,14 +21,89 @@ public struct SignUpCoordinatorView: View {
             switch screen.case {
             case let .signUp(store):
                 SignUpView(store: store)
-                    .toolbar(.hidden)
-            case let .nickname(store):
-                NicknameView(store: store)
-                    .toolbar(.hidden)
-            case let .success(store):
-                SignUpSuccessView(store: store)
-                    .toolbar(.hidden)
+            case let .termsAgreement(store):
+                TermsAgreementSheetView(store: store)
+                    .customSheet(heights: [340], radius: 30, corners: [.topLeft, .topRight])
             }
         }
     }
+}
+
+@Reducer
+public struct SignUpCoordinator {
+    public init() {}
+    @Reducer(state: .equatable)
+    public enum Screen {
+        case signUp(SignUpFeature)
+        case termsAgreement(TermsAgreementFeature)
+    }
+    @ObservableState
+    public struct State: Equatable {
+        var routes: IdentifiedArrayOf<Route<Screen.State>>
+
+        public init(
+            routes: IdentifiedArrayOf<Route<Screen.State>> = [
+                .root(.signUp(.init()), embedInNavigationView: true)
+            ]
+        ) {
+            self.routes = routes
+        }
+    }
+
+    public enum Action {
+        case router(IdentifiedRouterActionOf<Screen>)
+        case coordinatorFinished
+    }
+
+    public var body: some Reducer<State, Action> {
+        self.core
+            .dependency(\.authClient, .previewValue)
+            .dependency(\.nicknameClient, .previewValue)
+    }
+
+    @ReducerBuilder<State, Action>
+    var core: some Reducer<State, Action> {
+        Reduce { state, action in
+            switch action {
+            case let .router(
+                .routeAction(
+                    _,
+                    action: .signUp(.feature(.checkSignUpResponse(isSuccess)))
+                )):
+                if isSuccess {
+                    state
+                        .routes
+                        .presentSheet(
+                            .termsAgreement(.init())
+                        )
+                } else {
+                    break
+                }
+                return .none
+            case .router(.routeAction(_, action: .termsAgreement(.view(.startButtonTapped)))):
+                state.routes.dismiss()
+                guard case let .signUp(signUp) = state.routes.first?.screen else { return .none }
+                return .send(.router(.routeAction(
+                    id: signUp.id,
+                    action: .signUp(.feature(.showNicknameView))
+                )))
+            case .router(.routeAction(_, action: .signUp(.signUpSuccess(.finishButtonTapped)))):
+                return .send(.coordinatorFinished)
+            default: break
+            }
+            return .none
+        }
+        .forEachRoute(\.routes, action: \.router)
+    }
+}
+
+extension SignUpCoordinator.Screen.State: Identifiable {
+    public var id: UUID {
+    switch self {
+    case let .signUp(state):
+      state.id
+    case let .termsAgreement(state):
+      state.id
+    }
+  }
 }
