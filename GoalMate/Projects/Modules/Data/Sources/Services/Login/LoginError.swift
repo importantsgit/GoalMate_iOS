@@ -9,5 +9,7 @@ import Foundation
 
 public enum LoginError: Error {
     case invalidNonce
+    case authFailed
     case loginFailed
+    case noToken
 }

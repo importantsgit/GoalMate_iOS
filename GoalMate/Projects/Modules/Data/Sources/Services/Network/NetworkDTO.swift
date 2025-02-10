@@ -32,6 +32,13 @@ public struct AuthLoginResponseDTO: Codable {
     }
 }
 
+public struct LoginRequestDTO: Codable {
+    let accessToken: String
+    enum CodingKeys: String, CodingKey {
+        case accessToken = "access_token"
+    }
+}
+
 public struct RefreshLoginRequestDTO: Codable {
     let refreshToken: String
     enum CodingKeys: String, CodingKey {
