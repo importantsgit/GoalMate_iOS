@@ -7,10 +7,10 @@
 
 import Foundation
 
-struct EndPoint<R>: ResponseRequestable {
+struct Endpoint<R>: ResponseRequestable {
     typealias Response = R
 
-    let path: APIEndPoints.APIPath
+    let path: APIEndpoints.APIPath
     let method: HTTPMethodType
     let headerParameters: [String: String]
     let queryParametersEncodable: Encodable?
@@ -21,7 +21,7 @@ struct EndPoint<R>: ResponseRequestable {
     let responseDecoder: ResponseDecoder
 
     init(
-        path: APIEndPoints.APIPath,
+        path: APIEndpoints.APIPath,
         method: HTTPMethodType,
         headerParameters: [String: String] = [:],
         queryParametersEncodable: Encodable? = nil,
@@ -44,9 +44,9 @@ struct EndPoint<R>: ResponseRequestable {
 }
 
 // Path Parameter init
-extension EndPoint {
+extension Endpoint {
     init(
-        path: APIEndPoints.APIPath,
+        path: APIEndpoints.APIPath,
         pathParameters: [String: String],
         method: HTTPMethodType,
         headerParameters: [String: String] = [:],
@@ -55,7 +55,7 @@ extension EndPoint {
         bodyParametersEncodable: Encodable? = nil,
         bodyParameters: [String: Any] = [:]
     ) throws {
-        guard let processedPath = APIEndPoints.APIPath(
+        guard let processedPath = APIEndpoints.APIPath(
             rawValue: path.path(with: pathParameters)
         )
         else {
@@ -84,7 +84,7 @@ enum HTTPMethodType: String {
 
 // MARK: - Requestable
 protocol Requestable {
-    var path: APIEndPoints.APIPath { get }
+    var path: APIEndpoints.APIPath { get }
     var method: HTTPMethodType { get }
     var headerParameters: [String: String] { get }
     var queryParametersEncodable: Encodable? { get }

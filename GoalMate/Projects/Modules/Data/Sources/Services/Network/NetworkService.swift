@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class NetworkService: NSObject {
+public final class NetworkService: NSObject {
     private var config: NetworkConfigurable
 
     private var session: URLSession {

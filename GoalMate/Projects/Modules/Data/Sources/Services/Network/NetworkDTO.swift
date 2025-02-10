@@ -38,3 +38,24 @@ public struct RefreshLoginRequestDTO: Codable {
         case refreshToken = "refresh_token"
     }
 }
+
+public struct SetNicknameRequestDTO: Codable {
+    let name: String
+}
+
+public struct SetNicknameResponseDTO: Codable {
+    let status: String
+    let code: String
+    let message: String
+    let data: String
+}
+
+public struct checkNicknameRequestDTO: Codable {
+    let name: String
+}
+
+public struct checkNicknameResponseDTO: Codable {
+    let status: String
+    let code: String
+    let message: String
+}
