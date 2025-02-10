@@ -9,12 +9,7 @@ import FeatureCommon
 import SwiftUI
 
 internal struct SignUpProcessView: View {
-    enum ProcessType {
-        case signUp
-        case nickname
-        case complete
-    }
-    var processType: ProcessType
+    @Binding var processType: SignUpProcessType
 
     var body: some View {
         HStack(spacing: 0) {
@@ -118,11 +113,11 @@ fileprivate struct CircleView: View {
 @available(iOS 17.0, *)
 #Preview {
     VStack(spacing: 40) {
-        SignUpProcessView(processType: .signUp)
+        SignUpProcessView(processType: .constant(.signUp))
             .frame(width: 175)
-        SignUpProcessView(processType: .nickname)
+        SignUpProcessView(processType: .constant(.nickname))
             .frame(width: 175)
-        SignUpProcessView(processType: .complete)
+        SignUpProcessView(processType: .constant(.complete))
             .frame(width: 175)
         HStack {
             CircleView(type: .complete, config: .init(subTitle: "", number: 1))
