@@ -19,6 +19,14 @@ nonisolated(unsafe) let projectConfig = ProjectType.getConfig()
 let rootProject = Project.app(
     name: projectConfig.name,
     dependencies: projectConfig.dependencies,
+    resources: [
+        .glob(
+            pattern: .relativeToRoot("SupportFiles/AppResources/**"),
+            excluding: [],
+            tags: [],
+            inclusionCondition: nil
+        )
+    ],
     sources: projectConfig.sources,
     testSources: projectConfig.testSources
 )

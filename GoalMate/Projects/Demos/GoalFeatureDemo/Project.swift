@@ -15,5 +15,13 @@ let goalListDependencies: [TargetDependency] = [
 
 let goalListFeatureDemo = Project.app(
     name: "DemoGoalListFeature",
-    dependencies: goalListDependencies
+    dependencies: goalListDependencies,
+    resources: [
+        .glob(
+            pattern: .relativeToRoot("SupportFiles/AppResources/**"),
+            excluding: [],
+            tags: [],
+            inclusionCondition: nil
+        )
+    ]
 )

@@ -15,5 +15,13 @@ let introDependencies: [TargetDependency] = [
 
 let introFeatureDemo = Project.app(
     name: "DemoIntroFeature",
-    dependencies: introDependencies
+    dependencies: introDependencies,
+    resources: [
+        .glob(
+            pattern: .relativeToRoot("SupportFiles/AppResources/**"),
+            excluding: [],
+            tags: [],
+            inclusionCondition: nil
+        )
+    ]
 )

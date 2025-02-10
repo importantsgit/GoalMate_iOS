@@ -15,5 +15,13 @@ let profileDependencies: [TargetDependency] = [
 
 let myGoalFeatureDemo = Project.app(
     name: "DemoProfileFeature",
-    dependencies: profileDependencies
+    dependencies: profileDependencies,
+    resources: [
+        .glob(
+            pattern: .relativeToRoot("SupportFiles/AppResources/**"),
+            excluding: [],
+            tags: [],
+            inclusionCondition: nil
+        )
+    ]
 )

@@ -15,5 +15,13 @@ let homeDependencies: [TargetDependency] = [
 
 let homeFeatureDemo = Project.app(
     name: "DemoHomeFeature",
-    dependencies: homeDependencies
+    dependencies: homeDependencies,
+    resources: [
+        .glob(
+            pattern: .relativeToRoot("SupportFiles/AppResources/**"),
+            excluding: [],
+            tags: [],
+            inclusionCondition: nil
+        )
+    ]
 )

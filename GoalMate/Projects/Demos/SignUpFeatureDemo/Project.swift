@@ -15,5 +15,13 @@ let signUpDependencies: [TargetDependency] = [
 
 let signUpFeatureDemo = Project.app(
     name: "DemoSignUpFeature",
-    dependencies: signUpDependencies
+    dependencies: signUpDependencies,
+    resources: [
+        .glob(
+            pattern: .relativeToRoot("SupportFiles/AppResources/**"),
+            excluding: [],
+            tags: [],
+            inclusionCondition: nil
+        )
+    ]
 )
