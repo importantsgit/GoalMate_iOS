@@ -44,7 +44,7 @@ public struct ProfileCoordinator {
     var core: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-            case .router(.routeAction(_, action: .profile(.withdrawalButtonTapped))):
+            case .router(.routeAction(_, action: .profile(.view(.withdrawalButtonTapped)))):
                 state.routes.push(
                     .withdrawal(
                         .init()
