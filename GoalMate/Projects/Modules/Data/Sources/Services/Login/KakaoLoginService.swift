@@ -28,17 +28,17 @@ final class KakaoLoginService: NSObject {
                 ) { (oauthToken, error) in
                     if let error = error {
                         continuation.resume(throwing: error)
+                        return  // 여기서 return을 해줘야 합니다
                     }
-                    if let oauthToken,
-                       let idToken = oauthToken.idToken {
-                        self.decodeIDToken(idToken)
-                        continuation.resume(
-                            returning: .init(credential: idToken, nonce: nonce)
-                        )
-                    } else {
+                    guard let oauthToken = oauthToken,
+                          let idToken = oauthToken.idToken else {
                         continuation.resume(throwing: LoginError.loginFailed)
+                        return  // 여기서도 return을 해줘야 합니다
                     }
-                    return
+                    self.decodeIDToken(idToken)
+                    continuation.resume(
+                        returning: .init(credential: idToken, nonce: nonce)
+                    )
                 }
             }
         } else {
@@ -47,17 +47,17 @@ final class KakaoLoginService: NSObject {
                     if let error = error {
                         print(error)
                         continuation.resume(throwing: error)
+                        return
                     }
-                    if let oauthToken,
-                       let idToken = oauthToken.idToken {
-                        self.decodeIDToken(idToken)
-                        continuation.resume(
-                            returning: .init(credential: idToken, nonce: nonce)
-                        )
-                    } else {
+                    guard let oauthToken = oauthToken,
+                          let idToken = oauthToken.idToken else {
                         continuation.resume(throwing: LoginError.loginFailed)
+                        return
                     }
-                    return
+                    self.decodeIDToken(idToken)
+                    continuation.resume(
+                        returning: .init(credential: idToken, nonce: nonce)
+                    )
                 }
             }
         }
@@ -77,16 +77,16 @@ final class KakaoLoginService: NSObject {
                 var random: UInt8 = 0
                 let errorCode = SecRandomCopyBytes(kSecRandomDefault, 1, &random)
                 if errorCode != errSecSuccess {
-                    fatalError("Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)")
+                    fatalError(
+                        "Unable to generate nonce. SecRandomCopyBytes failed with OSStatus \(errorCode)"
+                    )
                 }
                 return random
             }
-            
             randoms.forEach { random in
                 if remainingLength == 0 {
                     return
                 }
-                
                 if random < charset.count {
                     result.append(charset[Int(random)])
                     remainingLength -= 1

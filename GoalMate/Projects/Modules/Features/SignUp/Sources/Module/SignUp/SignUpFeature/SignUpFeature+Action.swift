@@ -28,11 +28,10 @@ extension SignUpFeature {
             state.isLoading = true
             return .run { [provider] send in
                 do {
-                    let result = try await (
-                        provider == .apple ?
-                        authClient.appleLogin() :
-                            authClient.kakaoLogin()
-                    )
+                    let result = try await
+                        (provider == .apple ?
+                            authClient.appleLogin() :
+                            authClient.kakaoLogin())
                     print(result)
                     let tokens = try await authClient.authenticate(
                         response: result,
@@ -46,6 +45,9 @@ extension SignUpFeature {
                 } catch let error as NetworkError {
                     print("Error(NetworkError): \(error.localizedDescription)")
                     print(error.localizedDescription)
+                    await send(.feature(.checkSignUpResponse(false)))
+                } catch {
+                    print("Error(SDKError): \(error.localizedDescription)")
                     await send(.feature(.checkSignUpResponse(false)))
                 }
             }
@@ -116,7 +118,10 @@ extension SignUpFeature {
     // MARK: Feature
     func reduce(into state: inout State, action: FeatureAction) -> Effect<Action> {
         switch action {
-        case .checkSignUpResponse(_):
+        case let .checkSignUpResponse(isSuccess):
+            if isSuccess == false {
+                state.toastState = .display("로그인 중 문제가 발생했습니다.")
+            }
             state.isLoading = false
             return .none
         case .showNicknameView:
@@ -145,6 +150,7 @@ extension SignUpFeature {
                 state.nickname = state.nicknameFormState.inputText
                 state.pageType = .complete
             case .failure(_):
+                state.toastState = .display("닉네임을 저장하지 못했습니다.")
                 break
             }
             return .none
