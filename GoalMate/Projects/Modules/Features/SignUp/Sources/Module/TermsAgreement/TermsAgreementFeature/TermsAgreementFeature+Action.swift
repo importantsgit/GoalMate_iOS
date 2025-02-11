@@ -40,7 +40,7 @@ extension TermsAgreementFeature {
             return .none
         case .openTermsOfServiceView:
             guard let url = URL(
-                string: Environments.TermsOfServiceURL
+                string: Environments.TermsOfServiceURLString
             )
             else { return .none }
             return .run { [url] _ in
@@ -48,7 +48,7 @@ extension TermsAgreementFeature {
             }
         case .openPrivacyPolicyAgreeView:
             guard let url = URL(
-                string: Environments.PrivacyPolicyAgreeURL
+                string: Environments.PrivacyPolicyAgreeURLString
             )
             else { return .none }
             return .run { [url] _ in
