@@ -25,6 +25,8 @@ extension TermsAgreementFeature {
             if state.isServiceTermsAgreed &&
                 state.isPrivacyPolicyAgreed {
                 state.isAllTermsAgreed = true
+            } else if state.isPrivacyPolicyAgreed == false {
+                state.isAllTermsAgreed = false
             }
             return .none
         case .termsOfServiceButtonTapped:
@@ -32,6 +34,8 @@ extension TermsAgreementFeature {
             if state.isServiceTermsAgreed &&
                 state.isPrivacyPolicyAgreed {
                 state.isAllTermsAgreed = true
+            } else if state.isServiceTermsAgreed == false {
+                state.isAllTermsAgreed = false
             }
             return .none
         case .openTermsOfServiceView:
