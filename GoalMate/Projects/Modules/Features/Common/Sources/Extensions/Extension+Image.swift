@@ -34,6 +34,7 @@ public extension Images {
     static let flag = Asset.Assets.flag.swiftUIImage
     static let progress = Asset.Assets.progress.swiftUIImage
     static let launchScreenLogo = Asset.Assets.launchScreenLogo.swiftUIImage
+    static let pencil = Asset.Assets.pencil.swiftUIImage
 }
 
 public extension Image {
