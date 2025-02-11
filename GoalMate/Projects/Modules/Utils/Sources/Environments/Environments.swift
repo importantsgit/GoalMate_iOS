@@ -60,5 +60,5 @@ public enum Environments {
 
 public extension Environments {
     static let TermsOfServiceURL = "https://ash-oregano-9dc.notion.site/f97185c23c5444b4ae3796928ae7f646?pvs=74"
-    static let PrivacyPolicyAgreeURL = "https://ash-oregano-9dc.notion.site/f97185c23c5444b4ae3796928ae7f646?pvs=74"
+    static let PrivacyPolicyAgreeURL = "https://ash-oregano-9dc.notion.site/997827990f694f63a60b06c06beb1468"
 }
