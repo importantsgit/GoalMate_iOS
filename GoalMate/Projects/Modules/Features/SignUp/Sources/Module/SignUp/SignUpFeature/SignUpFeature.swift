@@ -8,6 +8,7 @@
 import ComposableArchitecture
 import Data
 import Dependencies
+import FeatureCommon
 import UIKit
 import Utils
 
@@ -48,6 +49,7 @@ public struct SignUpFeature {
         // 페이지 상태
         var pageType: SignUpProcessType
         var isLoading: Bool
+        var toastState: ToastState
         // 닉네임 입력 관련 상태
         var nicknameFormState: NicknameFormState
         // 키보드 상태
@@ -80,6 +82,7 @@ public struct SignUpFeature {
             self.id = id
             self.pageType = pageType
             self.isLoading = isLoading
+            self.toastState = .hide
             self.nicknameFormState = nicknameInput
             self.keyboardHeight = keyboardHeight
             self.nickname = ""

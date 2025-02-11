@@ -41,6 +41,7 @@ struct SignUpView: View {
             }
             .transition(.opacity)
             .animation(.easeInOut, value: store.pageType)
+            .toast(state: $store.toastState, position: .top)
         }
     }
 

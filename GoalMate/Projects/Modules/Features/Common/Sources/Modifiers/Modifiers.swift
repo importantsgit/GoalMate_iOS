@@ -13,7 +13,7 @@ struct FontModifier: ViewModifier {
     let size: CGFloat
     let font: IFont.Pretendard
     let color: Color?
-
+    
     func body(content: Content) -> some View {
         content
             .font(font.value.swiftUIFont(size: size))
@@ -23,7 +23,7 @@ struct FontModifier: ViewModifier {
 
 struct LoadingModifier: ViewModifier {
     @Binding var isLoading: Bool
-
+    
     func body(content: Content) -> some View {
         content
             .overlay {
@@ -109,5 +109,104 @@ struct CornerRoundView: Shape {
             cornerRadii: CGSize(width: radius, height: radius)
         )
         return Path(path.cgPath)
+    }
+}
+
+public enum ToastPosition { // 추가
+    case top, bottom
+    var edge: Edge {
+        switch self {
+        case .top: return .top
+        case .bottom: return .bottom
+        }
+    }
+    var alignment: Alignment {
+        switch self {
+        case .top: return .top
+        case .bottom: return .bottom
+        }
+    }
+}
+
+public enum ToastState: Equatable {
+    case display(String)
+    case hide
+    public static func == (lhs: ToastState, rhs: ToastState) -> Bool {
+        switch (lhs, rhs) {
+            case (.display(let lhsText), .display(let rhsText)):
+            return lhsText == rhsText
+        case (.hide, .hide):
+            return true
+        default:
+            return false
+        }
+    }
+}
+struct ToastModifier: ViewModifier {
+    @Binding var state: ToastState
+    let position: ToastPosition
+    @State private var showToast = false
+    @State private var currentTask: Task<Void, Never>?
+    init(
+        state: Binding<ToastState>,
+        position: ToastPosition = .bottom
+    ) {
+        self.position = position
+        self._state = state
+    }
+    func body(content: Content) -> some View {
+        ZStack(alignment: position.alignment) {
+            content
+            if showToast {
+                toastView
+                    .transition(
+                        .asymmetric(
+                            insertion: .move(edge: .top),
+                            removal: .move(edge: .top)
+                        )
+                    )
+                    .onTapGesture {
+                        withAnimation {
+                            showToast = false
+                        }
+                    }
+                    .zIndex(1)
+            }
+        }
+        .onChange(of: state) { _ in
+            if case .display = state {  // display 상태일 때만 새 Task 시작
+                currentTask?.cancel()  // 이전 Task 취소
+                currentTask = Task {
+                    withAnimation {
+                        showToast = true
+                    }
+                    try? await Task.sleep(for: .seconds(3))
+                    if !Task.isCancelled {
+                        withAnimation {
+                            showToast = false
+                        }
+                        state = .hide
+                    }
+                }
+            }
+        }
+    }
+    @ViewBuilder
+    var toastView: some View {
+        if case let .display(message) = state {
+            Text(message)
+                .foregroundColor(.white)
+                .padding(.horizontal, 20)
+                .padding(.vertical, 10)
+                .background(
+                    Capsule()
+                        .fill(Color.black.opacity(0.8))
+                )
+                .padding(.horizontal, 20)
+                .padding(
+                    position == .top ? .top : .bottom,
+                    30
+                )
+        }
     }
 }

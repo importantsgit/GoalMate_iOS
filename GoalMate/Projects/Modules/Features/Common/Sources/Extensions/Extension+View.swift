@@ -37,6 +37,16 @@ public extension View {
     ) -> some View {
         modifier(CornerRoundedModifier(radius: radius, corners: corners))
     }
+
+    func toast(
+        state: Binding<ToastState>,
+        position: ToastPosition = .bottom
+    ) -> some View {
+        modifier(ToastModifier(
+            state: state,
+            position: position
+        ))
+    }
 }
 
 public extension Text {
