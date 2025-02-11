@@ -36,8 +36,8 @@ public struct ProfileView: View {
                                 HStack(spacing: 10) {
                                     Text("김골메이트님")
                                         .pretendardStyle(.semiBold, size: 16, color: Colors.grey900)
-                                    Image(systemName: "pencil")
-                                        .resized(length: 12)
+                                    Images.pencil
+                                        .resized(length: 14)
                                         .background {
                                             Circle()
                                                 .fill(Colors.primary100)
@@ -61,7 +61,9 @@ public struct ProfileView: View {
                             HStack {
                                 Spacer()
                                 VStack(spacing: 4) {
-                                    Text("2")
+                                    Text(
+                                        "\(store?.profile?.state?.inProgressCount ?? 0)"
+                                    )
                                         .pretendard(.semiBold, size: 20, color: Colors.grey900)
                                     Text("진행중")
                                         .pretendard(.regular, size: 14, color: Colors.grey800)
@@ -72,7 +74,9 @@ public struct ProfileView: View {
                                     .frame(width: 1)
                                 Spacer()
                                 VStack(spacing: 4) {
-                                    Text("2")
+                                    Text(
+                                        "\(store?.profile?.state?.completedCount ?? 0)"
+                                    )
                                         .pretendard(.semiBold, size: 20, color: Colors.grey900)
                                     Text("진행완료")
                                         .pretendard(.regular, size: 14, color: Colors.grey800)
@@ -95,16 +99,24 @@ public struct ProfileView: View {
                         Spacer()
                             .frame(height: 20)
                         ListButton(title: "자주 묻는 질문") {
-                            store.send(.qnaButtonTapped)
+                            store.send(
+                                .view(.qnaButtonTapped)
+                            )
                         }
                         ListButton(title: "개인 정보 처리 방침") {
-                            store.send(.privacyPolicyButtonTapped)
+                            store.send(
+                                .view(.privacyPolicyButtonTapped)
+                            )
                         }
                         ListButton(title: "이용약관") {
-                            store.send(.termsOfServiceButtonTapped)
+                            store.send(
+                                .view(.termsOfServiceButtonTapped)
+                            )
                         }
                         ListButton(title: "탈퇴하기") {
-                            store.send(.withdrawalButtonTapped)
+                            store.send(
+                                .view(.withdrawalButtonTapped)
+                            )
                         }
                     }
                 }
