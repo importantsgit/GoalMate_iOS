@@ -13,7 +13,7 @@ struct APIEndpoints {
         case authLogin          = "auth/login"
         case refreshLogin       = "auth/reissue"
         case setNickname        = "mentees/my/name"
-        case checkNickname      = "mentees/my/validate"
+        case checkNickname      = "mentees/name/validate"
 
         case goalDetail         = "goals/{goalId}"
 
@@ -31,8 +31,8 @@ struct APIEndpoints {
     ) -> Endpoint<AuthLoginResponseDTO> {
         Endpoint(
             path: APIPath.authLogin,
-            method: .get,
-            queryParametersEncodable: request
+            method: .post,
+            bodyParametersEncodable: request
         )
     }
 
@@ -59,21 +59,29 @@ struct APIEndpoints {
     }
 
     static func setNicknameEndpoint(
-        with request: SetNicknameRequestDTO
+        with request: SetNicknameRequestDTO,
+        accessToken: String
     ) -> Endpoint<SetNicknameResponseDTO> {
         Endpoint(
             path: APIPath.setNickname,
             method: .put,
+            headerParameters: [
+                "Authorization": "Bearer \(accessToken)"
+            ],
             queryParametersEncodable: request
         )
     }
-    
+
     static func checkNicknameEndpoint(
-        with request: checkNicknameRequestDTO
+        with request: checkNicknameRequestDTO,
+        accessToken: String
     ) -> Endpoint<checkNicknameResponseDTO> {
         Endpoint(
             path: APIPath.checkNickname,
             method: .get,
+            headerParameters: [
+                "Authorization": "Bearer \(accessToken)"
+            ],
             queryParametersEncodable: request
         )
     }

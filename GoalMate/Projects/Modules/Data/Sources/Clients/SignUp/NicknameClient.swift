@@ -27,16 +27,26 @@ extension NicknameClient: DependencyKey {
         @Dependency(\.dataStorageClient) var dataStorageClient
         return .init(
             setNickname: { nickName in
+                guard let accessToken = await dataStorageClient.tokenInfo.accessToken
+                else { throw NetworkError.emyptyAccessToken }
                 let requestDTO: SetNicknameRequestDTO = .init(name: nickName)
-                let endpoint = APIEndpoints.setNicknameEndpoint(with: requestDTO)
+                let endpoint = APIEndpoints.setNicknameEndpoint(
+                    with: requestDTO,
+                    accessToken: accessToken
+                )
                 _ = try await networkClient.asyncRequest(with: endpoint)
                 await dataStorageClient.setUserInfo(
                     .init(nickname: nickName)
                 )
             },
             isUniqueNickname: { nickName in
+                guard let accessToken = await dataStorageClient.tokenInfo.accessToken
+                else { throw NetworkError.emyptyAccessToken }
                 let requestDTO: checkNicknameRequestDTO = .init(name: nickName)
-                let endpoint = APIEndpoints.checkNicknameEndpoint(with: requestDTO)
+                let endpoint = APIEndpoints.checkNicknameEndpoint(
+                    with: requestDTO,
+                    accessToken: accessToken
+                )
                 let response = try await networkClient.asyncRequest(with: endpoint)
                 return response.code == "200" // duplicated
             }

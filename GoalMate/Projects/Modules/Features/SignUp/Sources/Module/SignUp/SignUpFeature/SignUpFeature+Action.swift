@@ -120,7 +120,7 @@ extension SignUpFeature {
         switch action {
         case let .checkSignUpResponse(isSuccess):
             if isSuccess == false {
-                state.toastState = .display("로그인 중 문제가 발생했습니다.")
+                state.toastState = .display("네트워크에 문제가 발생했습니다.")
             }
             state.isLoading = false
             return .none
@@ -136,6 +136,12 @@ extension SignUpFeature {
                 state.nicknameFormState.validationState = .valid
                 return .none
             case let .failure(error):
+                if case .networkError = error {
+                    state.toastState = .display(
+                        "네트워크에 문제가 발생했습니다."
+                    )
+                    return .none
+                }
                 state.nicknameFormState.isDuplicateCheckEnabled = false
                 state.nicknameFormState.isSubmitEnabled = false
                 state.nicknameFormState.validationState = error == .duplicateName ?

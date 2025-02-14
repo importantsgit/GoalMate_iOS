@@ -12,8 +12,8 @@ public enum Environments {
         enum Plist {
             static let KakaoKey = "KAKAO_APP_KEY"
             static let baseURL = "BASE_URL"
-            static let AESKey = "ASE_KEY"
-            static let AESIV = "ASE_IV"
+            static let AESKey = "AES_KEY"
+            static let AESIV = "AES_IV"
         }
     }
 

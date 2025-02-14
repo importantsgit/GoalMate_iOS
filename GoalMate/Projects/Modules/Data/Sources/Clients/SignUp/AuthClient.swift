@@ -25,8 +25,8 @@ public enum LoginType {
     case apple
     var path: String {
         switch self {
-        case .kakao: return "kakao"
-        case .apple: return "apple"
+        case .kakao: return "KAKAO"
+        case .apple: return "APPLE"
         }
     }
 }

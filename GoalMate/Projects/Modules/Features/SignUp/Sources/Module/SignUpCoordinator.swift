@@ -57,8 +57,6 @@ public struct SignUpCoordinator {
 
     public var body: some Reducer<State, Action> {
         self.core
-            .dependency(\.authClient, .previewValue)
-            .dependency(\.nicknameClient, .previewValue)
     }
 
     @ReducerBuilder<State, Action>

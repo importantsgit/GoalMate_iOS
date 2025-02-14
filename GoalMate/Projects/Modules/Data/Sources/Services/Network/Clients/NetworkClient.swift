@@ -12,7 +12,12 @@ import Utils
 extension NetworkService: DependencyKey {
     public static var liveValue: NetworkService {
         return NetworkService(
-            config: NetworkConfiguration(baseURL: URL(string: Environments.baseURL)!)
+            config: NetworkConfiguration(
+                baseURL: URL(string: Environments.baseURL)!,
+                header: [
+                    "Content-Type": "application/json"
+                ]
+            )
         )
     }
 }
