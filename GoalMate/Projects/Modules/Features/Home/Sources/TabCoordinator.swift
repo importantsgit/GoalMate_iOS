@@ -23,6 +23,7 @@ public struct TabCoordinator {
     }
     @ObservableState
     public struct State: Equatable {
+        public var id: UUID
         public var selectedTab: Tab
         public var goal: GoalCoordinator.State
         public var myGoal: MyGoalCoordinator.State
@@ -33,6 +34,7 @@ public struct TabCoordinator {
             myGoal: MyGoalCoordinator.State = .init(),
             profile: ProfileCoordinator.State = .init()
         ) {
+            self.id = UUID()
             self.selectedTab = selectedTab
             self.goal = goal
             self.myGoal = myGoal
@@ -43,20 +45,24 @@ public struct TabCoordinator {
         case goal(GoalCoordinator.Action)
         case myGoal(MyGoalCoordinator.Action)
         case profile(ProfileCoordinator.Action)
+        case coordinator(CoordinatorAction)
         case binding(BindingAction<State>)
     }
+    public enum CoordinatorAction {
+        case showLogin
+    }
     public var body: some Reducer<State, Action> {
+        BindingReducer()
         Reduce { state, action in
             switch action {
-            case .goal(.showMyGoal):
-                state.selectedTab = .myGoal
-                return .none
-            case let .myGoal(.showMyGoalDetail(id)):
-                print("id: \(id)")
-                state.selectedTab = .goal
-                return .none
-            case .goal, .profile, .myGoal:
-                return .none
+            case let .coordinator(action):
+                return reduce(into: &state, action: action)
+            case let .goal(action):
+                return reduce(into: &state, action: action)
+            case let .myGoal(action):
+                return reduce(into: &state, action: action)
+            case .profile:
+                return reduce(into: &state, action: action)
             case .binding:
                 return .none
             }
@@ -70,7 +76,6 @@ public struct TabCoordinator {
         Scope(state: \.profile, action: \.profile) {
             ProfileCoordinator()
         }
-        BindingReducer()
     }
 }
 
