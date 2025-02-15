@@ -14,6 +14,7 @@ public enum NetworkError: LocalizedError {
     case invalidHTTPBody
     case invaildResponse
     case invalidFormat
+    case invalidPath
     case emyptyAccessToken
     case invalidAccessToken
 
@@ -31,6 +32,8 @@ public enum NetworkError: LocalizedError {
            return "서버로부터 잘못된 응답을 받았습니다."
        case .invalidFormat:
            return "데이터 형식이 올바르지 않습니다."
+       case .invalidPath:
+           return "잘못된 path 정보입니다."
        case .emyptyAccessToken:
            return "액세스 토큰이 존재하지 않습니다."
        case .invalidAccessToken:
