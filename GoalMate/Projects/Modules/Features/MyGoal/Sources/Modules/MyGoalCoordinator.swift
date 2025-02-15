@@ -19,20 +19,22 @@ public struct MyGoalCoordinator {
     }
 
     @ObservableState
-    public struct State: Equatable {
-        var routes: [Route<Screen.State>]
+    public struct State: Equatable, Identifiable {
+        public let id: UUID
+        var routes: IdentifiedArrayOf<Route<Screen.State>>
 
         public init(
-            routes: [Route<Screen.State>] = [
+            routes: IdentifiedArrayOf<Route<Screen.State>> = [
                 .root(.myGoalList(.init()))
             ]
         ) {
+            self.id = UUID()
             self.routes = routes
         }
     }
 
     public enum Action {
-        case router(IndexedRouterActionOf<Screen>)
+        case router(IdentifiedRouterActionOf<Screen>)
         case showMyGoalDetail(Int)
         case coordinatorFinished
     }
@@ -47,7 +49,7 @@ public struct MyGoalCoordinator {
             switch action {
             case let .router(.routeAction(_, action: .myGoalList(.showMyGoalDetail(data)))):
                 state.routes.push(.myGoalDetail(.init(
-                    id: data.id,
+                    goalId: data.id,
                     startDate: data.startDate,
                     endDate: data.endDate
                 )))
@@ -84,4 +86,15 @@ public struct MyGoalCoordinatorView: View {
             .toolbar(.hidden)
         }
     }
+}
+
+extension MyGoalCoordinator.Screen.State: Identifiable {
+    public var id: UUID {
+    switch self {
+    case let .myGoalList(state):
+        state.id
+    case let .myGoalDetail(state):
+        state.id
+    }
+  }
 }

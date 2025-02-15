@@ -14,6 +14,7 @@ public struct GoalDetailFeature {
     public init() {}
     @ObservableState
     public struct State: Equatable {
+        public let id: UUID
         let contentId: String
         var content: GoalContentDetail?
         var isShowPurchaseView: Bool
@@ -27,6 +28,7 @@ public struct GoalDetailFeature {
             currentPage: Int = 0,
             images: [Image] = []
         ) {
+            self.id = UUID()
             self.contentId = contentId
             self.images = images
             self.isShowPurchaseView = isShowPurchaseView

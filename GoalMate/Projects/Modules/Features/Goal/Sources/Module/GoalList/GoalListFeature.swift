@@ -6,18 +6,21 @@
 //
 
 import ComposableArchitecture
+import Foundation
 
 @Reducer
 public struct GoalListFeature {
     public init() {}
     @ObservableState
     public struct State: Equatable {
+        public let id: UUID
         var isLoading: Bool
         var goalContents: [GoalContent]
         public init(
             isLoading: Bool = false,
             goalContents: [GoalContent] = []
         ) {
+            self.id = UUID()
             self.isLoading = false
             self.goalContents = goalContents
         }

@@ -20,10 +20,10 @@ public struct ProfileCoordinator {
 
     @ObservableState
     public struct State: Equatable {
-        var routes: [Route<Screen.State>]
+        var routes: IdentifiedArrayOf<Route<Screen.State>>
 
         public init(
-            routes: [Route<Screen.State>] = [
+            routes: IdentifiedArrayOf<Route<Screen.State>> = [
                 .root(.profile(.init()))
             ]
         ) {
@@ -32,7 +32,7 @@ public struct ProfileCoordinator {
     }
 
     public enum Action {
-        case router(IndexedRouterActionOf<Screen>)
+        case router(IdentifiedRouterActionOf<Screen>)
         case coordinatorFinished
     }
 
@@ -80,4 +80,15 @@ public struct ProfileCoordinatorView: View {
             .toolbar(.hidden)
         }
     }
+}
+
+extension ProfileCoordinator.Screen.State: Identifiable {
+    public var id: UUID {
+    switch self {
+    case let .profile(state):
+      state.id
+    case let .withdrawal(state):
+      state.id
+    }
+  }
 }

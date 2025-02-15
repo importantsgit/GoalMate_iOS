@@ -39,6 +39,7 @@ public struct SignUpCoordinator {
     }
     @ObservableState
     public struct State: Equatable {
+        public var id: UUID
         var routes: IdentifiedArrayOf<Route<Screen.State>>
 
         public init(
@@ -46,6 +47,7 @@ public struct SignUpCoordinator {
                 .root(.signUp(.init()), embedInNavigationView: true)
             ]
         ) {
+            self.id = UUID()
             self.routes = routes
         }
     }

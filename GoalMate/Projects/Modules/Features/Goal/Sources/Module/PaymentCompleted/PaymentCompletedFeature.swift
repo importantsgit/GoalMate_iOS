@@ -16,10 +16,12 @@ public struct PaymentCompletedFeature {
     public init() {}
     @ObservableState
     public struct State: Equatable {
+        public let id: UUID
         var content: PaymentCompletedItem
         public init(
             content: PaymentCompletedItem
         ) {
+            self.id = UUID()
             self.content = content
         }
     }

@@ -6,13 +6,17 @@
 //
 
 import ComposableArchitecture
+import Foundation
 
 @Reducer
 public struct WithdrawalFeature {
     public init() {}
     @ObservableState
     public struct State: Equatable {
-        public init() {}
+        public let id: UUID
+        public init() {
+            self.id = UUID()
+        }
     }
     public enum Action: BindableAction {
         case binding(BindingAction<State>)

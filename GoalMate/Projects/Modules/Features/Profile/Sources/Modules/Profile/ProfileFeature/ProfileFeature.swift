@@ -14,9 +14,11 @@ public struct ProfileFeature {
     public init() {}
     @ObservableState
     public struct State: Equatable {
+        public let id: UUID
         var profile: ProfileContent?
         public init() {
-            profile = nil
+            self.id = UUID()
+            self.profile = nil
         }
     }
     public enum Action: BindableAction {

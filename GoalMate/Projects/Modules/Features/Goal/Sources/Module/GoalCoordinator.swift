@@ -10,6 +10,30 @@ import SwiftUI
 import TCACoordinators
 import Utils
 
+public struct GoalCoordinatorView: View {
+    let store: StoreOf<GoalCoordinator>
+
+    public init(store: StoreOf<GoalCoordinator>) {
+        self.store = store
+    }
+
+    public var body: some View {
+        TCARouter(store.scope(state: \.routes, action: \.router)) { screen in
+            Group {
+                switch screen.case {
+                case let .goalList(store):
+                    GoalListView(store: store)
+                case let .goalDetail(store):
+                    GoalDetailView(store: store)
+                case let .paymentCompleted(store):
+                    PaymentCompletedView(store: store)
+                }
+            }
+            .toolbar(.hidden)
+        }
+    }
+}
+
 @Reducer
 public struct GoalCoordinator {
     public init() {}
@@ -22,19 +46,21 @@ public struct GoalCoordinator {
 
     @ObservableState
     public struct State: Equatable {
-        var routes: [Route<Screen.State>]
+        public let id: UUID
+        var routes: IdentifiedArrayOf<Route<Screen.State>>
 
         public init(
-            routes: [Route<Screen.State>] = [
+            routes: IdentifiedArrayOf<Route<Screen.State>> = [
                 .root(.goalList(.init()))
             ]
         ) {
+            self.id = UUID()
             self.routes = routes
         }
     }
 
     public enum Action {
-        case router(IndexedRouterActionOf<Screen>)
+        case router(IdentifiedRouterActionOf<Screen>)
         case showMyGoal
         case coordinatorFinished
     }
@@ -82,26 +108,15 @@ public struct GoalCoordinator {
     }
 }
 
-public struct GoalCoordinatorView: View {
-    let store: StoreOf<GoalCoordinator>
-
-    public init(store: StoreOf<GoalCoordinator>) {
-        self.store = store
+extension GoalCoordinator.Screen.State: Identifiable {
+    public var id: UUID {
+    switch self {
+    case let .goalList(state):
+      state.id
+    case let .goalDetail(state):
+      state.id
+    case let .paymentCompleted(state):
+        state.id
     }
-
-    public var body: some View {
-        TCARouter(store.scope(state: \.routes, action: \.router)) { screen in
-            Group {
-                switch screen.case {
-                case let .goalList(store):
-                    GoalListView(store: store)
-                case let .goalDetail(store):
-                    GoalDetailView(store: store)
-                case let .paymentCompleted(store):
-                    PaymentCompletedView(store: store)
-                }
-            }
-            .toolbar(.hidden)
-        }
-    }
+  }
 }

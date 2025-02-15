@@ -24,10 +24,12 @@ public struct MyGoalListFeature {
     public init() {}
     @ObservableState
     public struct State: Equatable {
+        public let id: UUID
         var myGoalList: IdentifiedArrayOf<MyGoalContent>
         public init(
             myGoalList: IdentifiedArrayOf<MyGoalContent> = []
         ) {
+            self.id = UUID()
             self.myGoalList = myGoalList
         }
     }
