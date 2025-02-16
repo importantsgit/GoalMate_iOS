@@ -13,18 +13,20 @@ public struct MyGoalDetailFeature {
     public init() {}
     @ObservableState
     public struct State: Equatable {
-        let id: Int
+        public let id: UUID
+        let goalId: Int
         var content: MyGoalDetailContent?
         let startDate: Date
         let endDate: Date
         var currentMonth: Date
         var selectedDate: Date
         public init(
-            id: Int,
+            goalId: Int,
             startDate: Date,
             endDate: Date
         ) {
-            self.id = id
+            self.id = UUID()
+            self.goalId = goalId
             self.startDate = startDate
             self.endDate = endDate
             let today = Date()

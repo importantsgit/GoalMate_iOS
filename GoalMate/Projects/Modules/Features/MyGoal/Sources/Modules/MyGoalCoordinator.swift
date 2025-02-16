@@ -5,9 +5,32 @@
 //  Created by 이재훈 on 1/21/25.
 
 import ComposableArchitecture
+import Data
 import FeatureCommon
 import SwiftUI
 import TCACoordinators
+
+public struct MyGoalCoordinatorView: View {
+    let store: StoreOf<MyGoalCoordinator>
+
+    public init(store: StoreOf<MyGoalCoordinator>) {
+        self.store = store
+    }
+
+    public var body: some View {
+        TCARouter(store.scope(state: \.routes, action: \.router)) { screen in
+            Group {
+                switch screen.case {
+                case let .myGoalList(store):
+                    MyGoalListView(store: store)
+                case let .myGoalDetail(store):
+                    MyGoalDetailView(store: store)
+                }
+            }
+            .toolbar(.hidden)
+        }
+    }
+}
 
 @Reducer
 public struct MyGoalCoordinator {
@@ -63,28 +86,6 @@ public struct MyGoalCoordinator {
             return .none
         }
         .forEachRoute(\.routes, action: \.router)
-    }
-}
-
-public struct MyGoalCoordinatorView: View {
-    let store: StoreOf<MyGoalCoordinator>
-
-    public init(store: StoreOf<MyGoalCoordinator>) {
-        self.store = store
-    }
-
-    public var body: some View {
-        TCARouter(store.scope(state: \.routes, action: \.router)) { screen in
-            Group {
-                switch screen.case {
-                case let .myGoalList(store):
-                    MyGoalListView(store: store)
-                case let .myGoalDetail(store):
-                    MyGoalDetailView(store: store)
-                }
-            }
-            .toolbar(.hidden)
-        }
     }
 }
 

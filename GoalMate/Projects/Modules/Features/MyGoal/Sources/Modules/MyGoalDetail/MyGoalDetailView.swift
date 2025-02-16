@@ -533,22 +533,22 @@ fileprivate struct DetailButton: View {
  }
  }
  */
-@available(iOS 17.0, *)
-#Preview {
-    let calendar = Calendar.current
-    let today = Date()
-    let startDate = calendar.date(byAdding: .day, value: -50, to: today) ?? Date()
-    let endDate = calendar.date(byAdding: .day, value: 40, to: today) ?? Date()
-    
-    MyGoalDetailView(
-        store: .init(
-            initialState: .init(
-                id: 1,
-                startDate: startDate,
-                endDate: endDate
-            )
-        ) {
-            MyGoalDetailFeature()
-        }
-    )
-}
+//@available(iOS 17.0, *)
+//#Preview {
+//    let calendar = Calendar.current
+//    let today = Date()
+//    let startDate = calendar.date(byAdding: .day, value: -50, to: today) ?? Date()
+//    let endDate = calendar.date(byAdding: .day, value: 40, to: today) ?? Date()
+//    
+//    MyGoalDetailView(
+//        store: .init(
+//            initialState: .init(
+//                id: 1,
+//                startDate: startDate,
+//                endDate: endDate
+//            )
+//        ) {
+//            MyGoalDetailFeature()
+//        }
+//    )
+//}

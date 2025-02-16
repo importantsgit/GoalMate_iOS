@@ -16,7 +16,7 @@ struct MyGoalDetailContent: Equatable {
     let totalProgress: Double
     let description: GoalDetailDescription
     let comment: Comment
-    
+
     static func == (lhs: MyGoalDetailContent, rhs: MyGoalDetailContent) -> Bool {
         lhs.id == rhs.id
     }
