@@ -9,12 +9,42 @@ import FeatureCommon
 import SwiftUI
 import TCACoordinators
 
+public struct ProfileCoordinatorView: View {
+    let store: StoreOf<ProfileCoordinator>
+
+    public init(store: StoreOf<ProfileCoordinator>) {
+        self.store = store
+    }
+
+    public var body: some View {
+        TCARouter(store.scope(state: \.routes, action: \.router)) { screen in
+            Group {
+                switch screen.case {
+                case let .profile(store):
+                    ProfileView(store: store)
+                case let .withdrawal(store):
+                    WithdrawalView(store: store)
+                case let .nicknameEdit(store):
+                    NicknameEditView(store: store)
+                        .customSheet(
+                            heights: [280],
+                            radius: 30,
+                            corners: [.topLeft, .topRight]
+                        )
+                }
+            }
+            .toolbar(.hidden)
+        }
+    }
+}
+
 @Reducer
 public struct ProfileCoordinator {
     public init() {}
     @Reducer(state: .equatable)
     public enum Screen {
         case profile(ProfileFeature)
+        case nicknameEdit(NicknameEditFeature)
         case withdrawal(WithdrawalFeature)
     }
 
@@ -44,41 +74,49 @@ public struct ProfileCoordinator {
     var core: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
+            case let .router(
+                .routeAction(
+                    _,
+                    action: .profile(
+                        .feature(.showNicknameEdit(nickname))
+                    )
+                )
+            ):
+                state.routes.presentSheet(
+                    .nicknameEdit(.init(nickname: nickname))
+                )
+                return .none
+            case let .router(.routeAction(
+                _,
+                action: .nicknameEdit(.feature(.nicknameSubmitted(result))))
+            ):
+                if case let .success(nickname) = result {
+                    state.routes.dismiss()
+                    if let profile = state.routes.first(where: {
+                        if case .profile = $0.screen { return true }
+                        return false
+                    })?.screen as? ProfileFeature.State {
+                        return .send(.router(.routeAction(
+                            id: profile.id,
+                            action: .profile(.view(.setNickname(nickname)))
+                        )))
+                    }
+                }
+                return .none
             case .router(.routeAction(_, action: .profile(.view(.withdrawalButtonTapped)))):
                 state.routes.push(
                     .withdrawal(
                         .init()
                     )
                 )
+                return .none
             case .router(.routeAction(_, action: .withdrawal(.backButtonTapped))):
                 state.routes.popToRoot()
+                return .none
             default: return .none
             }
-            return .none
         }
         .forEachRoute(\.routes, action: \.router)
-    }
-}
-
-public struct ProfileCoordinatorView: View {
-    let store: StoreOf<ProfileCoordinator>
-
-    public init(store: StoreOf<ProfileCoordinator>) {
-        self.store = store
-    }
-
-    public var body: some View {
-        TCARouter(store.scope(state: \.routes, action: \.router)) { screen in
-            Group {
-                switch screen.case {
-                case let .profile(store):
-                    ProfileView(store: store)
-                case let .withdrawal(store):
-                    WithdrawalView(store: store)
-                }
-            }
-            .toolbar(.hidden)
-        }
     }
 }
 
@@ -89,6 +127,8 @@ extension ProfileCoordinator.Screen.State: Identifiable {
       state.id
     case let .withdrawal(state):
       state.id
+    case let .nicknameEdit(state):
+        state.id
     }
   }
 }

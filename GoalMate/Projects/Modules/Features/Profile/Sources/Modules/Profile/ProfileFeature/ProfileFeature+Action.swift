@@ -23,6 +23,10 @@ extension ProfileFeature {
     }
     func reduce(into state: inout State, action: ViewAction) -> Effect<Action> {
         switch action {
+        case .nicknameEditButtonTapped:
+            return .send(
+                .feature(.showNicknameEdit(state.profile?.name ?? ""))
+            )
         case .qnaButtonTapped:
             guard let url = URL(
                 string: Environments.qnaURLString
@@ -49,10 +53,15 @@ extension ProfileFeature {
             }
         case .withdrawalButtonTapped:
             return .none
+        case let .setNickname(nickname):
+            state.profile?.name = nickname
+            return .none
         }
     }
     func reduce(into state: inout State, action: FeatureAction) -> Effect<Action> {
         switch action {
+        case .showNicknameEdit:
+            return .none
         case let .fetchMyGoalCount(result):
             switch result {
             case  let .success(content):

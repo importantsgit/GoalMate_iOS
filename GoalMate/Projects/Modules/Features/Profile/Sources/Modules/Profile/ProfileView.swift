@@ -31,7 +31,7 @@ public struct ProfileView: View {
                     VStack(spacing: 44) {
                         VStack(alignment: .leading, spacing: 8) {
                             Button {
-                                // 네이밍 변경
+                                store.send(.view(.nicknameEditButtonTapped))
                             } label: {
                                 HStack(spacing: 10) {
                                     Text("김골메이트님")
@@ -62,7 +62,7 @@ public struct ProfileView: View {
                                 Spacer()
                                 VStack(spacing: 4) {
                                     Text(
-                                        "\(store?.profile?.state?.inProgressCount ?? 0)"
+                                         "\(store.profile?.state.inProgressCount ?? 0)"
                                     )
                                         .pretendard(.semiBold, size: 20, color: Colors.grey900)
                                     Text("진행중")
@@ -75,7 +75,7 @@ public struct ProfileView: View {
                                 Spacer()
                                 VStack(spacing: 4) {
                                     Text(
-                                        "\(store?.profile?.state?.completedCount ?? 0)"
+                                        "\(store.profile?.state.completedCount ?? 0)"
                                     )
                                         .pretendard(.semiBold, size: 20, color: Colors.grey900)
                                     Text("진행완료")
@@ -123,6 +123,9 @@ public struct ProfileView: View {
 
             }
             .padding(.horizontal, 20)
+            .task {
+                store.send(.viewCycling(.onAppear))
+            }
         }
     }
 }
@@ -137,13 +140,15 @@ fileprivate struct ListButton: View {
     }
 
     var body: some View {
-        Button {
-            action()
-        } label: {
-            Text(title)
-                .pretendardStyle(.regular, size: 16, color: Colors.grey900)
-                .frame(height: 46)
-                .frame(maxWidth: .infinity, alignment: .leading)
+        WithPerceptionTracking {
+            Button {
+                action()
+            } label: {
+                Text(title)
+                    .pretendardStyle(.regular, size: 16, color: Colors.grey900)
+                    .frame(height: 46)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
         }
     }
 }

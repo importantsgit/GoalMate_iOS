@@ -15,6 +15,7 @@ public struct ProfileFeature {
     @ObservableState
     public struct State: Equatable {
         public let id: UUID
+        var name: String?
         var profile: ProfileContent?
         public init() {
             self.id = UUID()
@@ -31,13 +32,16 @@ public struct ProfileFeature {
         case onAppear
     }
     public enum ViewAction {
+        case nicknameEditButtonTapped
         case qnaButtonTapped
         case privacyPolicyButtonTapped
         case termsOfServiceButtonTapped
         case withdrawalButtonTapped
+        case setNickname(String)
     }
     public enum FeatureAction {
         case fetchMyGoalCount(Result<ProfileContent, Error>)
+        case showNicknameEdit(String)
     }
     @Dependency(\.openURL) var openURL
     public var body: some Reducer<State, Action> {
