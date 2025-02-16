@@ -6,8 +6,8 @@
 //
 
 import ComposableArchitecture
-import FeatureSignUp
 import FeatureHome
+import FeatureSignUp
 import SwiftUI
 import TCACoordinators
 
@@ -33,13 +33,11 @@ struct AppCoordinator {
         case signUp(SignUpCoordinator)
         case tab(TabCoordinator)
     }
-    
     @ObservableState
     public struct State: Equatable {
         var id: UUID
         var appDelegate: AppDelegateReducer.State
         var routes: IdentifiedArrayOf<Route<Screen.State>>
-        
         init(
             appDelegate: AppDelegateReducer.State = AppDelegateReducer.State(),
             routes: IdentifiedArrayOf<Route<Screen.State>> = [
@@ -51,18 +49,15 @@ struct AppCoordinator {
             self.routes = routes
         }
     }
-    
     public enum Action {
         case appDelegate(AppDelegateReducer.Action)
         case router(IdentifiedRouterActionOf<Screen>)
         case didChangeScenePhase(ScenePhase)
     }
-    
     public var body: some Reducer<State, Action> {
         self.core
             .forEachRoute(\.routes, action: \.router)
     }
-    
     @ReducerBuilder<State, Action>
     var core: some Reducer<State, Action> {
         Scope(state: \.appDelegate, action: \.appDelegate) {
@@ -72,10 +67,37 @@ struct AppCoordinator {
             switch action {
             case .appDelegate:
                 return .none
-            case .router:
+            case .router(
+                .routeAction(
+                    _,
+                    action: .tab(.goal(.showLogin))
+                )
+            ):
+                state.routes.presentCover(.signUp(.init()))
+                return .none
+            case .router(
+                .routeAction(
+                    _,
+                    action: .signUp(
+                        .router(.routeAction(
+                            _,
+                            action: .signUp(.auth(.backButtonTapped))))
+                    )
+                )
+            ):
+                state.routes.dismiss()
+                return .none
+            case .router(
+                .routeAction(
+                    _,
+                    action: .signUp(.coordinatorFinished)
+                )
+            ):
+                state.routes.dismiss()
                 return .none
             case .didChangeScenePhase:
                 return .none
+            default: return .none
             }
         }
     }
@@ -92,7 +114,6 @@ extension AppCoordinator.Screen.State: Identifiable {
   }
 }
 
-
 @available(iOS 17.0, *)
 #Preview {
     AppCoordinatorView(
@@ -104,4 +125,3 @@ extension AppCoordinator.Screen.State: Identifiable {
         )
     )
 }
-

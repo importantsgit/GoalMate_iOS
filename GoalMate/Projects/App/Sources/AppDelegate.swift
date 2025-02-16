@@ -7,10 +7,10 @@
 
 import ComposableArchitecture
 import Foundation
+import KakaoSDKCommon
 import TCACoordinators
 import UIKit
 import Utils
-import KakaoSDKCommon
 
 @Reducer
 public struct AppDelegateReducer {
