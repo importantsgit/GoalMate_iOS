@@ -6,10 +6,10 @@
 //
 
 import ComposableArchitecture
+import Data
 import FeatureGoal
 import FeatureMyGoal
 import FeatureProfile
-import Data
 
 extension TabCoordinator {
     func reduce(into state: inout State, action: CoordinatorAction) -> Effect<Action> {

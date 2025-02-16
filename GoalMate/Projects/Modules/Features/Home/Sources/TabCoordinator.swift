@@ -53,20 +53,6 @@ public struct TabCoordinator {
     }
     public var body: some Reducer<State, Action> {
         BindingReducer()
-        Reduce { state, action in
-            switch action {
-            case let .coordinator(action):
-                return reduce(into: &state, action: action)
-            case let .goal(action):
-                return reduce(into: &state, action: action)
-            case let .myGoal(action):
-                return reduce(into: &state, action: action)
-            case .profile:
-                return reduce(into: &state, action: action)
-            case .binding:
-                return .none
-            }
-        }
         Scope(state: \.goal, action: \.goal) {
             GoalCoordinator()
         }
@@ -75,6 +61,20 @@ public struct TabCoordinator {
         }
         Scope(state: \.profile, action: \.profile) {
             ProfileCoordinator()
+        }
+        Reduce { state, action in
+            switch action {
+            case let .coordinator(action):
+                return reduce(into: &state, action: action)
+            case let .goal(action):
+                return reduce(into: &state, action: action)
+            case let .myGoal(action):
+                return reduce(into: &state, action: action)
+            case let .profile(action):
+                return reduce(into: &state, action: action)
+            case .binding:
+                return .none
+            }
         }
     }
 }
