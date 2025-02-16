@@ -17,13 +17,16 @@ public struct SignUpCoordinatorView: View {
     }
 
     public var body: some View {
-        TCARouter(store.scope(state: \.routes, action: \.router)) { screen in
-            switch screen.case {
-            case let .signUp(store):
-                SignUpView(store: store)
-            case let .termsAgreement(store):
-                TermsAgreementSheetView(store: store)
-                    .customSheet(heights: [340], radius: 30, corners: [.topLeft, .topRight])
+        ZStack {
+            Color.white
+            TCARouter(store.scope(state: \.routes, action: \.router)) { screen in
+                switch screen.case {
+                case let .signUp(store):
+                    SignUpView(store: store)
+                case let .termsAgreement(store):
+                    TermsAgreementSheetView(store: store)
+                        .customSheet(heights: [340], radius: 30, corners: [.topLeft, .topRight])
+                }
             }
         }
     }

@@ -102,6 +102,7 @@ public struct SignUpFeature {
     }
     public enum AuthAction {
         case signUpButtonTapped(SignUpProvider)
+        case backButtonTapped
     }
     public enum NicknameAction {
         case nicknameTextInputted(String)

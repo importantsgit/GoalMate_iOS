@@ -51,6 +51,7 @@ extension SignUpFeature {
                     await send(.feature(.checkSignUpResponse(false)))
                 }
             }
+        default: return .none
         }
     }
     // MARK: Nickname

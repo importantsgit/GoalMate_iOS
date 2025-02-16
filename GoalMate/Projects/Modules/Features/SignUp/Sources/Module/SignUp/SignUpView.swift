@@ -20,6 +20,20 @@ struct SignUpView: View {
     public var body: some View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
+                NavigationBar(
+                    leftContent: {
+                        Button {
+                            store.send(.auth(.backButtonTapped))
+                        } label: {
+                            VStack {
+                                Images.back
+                                    .resized(length: 24)
+                            }
+                            .padding(.all, 12)
+                        }
+                    }
+                )
+                .frame(height: 64)
                 Spacer()
                     .frame(height: 86)
                 SignUpProcessView(processType: $store.pageType)
