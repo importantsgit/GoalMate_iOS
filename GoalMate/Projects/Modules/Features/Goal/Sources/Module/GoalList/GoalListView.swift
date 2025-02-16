@@ -12,18 +12,20 @@ import Utils
 
 struct GoalListView: View {
     @State var store: StoreOf<GoalListFeature>
+    init(store: StoreOf<GoalListFeature>) {
+        self.store = store
+    }
     var body: some View {
         WithPerceptionTracking {
             VStack {
                 NavigationBar(
                     leftContent: {
                         Images.logoSub
-                            .resized(size: .init(width: 84, height: 32))
+                            .resized(size: .init(width: 88, height: 24))
                     }
                 )
-                .padding(.horizontal, 16)
                 .frame(height: 64)
-                ScrollView(.vertical) {
+                InfiniteScrollView {
                     LazyVGrid(
                         columns: [
                             GridItem(.flexible(), spacing: .grid(2)),
@@ -35,17 +37,21 @@ struct GoalListView: View {
                         ForEach(store.goalContents) { content in
                             WithPerceptionTracking {
                                 Button {
-                                    store.send(.contentTapped(content.id))
+                                    store.send(.view(.contentTapped(content.id)))
                                 } label: {
                                     getGoalContentCell(content: content)
                                 }
                             }
                         }
                     }
+                } onLoadMore: {
+                    if store.isLoading == false {
+                        store.send(.view(.onLoadMore))
+                    }
                 }
                 .padding(.horizontal, 20)
                 .onAppear {
-                    store.send(.onAppear)
+                    store.send(.viewCycling(.onAppear))
                 }
             }
         }
@@ -86,7 +92,7 @@ struct GoalListView: View {
                             backgroundColor: Colors.secondaryY700
                         )
                     }
-
+                    /*
                     VStack(spacing: 4) {
                         HStack(spacing: 4) {
                             HStack(spacing: 0) {
@@ -121,6 +127,7 @@ struct GoalListView: View {
                             )
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
+                     */
                 }
                 Spacer()
             }

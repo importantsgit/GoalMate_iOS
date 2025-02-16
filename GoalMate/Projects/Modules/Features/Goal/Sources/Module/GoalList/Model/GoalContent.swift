@@ -9,7 +9,7 @@ import Foundation
 
 public struct GoalContent: Identifiable, Equatable {
     // 할인 관련
-    public let id: String
+    public let id: Int
     public let title: String              // 제목
     public let discountPercentage: Double  // 할인율
     public let originalPrice: Int         // 원래 가격
@@ -22,7 +22,7 @@ public struct GoalContent: Identifiable, Equatable {
     public let imageURL: String
 
     init(
-        id: String,
+        id: Int,
         title: String,
         discountPercentage: Double,
         originalPrice: Int,
@@ -54,7 +54,7 @@ extension GoalContent {
                let remainingCapacity = Int.random(in: 0...maxOccupancy)
 
                return .init(
-                   id: "\(index)",
+                   id: index,
                    title: [
                        "매일 영어 공부 30분하기",
                        "아침 6시 기상 챌린지",

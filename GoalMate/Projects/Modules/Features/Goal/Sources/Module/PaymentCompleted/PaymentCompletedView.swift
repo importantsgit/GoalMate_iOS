@@ -46,7 +46,7 @@ struct PaymentCompletedView: View {
                     HStack(alignment: .top, spacing: 30) {
                         Text("목표")
                             .pretendardStyle(.medium, size: 16, color: Colors.grey900)
-                        Text(store.content.goalSubject)
+                        Text(store.content.title)
                             .pretendardStyle(.semiBold, size: 16, color: Colors.grey900)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
@@ -57,20 +57,20 @@ struct PaymentCompletedView: View {
                             .pretendardStyle(.semiBold, size: 16, color: Colors.grey900)
                             .frame(maxWidth: .infinity, alignment: .leading)
                     }
-                    HStack(alignment: .top, spacing: 30) {
-                        Text("가격")
-                            .pretendardStyle(.medium, size: 16, color: Colors.grey900)
-                        HStack(spacing: 10) {
-                            Text("\(store.content.originalPrice)원")
-                                .pretendardStyle(.semiBold, size: 16, color: Colors.grey900)
-                                .strikethrough(
-                                    color: Colors.grey900
-                                )
-                            Text("\(store.content.originalPrice)원")
-                                .pretendardStyle(.semiBold, size: 20, color: Colors.grey900)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                    }
+//                    HStack(alignment: .top, spacing: 30) {
+//                        Text("가격")
+//                            .pretendardStyle(.medium, size: 16, color: Colors.grey900)
+//                        HStack(spacing: 10) {
+//                            Text("\(store.content.originalPrice)원")
+//                                .pretendardStyle(.semiBold, size: 16, color: Colors.grey900)
+//                                .strikethrough(
+//                                    color: Colors.grey900
+//                                )
+//                            Text("\(store.content.originalPrice)원")
+//                                .pretendardStyle(.semiBold, size: 20, color: Colors.grey900)
+//                        }
+//                        .frame(maxWidth: .infinity, alignment: .leading)
+//                    }
                 }
                 .padding(.horizontal, 20)
                 .padding(.vertical, 16)

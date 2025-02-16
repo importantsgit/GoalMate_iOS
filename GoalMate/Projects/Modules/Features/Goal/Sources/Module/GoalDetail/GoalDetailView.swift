@@ -11,7 +11,7 @@ import SwiftUI
 
 public struct GoalDetailView: View {
     @State var progress: Double
-    @State var store: StoreOf<GoalDetailFeature>
+    @Perception.Bindable var store: StoreOf<GoalDetailFeature>
     init(
         progress: Double = 0.1,
         store: StoreOf<GoalDetailFeature>
@@ -26,7 +26,7 @@ public struct GoalDetailView: View {
                     NavigationBar(
                         leftContent: {
                             Button {
-                                store.send(.backButtonTapped)
+                                store.send(.view(.backButtonTapped))
                             } label: {
                                 VStack {
                                     Images.back
@@ -44,13 +44,7 @@ public struct GoalDetailView: View {
                     .background(Color.white)
                     ScrollView(.vertical) {
                         VStack(spacing: 0) {
-                            if store.images.isEmpty {
-                                Colors.grey200
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                    .aspectRatio(36/27, contentMode: .fit)
-                            } else {
-                                pageView
-                            }
+                            pageView
                             Spacer()
                                 .frame(height: 16)
                             VStack(spacing: 24) {
@@ -84,12 +78,10 @@ public struct GoalDetailView: View {
             }
             // onAppear로 동작 시, Concurrency하게 동작되지 않아 바로 Pop되는 현상 발생
             .task {
-                store.send(.onAppear)
+                store.send(.viewCycling(.onAppear))
             }
-            .sheet(isPresented: $store.isShowPurchaseView) {
-                GoalDetailSheetView(store: store)
-                    .presentationDetents([.height(370)])
-            }
+            .loading(isLoading: $store.isLoading)
+            .toast(state: $store.toastState, position: .top)
         }
     }
 }
@@ -99,19 +91,50 @@ private extension GoalDetailView {
     var pageView: some View {
         WithPerceptionTracking {
             TabView(selection: $store.currentPage) {
-                let images = store.images as [Image]
-                ForEach(Array(images.enumerated()), id: \.offset) { image in
-                    image.element
+                if let content = store.content {
+                    ForEach(
+                        Array(content.thumbnailImages.enumerated()),
+                        id: \.offset
+                    ) { index, imageURL in
+                        AsyncImage(url: URL(string: imageURL)) { phase in
+                            switch phase {
+                            case .empty:
+//                                ProgressView()
+//                                    .progressViewStyle(.circular)
+//                                    .scaleEffect(2.0)
+                                Rectangle()
+                                    .fill(.black)
+                            case .success(let image):
+                                Rectangle()
+                                    .fill(.black)
+//                                image
+//                                    .resizable()
+//                                    .aspectRatio(contentMode: .fill)
+//                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            case .failure:
+                                Rectangle()
+                                    .fill(.black)
+//                                Image(systemName: "square.and.arrow.up")
+//                                    .foregroundColor(.gray)
+                            @unknown default:
+                                Rectangle()
+                                    .fill(.black)
+                            }
+                        }
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .tag(image.offset)
+                        .tag(index)
                         .background(Colors.grey200)
+                    }
+                } else {
+                    Colors.grey200
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
             .clipShape(RoundedRectangle(cornerRadius: 10))
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
             .overlay(alignment: .bottom) {
                 // 커스텀 인디케이터
-                let count = store.images.count
+                let count = store.content?.thumbnailImages.count ?? 0
                 if count > 1 {
                     HStack(spacing: 8) {
                         ForEach(0..<count) { index in
@@ -266,7 +289,11 @@ fileprivate struct GoalDescriptionView: View {
                             ) { goal in
                                 HStack(alignment: .top, spacing: 12) {
                                     Text("\(goal.offset+1)")
-                                        .pretendard(.semiBold, size: 13, color: Colors.secondaryY800)
+                                        .pretendard(
+                                            .semiBold,
+                                            size: 13,
+                                            color: Colors.secondaryY800
+                                        )
                                         .padding(.vertical, 2)
                                         .frame(minWidth: 34)
                                         .background(Colors.secondaryY50)
@@ -313,9 +340,16 @@ fileprivate struct BottomButtonView: View {
                         .stroke(Colors.grey500, lineWidth: 1)
                 )
                 Button {
-                    store.send(.startButtonTapped)
+                    if store.isLogin {
+                        store.send(.view(.startButtonTapped))
+                    } else {
+                        store.send(.view(.loginButtonTapped))
+                    }
                 } label: {
-                    Text("목표 시작하기")
+                    Text(store.isLogin ?
+                            "목표 시작하기" :
+                            "지금 로그인하러 가기"
+                    )
                         .pretendardStyle(
                             .medium,
                             size: 16,
@@ -376,99 +410,12 @@ fileprivate struct LabelView: View {
     }
 }
 
-fileprivate struct GoalDetailSheetView: View {
-    let store: StoreOf<GoalDetailFeature>
-    var body: some View {
-        WithPerceptionTracking {
-            VStack {
-                Rectangle()
-                    .fill(Colors.grey300)
-                    .frame(width: 32, height: 4)
-                    .clipShape(.capsule)
-                    .padding(.vertical, 16)
-                Spacer()
-                    .frame(height: 16)
-                if let content = store.content {
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack(alignment: .top, spacing: 30) {
-                            Text("목표")
-                                .pretendardStyle(.medium, size: 16, color: Colors.grey500)
-                            Text(content.details.goalSubject)
-                                .pretendardStyle(.semiBold, size: 16, color: Colors.grey900)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        HStack(alignment: .top, spacing: 30) {
-                            Text("멘토")
-                                .pretendardStyle(.medium, size: 16, color: Colors.grey500)
-                            Text(content.details.mentor)
-                                .pretendardStyle(.semiBold, size: 16, color: Colors.grey900)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        HStack(alignment: .top, spacing: 30) {
-                            Text("가격")
-                                .pretendardStyle(.medium, size: 16, color: Colors.grey500)
-                            HStack(spacing: 10) {
-                                Text("\(content.originalPrice)원")
-                                    .pretendardStyle(.semiBold, size: 16, color: Colors.grey900)
-                                    .strikethrough(
-                                        color: Colors.grey900
-                                    )
-                                Text("\(content.discountedPrice)원")
-                                    .pretendardStyle(.semiBold, size: 20, color: Colors.grey900)
-                            }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                    }
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 16)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 20)
-                            .stroke(Colors.grey300, lineWidth: 1)
-                    )
-                }
-                Spacer()
-                HStack(spacing: 19) {
-                    Images.danger
-                        .resized(length: 20)
-                    VStack(alignment: .leading, spacing: 6) {
-                        Text("유의해주세요")
-                            .pretendard(.regular, size: 14, color: Colors.grey600)
-                        Text("무료 참여 기회는 한 번 만 가능해요")
-                            .pretendard(.medium, size: 16, color: Colors.grey900)
-                    }
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity)
-                .padding(20)
-                .background(Colors.grey50)
-                .clipShape(.rect(cornerRadius: 24))
-                Spacer()
-                Button {
-                    store.send(.purchaseButtonTapped)
-                } label: {
-                    Text("목표 시작하기")
-                        .pretendardStyle(
-                            .medium,
-                            size: 16,
-                            color: .black
-                        )
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 54)
-                        .background(Colors.primary)
-                        .clipShape(.capsule)
-                }
-            }
-            .padding(.horizontal, 20)
-        }
-    }
-}
-
 @available(iOS 17.0, *)
 #Preview {
     GoalDetailView(
         store: Store(
             initialState: GoalDetailFeature.State.init(
-                contentId: "1"
+                contentId: 1
             ),
             reducer: {
                 GoalDetailFeature()

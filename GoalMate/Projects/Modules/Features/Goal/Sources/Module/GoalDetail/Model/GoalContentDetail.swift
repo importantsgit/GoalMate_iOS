@@ -8,7 +8,7 @@
 import Foundation
 
 public struct GoalContentDetail: Identifiable, Equatable {
-    public let id: String
+    public let id: Int
     public let details: GoalDetails
     public let discountPercentage: Int  // 할인율
     public let originalPrice: Int         // 원래 가격
@@ -17,16 +17,20 @@ public struct GoalContentDetail: Identifiable, Equatable {
     public let maxOccupancy: Int           // 최대 인원수
     public let remainingCapacity: Int      // 참가 가능한 인원수
     public let currentParticipants: Int    // 참여하고 있는 인원 수
+    public let thumbnailImages: [String]
+    public let contentImages: [String]
 
     public init(
-        id: String,
+        id: Int,
         details: GoalDetails,
         discountPercentage: Int,
         originalPrice: Int,
         discountedPrice: Int,
         maxOccupancy: Int,
         remainingCapacity: Int,
-        currentParticipants: Int
+        currentParticipants: Int,
+        thumbnailImages: [String],
+        contentImages: [String]
     ) {
         self.id = id
         self.details = details
@@ -36,6 +40,8 @@ public struct GoalContentDetail: Identifiable, Equatable {
         self.maxOccupancy = maxOccupancy
         self.remainingCapacity = remainingCapacity
         self.currentParticipants = currentParticipants
+        self.thumbnailImages = thumbnailImages
+        self.contentImages = contentImages
     }
 }
 
@@ -85,7 +91,9 @@ extension GoalContentDetail {
             discountedPrice: content.discountedPrice,
             maxOccupancy: content.maxOccupancy,
             remainingCapacity: 0,
-            currentParticipants: content.maxOccupancy
+            currentParticipants: content.maxOccupancy,
+            thumbnailImages: [],
+            contentImages: []
         )
     }
 
@@ -117,14 +125,16 @@ extension GoalContentDetail {
             ]
         )
         return GoalContentDetail(
-            id: "111",
+            id: 111,
             details: details,
             discountPercentage: discountPercentage,
             originalPrice: originalPrice,
             discountedPrice: discountedPrice,
             maxOccupancy: maxOccupancy,
             remainingCapacity: remainingCapacity,
-            currentParticipants: maxOccupancy - remainingCapacity
+            currentParticipants: maxOccupancy - remainingCapacity,
+            thumbnailImages: [],
+            contentImages: []
         )
     }
 }

@@ -17,9 +17,9 @@ public struct PaymentCompletedFeature {
     @ObservableState
     public struct State: Equatable {
         public let id: UUID
-        var content: PaymentCompletedItem
+        var content: PaymentCompletedContent
         public init(
-            content: PaymentCompletedItem
+            content: PaymentCompletedContent
         ) {
             self.id = UUID()
             self.content = content
