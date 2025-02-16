@@ -12,10 +12,14 @@ struct APIEndpoints {
     enum APIPath: String {
         case authLogin          = "auth/login"
         case refreshLogin       = "auth/reissue"
+        case withdraw           = "auth/withdraw"
+        
         case setNickname        = "mentees/my/name"
         case checkNickname      = "mentees/name/validate"
 
-        case goalDetail         = "goals/{goalId}"
+        case fetchGoals         = "goals"
+        case fetchGoalDetail    = "goals/{goalId}"
+        case joinGoal           = "goals/{goalId}/mentees"
 
         func path(with parameters: [String: String]) -> String {
             var result = self.rawValue
@@ -37,24 +41,26 @@ struct APIEndpoints {
     }
 
     static func refreshLoginEndpoint(
-        with request: RefreshLoginRequestDTO
+        refreshToken: String
     ) -> Endpoint<AuthLoginResponseDTO> {
         Endpoint(
             path: APIPath.refreshLogin,
-            method: .get,
-            queryParametersEncodable: request
+            method: .put,
+            headerParameters: [
+                "Authorization": "Bearer \(refreshToken)"
+            ]
         )
     }
-
-    static func goalDetailEndpoint(
-        goalId: String,
-        with request: TokenResponse
-    ) throws -> Endpoint<TokenResponse> {
-        try Endpoint(
-            path: APIPath.authLogin,
-            pathParameters: ["goalId": goalId],
-            method: .get,
-            queryParametersEncodable: request
+    
+    static func withdrawEndpoint(
+        accessToken: String
+    ) -> Endpoint<Void> {
+        Endpoint(
+            path: .withdraw,
+            method: .delete,
+            headerParameters: [
+                "Authorization": "Bearer \(accessToken)"
+            ]
         )
     }
 
@@ -73,9 +79,9 @@ struct APIEndpoints {
     }
 
     static func checkNicknameEndpoint(
-        with request: checkNicknameRequestDTO,
+        with request: CheckNicknameRequestDTO,
         accessToken: String
-    ) -> Endpoint<checkNicknameResponseDTO> {
+    ) -> Endpoint<CheckNicknameResponseDTO> {
         Endpoint(
             path: APIPath.checkNickname,
             method: .get,
@@ -83,6 +89,44 @@ struct APIEndpoints {
                 "Authorization": "Bearer \(accessToken)"
             ],
             queryParametersEncodable: request
+        )
+    }
+
+    static func fetchGoalEndpoint(
+        with request: FetchGoalsRequestDTO
+    ) -> Endpoint<FetchGoalsResponseDTO> {
+        Endpoint(
+            path: .fetchGoals,
+            method: .get,
+            queryParametersEncodable: request
+        )
+    }
+
+    static func fetchGoalDetailEndpoint(
+        goalId: Int
+    ) throws -> Endpoint<FetchGoalDetailResponseDTO> {
+        try Endpoint(
+            path: .fetchGoalDetail,
+            pathParameters: [
+                "goalId": "\(goalId)"
+            ],
+            method: .get
+        )
+    }
+
+    static func joinGoalEndpoint(
+        goalId: Int,
+        accessToken: String
+    ) throws -> Endpoint<JoinGoalResponseDTO> {
+        try Endpoint(
+            path: .joinGoal,
+            pathParameters: [
+                "goalId": "\(goalId)"
+            ],
+            method: .post,
+            headerParameters: [
+                "Authorization": "Bearer \(accessToken)"
+            ]
         )
     }
 }

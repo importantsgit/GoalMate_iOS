@@ -42,7 +42,7 @@ extension NicknameClient: DependencyKey {
             isUniqueNickname: { nickName in
                 guard let accessToken = await dataStorageClient.tokenInfo.accessToken
                 else { throw NetworkError.emyptyAccessToken }
-                let requestDTO: checkNicknameRequestDTO = .init(name: nickName)
+                let requestDTO: CheckNicknameRequestDTO = .init(name: nickName)
                 let endpoint = APIEndpoints.checkNicknameEndpoint(
                     with: requestDTO,
                     accessToken: accessToken

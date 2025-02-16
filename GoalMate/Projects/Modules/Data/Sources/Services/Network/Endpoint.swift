@@ -10,7 +10,7 @@ import Foundation
 struct Endpoint<R>: ResponseRequestable {
     typealias Response = R
 
-    let path: APIEndpoints.APIPath
+    let path: String
     let method: HTTPMethodType
     let headerParameters: [String: String]
     let queryParametersEncodable: Encodable?
@@ -31,7 +31,7 @@ struct Endpoint<R>: ResponseRequestable {
         bodyEncoder: BodyEncoder = JSONBodyEncoder(),
         responseDecoder: ResponseDecoder = JSONResponseDecoder()
     ) {
-        self.path = path
+        self.path = path.rawValue
         self.method = method
         self.headerParameters = headerParameters
         self.queryParametersEncodable = queryParametersEncodable
@@ -55,13 +55,7 @@ extension Endpoint {
         bodyParametersEncodable: Encodable? = nil,
         bodyParameters: [String: Any] = [:]
     ) throws {
-        guard let processedPath = APIEndpoints.APIPath(
-            rawValue: path.path(with: pathParameters)
-        )
-        else {
-            throw NetworkError.invalidFormat
-        }
-        self.path = processedPath
+        self.path = path.path(with: pathParameters)
         self.method = method
         self.headerParameters = headerParameters
         self.queryParametersEncodable = queryParametersEncodable
@@ -84,7 +78,7 @@ enum HTTPMethodType: String {
 
 // MARK: - Requestable
 protocol Requestable {
-    var path: APIEndpoints.APIPath { get }
+    var path: String { get }
     var method: HTTPMethodType { get }
     var headerParameters: [String: String] { get }
     var queryParametersEncodable: Encodable? { get }
@@ -102,7 +96,7 @@ extension Requestable {
     ) throws -> URL {
         var baseURL = config.baseURL.absoluteString
         baseURL = baseURL.suffix(1) == "/" ? baseURL : baseURL + "/"
-        let endpoint = baseURL.appending(path.rawValue)
+        let endpoint = baseURL.appending(path)
 
         guard var urlComponent = URLComponents(
             string: endpoint

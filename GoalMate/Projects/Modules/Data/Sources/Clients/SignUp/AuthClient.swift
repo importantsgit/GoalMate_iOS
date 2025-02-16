@@ -39,6 +39,7 @@ public struct AuthClient {
         _ response: SocialLoginResponse,
         _ type: LoginType
     ) async throws -> TokenResponse
+    public var isLogin: () async throws -> Bool
     public var refresh: (_ token: String) async throws -> TokenResponse
 
     public init(
@@ -48,6 +49,7 @@ public struct AuthClient {
             _: SocialLoginResponse,
             _: LoginType
         ) -> TokenResponse,
+        isLogin: @escaping () -> Bool,
         refresh: @escaping (
             _: String
         ) -> TokenResponse
@@ -55,6 +57,7 @@ public struct AuthClient {
         self.kakaoLogin = kakaoLogin
         self.appleLogin = appleLogin
         self.authenticate = authenticate
+        self.isLogin = isLogin
         self.refresh = refresh
     }
 }
@@ -91,10 +94,15 @@ extension AuthClient: DependencyKey {
                     refreshToken: response.data.refreshToken
                 )
             },
+            isLogin: {
+                // await dataStorageClient.isLogin
+                true
+            },
             refresh: { token in
-                let requestDTO: RefreshLoginRequestDTO = .init(refreshToken: token)
-                let endpoint = APIEndpoints.refreshLoginEndpoint(with: requestDTO)
+                let endpoint = APIEndpoints.refreshLoginEndpoint(refreshToken: token)
                 let response = try await networkClient.asyncRequest(with: endpoint)
+                guard response.code == "200"
+                else { throw NetworkError.statusCodeError(code: 300) }
                 await dataStorageClient.setTokenInfo(.init(
                     accessToken: response.data.accessToken,
                     refreshToken: response.data.refreshToken
@@ -113,6 +121,7 @@ extension AuthClient: DependencyKey {
         authenticate: { _, _ in
             return .init(accessToken: "access", refreshToken: "refresh")
         },
+        isLogin: { return true },
         refresh: { _ in
             return .init(accessToken: "access", refreshToken: "refresh")
         }
@@ -124,6 +133,7 @@ extension AuthClient: DependencyKey {
         authenticate: { _, _ in
             return .init(accessToken: "access", refreshToken: "refresh")
         },
+        isLogin: { return false },
         refresh: { _ in
             return .init(accessToken: "access", refreshToken: "refresh")
         }

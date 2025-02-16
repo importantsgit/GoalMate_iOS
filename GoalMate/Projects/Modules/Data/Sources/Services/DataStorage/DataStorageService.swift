@@ -40,10 +40,12 @@ public actor DataStorageService {
         encrypted: Key.token.needsEncryption
     )
     var tokenInfo: TokenInfo
+    var isLogin: Bool = false
     public func setUserInfo(_ userInfo: UserInfo) {
         self.userInfo = userInfo
     }
     public func setTokenInfo(_ tokenInfo: TokenInfo) {
+        self.isLogin = true
         self.tokenInfo = tokenInfo
     }
 }

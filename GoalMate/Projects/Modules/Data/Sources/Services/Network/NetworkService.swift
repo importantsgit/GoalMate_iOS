@@ -54,10 +54,26 @@ public final class NetworkService: NSObject {
         switch response.statusCode {
         case 200...299:
             do {
-                return try decoder.decode(data)
-            } catch {
+                let decodingData: T = try decoder.decode(data)
+                print(decodingData)
+                return decodingData
+            } catch let error {
+                switch error as? DecodingError {
+                case .dataCorrupted(let context):
+                    print("Data corrupted: \(context)")
+                case .keyNotFound(let key, let context):
+                    print("Key '\(key)' not found: \(context.debugDescription)")
+                case .valueNotFound(let value, let context):
+                    print("Value '\(value)' not found: \(context.debugDescription)")
+                case .typeMismatch(let type, let context):
+                    print("Type '\(type)' mismatch: \(context.debugDescription)")
+                case .none:
+                    print("Error: \(error)")
+                case .some(let error):
+                    print("Error: \(error)")
+                }
                 throw NetworkError.invalidFormat
-            }
+             }
         default:
             throw NetworkError.statusCodeError(code: response.statusCode)
         }
