@@ -17,6 +17,7 @@ public enum NetworkError: LocalizedError {
     case invalidPath
     case emyptyAccessToken
     case invalidAccessToken
+    case emptyData
 
     public var errorDescription: String? {
        switch self {
@@ -38,6 +39,8 @@ public enum NetworkError: LocalizedError {
            return "액세스 토큰이 존재하지 않습니다."
        case .invalidAccessToken:
            return "액세스 토큰이 유효하지 않습니다."
+       case .emptyData:
+           return "데이터가 존재하지 않습니다."
        }
     }
 }

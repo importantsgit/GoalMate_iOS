@@ -13,13 +13,14 @@ struct APIEndpoints {
         case authLogin          = "auth/login"
         case refreshLogin       = "auth/reissue"
         case withdraw           = "auth/withdraw"
-        
+
         case setNickname        = "mentees/my/name"
         case checkNickname      = "mentees/name/validate"
+        case joinGoal           = "goals/{goalId}/mentees"
+        case fetchMenteeInfo    = "mentees/my"
 
         case fetchGoals         = "goals"
         case fetchGoalDetail    = "goals/{goalId}"
-        case joinGoal           = "goals/{goalId}/mentees"
 
         func path(with parameters: [String: String]) -> String {
             var result = self.rawValue
@@ -124,6 +125,18 @@ struct APIEndpoints {
                 "goalId": "\(goalId)"
             ],
             method: .post,
+            headerParameters: [
+                "Authorization": "Bearer \(accessToken)"
+            ]
+        )
+    }
+
+    static func fetchMenteeInfoEndpoint(
+        accessToken: String
+    ) throws -> Endpoint<FetchMenteeInfoResponseDTO> {
+        Endpoint(
+            path: .fetchMenteeInfo,
+            method: .get,
             headerParameters: [
                 "Authorization": "Bearer \(accessToken)"
             ]

@@ -70,6 +70,40 @@ public struct CheckNicknameResponseDTO: Codable {
     let status: String
     let code: String
     let message: String
+    let data: Response?
+    public struct Response: Codable {
+        let isAvailable: Bool
+        public enum CodingKeys: String, CodingKey {
+            case isAvailable = "is_available"
+        }
+    }
+}
+
+public struct FetchMenteeInfoResponseDTO: Codable {
+    let status: String
+    let code: String
+    let message: String
+    let data: Response?
+    public struct Response: Codable {
+        public let id: Int
+        public let name: String?
+        public let inProgressGoalCount: Int?
+        public let completedGoalCount: Int?
+        public let freeParticipationCount: Int?
+        public let menteeStatus: MenteeStatus?
+        public enum MenteeStatus: String, Codable {
+            case pending    = "PENDING"
+            case active     = "ACTIVE"
+            case deleted    = "DELETED"
+        }
+        public enum CodingKeys: String, CodingKey {
+            case id, name
+            case inProgressGoalCount = "in_progress_goal_count"
+            case completedGoalCount = "completed_goal_count"
+            case freeParticipationCount = "free_participation_count"
+            case menteeStatus = "mentee_status"
+        }
+    }
 }
 
 public struct FetchGoalsRequestDTO: Codable {
@@ -152,8 +186,8 @@ public struct FetchGoalDetailResponseDTO: Codable {
         public let updatedAt: String?
         public let weeklyObjectives: [WeeklyObjective]
         public let midObjectives: [MidObjective]
-        public let thumbnailImages: [String]
-        public let contentImages: [String]
+        public let thumbnailImages: [ContentImage]
+        public let contentImages: [ContentImage]
         public enum GoalStatus: String, Codable {
             case notStarted = "NOT_STARTED"
             case inProgress = "IN_PROGRESS"
@@ -185,6 +219,10 @@ public struct FetchGoalDetailResponseDTO: Codable {
         public struct MidObjective: Codable {
             public let number: Int?
             public let description: String?
+        }
+        public struct ContentImage: Codable {
+            public let sequence: Int?
+            public let imageUrl: String?
         }
     }
 }
@@ -296,13 +334,29 @@ extension FetchGoalDetailResponseDTO {
                 .init(number: 3, description: "회화에 자주 쓰이는 표현 익히기")
             ],
             thumbnailImages: [
-                "https://example.com/thumbnail1.jpg",
-                "https://example.com/thumbnail2.jpg"
+                .init(sequence: 1, imageUrl: "https://example.com/thumbnail1.jpg"),
+                .init(sequence: 1, imageUrl: "https://example.com/thumbnail2.jpg")
             ],
             contentImages: [
-                "https://example.com/content1.jpg",
-                "https://example.com/content2.jpg"
+                .init(sequence: 1, imageUrl: "https://example.com/thumbnail1.jpg"),
+                .init(sequence: 1, imageUrl: "https://example.com/thumbnail2.jpg")
             ]
+        )
+    )
+}
+
+extension FetchMenteeInfoResponseDTO {
+    static let dummy = FetchMenteeInfoResponseDTO(
+        status: "SUCCESS",
+        code: "200",
+        message: "정상적으로 처리되었습니다.",
+        data: .init(
+            id: 1,
+            name: "김멘티",
+            inProgressGoalCount: 10,
+            completedGoalCount: 2,
+            freeParticipationCount: 30,
+            menteeStatus: .active
         )
     )
 }
