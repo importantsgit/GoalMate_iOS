@@ -13,11 +13,25 @@ extension ProfileFeature {
     func reduce(into state: inout State, action: ViewCyclingAction) -> Effect<Action> {
         switch action {
         case .onAppear:
+            state.isLoading = true
             return .run { send in
-                try await Task.sleep(nanoseconds: 1_000_000_000)
-                await send(
-                    .feature(.fetchMyGoalCount(.success(ProfileContent.dummy)))
-                )
+                do {
+                    let response = try await menteeClient.fetchMenteeInfo()
+                    let content = ProfileContent(
+                        name: response.name ?? "",
+                        state: .init(
+                            inProgressCount: response.inProgressGoalCount ?? 0,
+                            completedCount: response.completedGoalCount ?? 0
+                        )
+                    )
+                    await send(
+                        .feature(.fetchMyGoalCount(.success(content)))
+                    )
+                } catch {
+                    await send(
+                        .feature(.fetchMyGoalCount(.failure(error)))
+                    )
+                }
             }
         }
     }
@@ -56,6 +70,28 @@ extension ProfileFeature {
         case let .setNickname(nickname):
             state.profile?.name = nickname
             return .none
+        case .retryButtonTapped:
+            state.didFailToLoad = false
+            state.isLoading = true
+            return .run { send in
+                do {
+                    let response = try await menteeClient.fetchMenteeInfo()
+                    let content = ProfileContent(
+                        name: response.name ?? "",
+                        state: .init(
+                            inProgressCount: response.inProgressGoalCount ?? 0,
+                            completedCount: response.completedGoalCount ?? 0
+                        )
+                    )
+                    await send(
+                        .feature(.fetchMyGoalCount(.success(content)))
+                    )
+                } catch {
+                    await send(
+                        .feature(.fetchMyGoalCount(.failure(error)))
+                    )
+                }
+            }
         }
     }
     func reduce(into state: inout State, action: FeatureAction) -> Effect<Action> {
@@ -67,8 +103,10 @@ extension ProfileFeature {
             case  let .success(content):
                 state.profile = content
             case let .failure(error):
-                break
+                print(error)
+                state.didFailToLoad = true
             }
+            state.isLoading = false
             return .none
         }
     }

@@ -17,8 +17,12 @@ public struct ProfileFeature {
         public let id: UUID
         var name: String?
         var profile: ProfileContent?
+        var isLoading: Bool
+        var didFailToLoad: Bool
         public init() {
             self.id = UUID()
+            self.isLoading = true
+            self.didFailToLoad = false
             self.profile = nil
         }
     }
@@ -38,11 +42,13 @@ public struct ProfileFeature {
         case termsOfServiceButtonTapped
         case withdrawalButtonTapped
         case setNickname(String)
+        case retryButtonTapped
     }
     public enum FeatureAction {
         case fetchMyGoalCount(Result<ProfileContent, Error>)
         case showNicknameEdit(String)
     }
+    @Dependency(\.menteeClient) var menteeClient
     @Dependency(\.openURL) var openURL
     public var body: some Reducer<State, Action> {
         BindingReducer()

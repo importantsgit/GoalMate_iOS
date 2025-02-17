@@ -22,6 +22,12 @@ public struct ProfileView: View {
                     leftContent: {
                         Text("마이페이지")
                             .pretendardStyle(.semiBold, size: 20, color: Colors.grey900)
+                            .overlay {
+                                if store.isLoading {
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .fill(Colors.grey200)
+                                }
+                            }
                     }
                 )
                 .frame(height: 64)
@@ -34,7 +40,7 @@ public struct ProfileView: View {
                                 store.send(.view(.nicknameEditButtonTapped))
                             } label: {
                                 HStack(spacing: 10) {
-                                    Text("김골메이트님")
+                                    Text("\(store.profile?.name ?? "")님")
                                         .pretendardStyle(.semiBold, size: 16, color: Colors.grey900)
                                     Images.pencil
                                         .resized(length: 14)
@@ -54,10 +60,25 @@ public struct ProfileView: View {
                         .padding(.horizontal, 20)
                         .background(Colors.primary)
                         .clipShape(.rect(cornerRadius: 24))
+                        .overlay {
+                            if store.isLoading {
+                                RoundedRectangle(cornerRadius: 24)
+                                    .fill(Colors.grey200)
+                            }
+                        }
                         VStack(spacing: 8) {
-                            Text("목표 현황")
+                            Text("목표 현황")                 .pretendard(
+                                .semiBold,
+                                size: 16,
+                                color: Colors.grey900
+                            )
+                                .overlay {
+                                    if store.isLoading {
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .fill(Colors.grey200)
+                                    }
+                                }
                                 .frame(maxWidth: .infinity, alignment: .leading)
-                                .pretendard(.semiBold, size: 16, color: Colors.grey900)
                             HStack {
                                 Spacer()
                                 VStack(spacing: 4) {
@@ -89,8 +110,14 @@ public struct ProfileView: View {
                             .background(Colors.primary50)
                             .clipShape(.rect(cornerRadius: 24))
                             .overlay {
-                                RoundedRectangle(cornerRadius: 24)
-                                    .stroke(Colors.primary200, lineWidth: 1)
+                                ZStack {
+                                    RoundedRectangle(cornerRadius: 24)
+                                        .stroke(Colors.primary200, lineWidth: 1)
+                                    if store.isLoading {
+                                        RoundedRectangle(cornerRadius: 24)
+                                            .fill(Colors.grey200)
+                                    }
+                                }
                             }
                         }
                         SeparatorView(height: 16, color: Colors.grey50)
@@ -98,44 +125,68 @@ public struct ProfileView: View {
                     VStack(spacing: 0) {
                         Spacer()
                             .frame(height: 20)
-                        ListButton(title: "자주 묻는 질문") {
+                        ListButton(
+                            title: "자주 묻는 질문",
+                            isLoading: store.isLoading
+                        ) {
                             store.send(
                                 .view(.qnaButtonTapped)
                             )
                         }
-                        ListButton(title: "개인 정보 처리 방침") {
+                        ListButton(
+                            title: "개인 정보 처리 방침",
+                            isLoading: store.isLoading
+                        ) {
                             store.send(
                                 .view(.privacyPolicyButtonTapped)
                             )
                         }
-                        ListButton(title: "이용약관") {
+                        ListButton(
+                            title: "이용약관",
+                            isLoading: store.isLoading
+                        ) {
                             store.send(
                                 .view(.termsOfServiceButtonTapped)
                             )
                         }
-                        ListButton(title: "탈퇴하기") {
+                        ListButton(
+                            title: "탈퇴하기",
+                            isLoading: store.isLoading
+                        ) {
                             store.send(
                                 .view(.withdrawalButtonTapped)
                             )
                         }
                     }
                 }
-
+                .loadingFailure(didFailToLoad: store.didFailToLoad) {
+                    store.send(.view(.retryButtonTapped))
+                }
             }
             .padding(.horizontal, 20)
             .task {
                 store.send(.viewCycling(.onAppear))
             }
+            .animation(
+                .easeInOut(duration: 0.3),
+                value: store.isLoading
+            )
         }
     }
 }
 
 fileprivate struct ListButton: View {
     let title: String
+    let isLoading: Bool
     let action: () -> Void
 
-    init(title: String, action: @escaping () -> Void) {
+    init(
+        title: String,
+        isLoading: Bool,
+        action: @escaping () -> Void
+    ) {
         self.title = title
+        self.isLoading = isLoading
         self.action = action
     }
 
@@ -146,8 +197,15 @@ fileprivate struct ListButton: View {
             } label: {
                 Text(title)
                     .pretendardStyle(.regular, size: 16, color: Colors.grey900)
+                    .overlay {
+                        if isLoading {
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Colors.grey200)
+                        }
+                    }
                     .frame(height: 46)
                     .frame(maxWidth: .infinity, alignment: .leading)
+
             }
         }
     }
