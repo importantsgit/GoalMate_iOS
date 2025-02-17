@@ -91,27 +91,35 @@ public struct ProfileCoordinator {
                 action: .nicknameEdit(.feature(.nicknameSubmitted(result))))
             ):
                 if case let .success(nickname) = result {
-                    state.routes.dismiss()
-                    if let profile = state.routes.first(where: {
-                        if case .profile = $0.screen { return true }
-                        return false
-                    })?.screen as? ProfileFeature.State {
-                        return .send(.router(.routeAction(
-                            id: profile.id,
-                            action: .profile(.view(.setNickname(nickname)))
-                        )))
+                    guard let profileRoute = state.routes.first(where: {
+                              if case .profile = $0.screen { return true }
+                              return false
+                          }),
+                          case let .profile(profileState) = profileRoute.screen
+                    else {
+                        return .none
                     }
+                    return .send(.router(.routeAction(
+                        id: profileState.id,
+                        action: .profile(.view(.setNickname(nickname)))
+                    )))
                 }
                 return .none
+            case .router(.routeAction(
+                _,
+                action: .nicknameEdit(.feature(.nicknameEditCompleted))
+            )):
+                state.routes.dismiss()
+                return .none
             case .router(.routeAction(_, action: .profile(.view(.withdrawalButtonTapped)))):
-                state.routes.push(
+                state.routes.presentCover(
                     .withdrawal(
                         .init()
                     )
                 )
                 return .none
-            case .router(.routeAction(_, action: .withdrawal(.backButtonTapped))):
-                state.routes.popToRoot()
+            case .router(.routeAction(_, action: .withdrawal(.view(.backButtonTapped)))):
+                state.routes.dismiss()
                 return .none
             default: return .none
             }
