@@ -60,17 +60,13 @@ extension GoalDetailFeature {
         case .fetchDetail:
             return .run { [contentId = state.contentId] send in
                 do {
-                    let response = try await goalClient.fetchGoalDetail(goalId: contentId)
-                    guard let content = response
-                    else {
-                        await send(.feature(
-                            .checkFetchDetailResponse(.failure(FetchError.emptyData))))
-                        return
-                    }
+                    let content = try await goalClient.fetchGoalDetail(goalId: contentId)
                     let today = Date()
-                    let endDate = Calendar.current.date(byAdding: .day, value: content.period ?? 0, to: today) ?? today
+                    let endDate = Calendar.current.date(
+                        byAdding: .day, value: content.period ?? 0, to: today
+                    ) ?? today
                     let dateFormatter = DateFormatter()
-                    dateFormatter.dateFormat = "yyyy.MM.dd"
+                    dateFormatter.dateFormat = "yyyy년 MM월 dd일"
                     let maxOccupancy = content.participantsLimit ?? 0
                     let currentParticipants = content.currentParticipants ?? 0
                     let result: GoalContentDetail = .init(
@@ -96,8 +92,8 @@ extension GoalDetailFeature {
                         maxOccupancy: maxOccupancy,
                         remainingCapacity: maxOccupancy - currentParticipants,
                         currentParticipants: currentParticipants,
-                        thumbnailImages: [],
-                        contentImages: []
+                        thumbnailImages: content.thumbnailImages.compactMap { $0.imageUrl },
+                        contentImages: content.contentImages.compactMap { $0.imageUrl }
                     )
                     await send(.feature(.checkFetchDetailResponse(.success(result))))
                 } catch {

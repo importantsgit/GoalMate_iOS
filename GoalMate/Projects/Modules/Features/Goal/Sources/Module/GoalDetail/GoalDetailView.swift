@@ -96,26 +96,21 @@ private extension GoalDetailView {
                         Array(content.thumbnailImages.enumerated()),
                         id: \.offset
                     ) { index, imageURL in
-                        AsyncImage(url: URL(string: imageURL)) { phase in
+                        AsyncImage(
+                            url: URL(string: imageURL)
+                        ) { phase in
                             switch phase {
                             case .empty:
-//                                ProgressView()
-//                                    .progressViewStyle(.circular)
-//                                    .scaleEffect(2.0)
-                                Rectangle()
-                                    .fill(.black)
+                                ProgressView()
+                                    .progressViewStyle(.circular)
                             case .success(let image):
-                                Rectangle()
-                                    .fill(.black)
-//                                image
-//                                    .resizable()
-//                                    .aspectRatio(contentMode: .fill)
-//                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                image
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
                             case .failure:
-                                Rectangle()
-                                    .fill(.black)
-//                                Image(systemName: "square.and.arrow.up")
-//                                    .foregroundColor(.gray)
+                                Image(systemName: "square.and.arrow.up")
+                                    .foregroundColor(.gray)
                             @unknown default:
                                 Rectangle()
                                     .fill(.black)
@@ -130,7 +125,6 @@ private extension GoalDetailView {
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
-            .clipShape(RoundedRectangle(cornerRadius: 10))
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
             .overlay(alignment: .bottom) {
                 // 커스텀 인디케이터
@@ -175,6 +169,7 @@ fileprivate struct TitleView: View {
                             maxWidth: .infinity,
                             alignment: .leading
                         )
+                    /*
                     VStack(spacing: 6) {
                         HStack(spacing: 8) {
                             Text("\(content.discountPercentage)%")
@@ -207,6 +202,7 @@ fileprivate struct TitleView: View {
                                 alignment: .leading
                             )
                     }
+                     */
                     AvailableTagView(
                         remainingCapacity: content.remainingCapacity,
                         currentParticipants: content.currentParticipants,
@@ -231,7 +227,7 @@ fileprivate struct GoalDescriptionView: View {
     let store: StoreOf<GoalDetailFeature>
     var body: some View {
         WithPerceptionTracking {
-            if let content = store.content {
+            if let content: GoalContentDetail = store.content {
                 VStack(spacing: 20) {
                     Group {
                         SeparatorView()
@@ -239,6 +235,23 @@ fileprivate struct GoalDescriptionView: View {
                             LabelView(title: "목표 주제", content: content.details.goalSubject)
                             LabelView(title: "멘토명", content: content.details.mentor)
                             LabelView(title: "목표 기간", content: content.details.period)
+                            HStack(spacing: 0) {
+                                Spacer()
+                                    .frame(width: 90)
+                                HStack(alignment: .top, spacing: 10) {
+                                    Images.calendar
+                                        .resized(length: 24)
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        Text("\(content.details.startDate)에 시작해서")
+                                        Text("\(content.details.endDate)에 끝나요")
+                                    }
+                                    .pretendard(.medium, size: 14, color: Colors.grey600)
+                                }
+                                .padding(12)
+                                .background(Colors.grey50)
+                                .clipShape(.rect(cornerRadius: 12))
+                                Spacer()
+                            }
                         }
                         SeparatorView()
                     }
@@ -309,6 +322,37 @@ fileprivate struct GoalDescriptionView: View {
                         }
                     }
                     .padding(.horizontal, 20)
+                    Spacer()
+                        .frame(height: 30)
+                    LazyVStack(spacing: 0) {
+                        ForEach(
+                            Array(content.contentImages),
+                            id: \.self
+                        ) { imageURL in
+                            AsyncImage(
+                                url: URL(string: imageURL)
+                            ) { phase in
+                                switch phase {
+                                case .empty:
+                                    ProgressView()
+                                        .progressViewStyle(.circular)
+                                case .success(let image):
+                                    image
+                                        .resizable()
+                                        .aspectRatio(contentMode: .fill)
+                                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                                case .failure:
+                                    Image(systemName: "square.and.arrow.up")
+                                        .foregroundColor(.gray)
+                                @unknown default:
+                                    Rectangle()
+                                        .fill(.black)
+                                }
+                            }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            .background(Colors.grey200)
+                        }
+                    }
                 }
             } else {
                 EmptyView()
@@ -324,8 +368,10 @@ fileprivate struct BottomButtonView: View {
             VStack(spacing: 10) {
                 HStack(spacing: 4) {
                     Images.bell
+                        .renderingMode(.template)
                         .resized(length: 16)
-                    Text("무료참여 ??자리 남았어요")
+                        .foregroundStyle(Colors.grey800)
+                    Text("무료참여 \(store.content?.remainingCapacity ?? 0)자리 남았어요")
                         .pretendardStyle(
                             .regular,
                             size: 12,
@@ -335,6 +381,7 @@ fileprivate struct BottomButtonView: View {
                 .padding(.vertical, 10)
                 .padding(.horizontal, 12)
                 .background(.white)
+                .clipShape(.rect(cornerRadius: 20))
                 .overlay(
                     RoundedRectangle(cornerRadius: 20)
                         .stroke(Colors.grey500, lineWidth: 1)
@@ -372,7 +419,7 @@ fileprivate struct BottomButtonView: View {
             }
             .background(
                 LinearGradient(
-                    gradient: Gradient(colors: [.clear, .white]),
+                    gradient: Gradient(colors: [.clear, .white, .white]),
                     startPoint: .top,
                     endPoint: .bottom
                 )
