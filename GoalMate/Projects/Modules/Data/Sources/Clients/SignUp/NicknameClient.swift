@@ -48,7 +48,9 @@ extension NicknameClient: DependencyKey {
                     accessToken: accessToken
                 )
                 let response = try await networkClient.asyncRequest(with: endpoint)
-                return response.code == "200" // duplicated
+                guard let data = response.data
+                else { throw NetworkError.emptyData }
+                return data.isAvailable
             }
         )
     }
