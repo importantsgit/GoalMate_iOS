@@ -99,6 +99,7 @@ public struct NicknameEditFeature {
         case checkDuplicateResponse(Result<String, NicknameSubmitError>)
         case nicknameSubmitted(Result<String, NicknameSubmitError>)
         case updateKeyboardHeight(CGFloat)
+        case nicknameEditCompleted(String)
     }
     @Dependency(\.authClient) var authClient
     @Dependency(\.keyboardClient) var keyboardClient

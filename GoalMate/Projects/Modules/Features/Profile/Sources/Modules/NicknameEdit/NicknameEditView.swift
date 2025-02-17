@@ -101,7 +101,6 @@ struct NicknameEditView: View {
                                          Colors.focused :
                                             Colors.grey900
                                         ))
-//                        .font(.system(size: 16, weight: .regular))
                         .labelsHidden()
                         .focused($focusedField, equals: .nickname)
                         Button {

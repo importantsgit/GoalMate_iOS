@@ -104,14 +104,16 @@ extension NicknameEditFeature {
         case let .nicknameSubmitted(result):
             state.isLoading = false
             switch result {
-            case .success(_):
-                state.nickname = state.nicknameFormState.inputText
+            case let .success(nickname):
+                return .send(.feature(.nicknameEditCompleted(nickname)))
             case .failure(_):
                 state.toastState = .display("닉네임을 저장하지 못했습니다.")
             }
             return .none
         case let .updateKeyboardHeight(height):
             state.keyboardHeight = height
+            return .none
+        case .nicknameEditCompleted:
             return .none
         }
     }
