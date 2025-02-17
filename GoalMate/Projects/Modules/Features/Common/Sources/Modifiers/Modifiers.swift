@@ -13,7 +13,6 @@ struct FontModifier: ViewModifier {
     let size: CGFloat
     let font: IFont.Pretendard
     let color: Color?
-    
     func body(content: Content) -> some View {
         content
             .font(font.value.swiftUIFont(size: size))
@@ -23,7 +22,6 @@ struct FontModifier: ViewModifier {
 
 struct LoadingModifier: ViewModifier {
     @Binding var isLoading: Bool
-    
     func body(content: Content) -> some View {
         content
             .overlay {
@@ -207,6 +205,43 @@ struct ToastModifier: ViewModifier {
                     position == .top ? .top : .bottom,
                     30
                 )
+        }
+    }
+}
+
+struct LoadingFailureModifier: ViewModifier {
+    let didFailToLoad: Bool
+    let retryAction: () -> Void
+    func body(content: Content) -> some View {
+        content.overlay {
+            if didFailToLoad {
+                failureView
+            }
+        }
+    }
+    @ViewBuilder
+    private var failureView: some View {
+        ZStack {
+            Color.white
+            VStack(spacing: 24) {
+                Text("문제가 생겨\n화면을 불러오지 못했어요")
+                    .pretendardStyle(
+                        .regular,
+                        size: 16,
+                        color: Colors.grey900
+                    )
+                    .multilineTextAlignment(.center)
+                Button {
+                    retryAction()
+                } label: {
+                    Text("다시 시도하기")
+                        .pretendardStyle(.regular, size: 16)
+                        .padding(.horizontal, 36)
+                        .padding(.vertical, 12)
+                        .background(Colors.primary)
+                        .clipShape(.capsule)
+                }
+            }
         }
     }
 }

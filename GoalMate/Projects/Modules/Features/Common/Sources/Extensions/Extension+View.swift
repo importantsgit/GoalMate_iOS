@@ -47,6 +47,18 @@ public extension View {
             position: position
         ))
     }
+
+    func loadingFailure(
+        didFailToLoad: Bool,
+        retryAction: @escaping () -> Void
+    ) -> some View {
+        modifier(
+            LoadingFailureModifier(
+                didFailToLoad: didFailToLoad,
+                retryAction: retryAction
+            )
+        )
+    }
 }
 
 public extension Text {
