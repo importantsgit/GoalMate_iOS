@@ -25,6 +25,7 @@ public struct GoalDetailFeature {
         var isShowUnavailablePopup: Bool
         var currentPage: Int
         var isLoading: Bool
+        var didFailToLoad: Bool
         var isLogin: Bool
         var toastState: ToastState
         public init(
@@ -40,6 +41,7 @@ public struct GoalDetailFeature {
             self.currentPage = currentPage
             self.isLoading = true
             self.isLogin = false
+            self.didFailToLoad = false
             self.toastState = .hide
         }
     }
@@ -58,6 +60,7 @@ public struct GoalDetailFeature {
         case startButtonTapped
         case loginButtonTapped
         case popupButtonTapped
+        case retryButtonTapped
     }
     public enum FeatureAction {
         case fetchDetail

@@ -76,11 +76,12 @@ public struct GoalDetailView: View {
                     }
                 }
             }
-            // onAppear로 동작 시, Concurrency하게 동작되지 않아 바로 Pop되는 현상 발생
+            .loadingFailure(didFailToLoad: store.didFailToLoad) {
+                store.send(.view(.retryButtonTapped))
+            }
             .task {
                 store.send(.viewCycling(.onAppear))
             }
-            .loading(isLoading: $store.isLoading)
             .toast(state: $store.toastState, position: .top)
         }
     }
@@ -149,6 +150,10 @@ private extension GoalDetailView {
                 }
             }
             .aspectRatio(36/27, contentMode: .fit)
+            .animation(
+                .easeInOut(duration: 0.3),
+                value: store.isLoading
+            )
         }
     }
 }
@@ -157,68 +162,79 @@ fileprivate struct TitleView: View {
     let store: StoreOf<GoalDetailFeature>
     var body: some View {
         WithPerceptionTracking {
-            if let content = store.content {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(content.details.title.splitCharacters())
-                        .pretendardStyle(
-                            .semiBold,
-                            size: 22,
-                            color: Colors.grey900
-                        )
-                        .frame(
-                            maxWidth: .infinity,
-                            alignment: .leading
-                        )
-                    /*
-                    VStack(spacing: 6) {
-                        HStack(spacing: 8) {
-                            Text("\(content.discountPercentage)%")
-                                .pretendardStyle(
-                                    .semiBold,
-                                    size: 14,
-                                    color: Colors.error
-                                )
-                            Text("\(content.originalPrice)원")
-                                .pretendardStyle(
-                                    .semiBold,
-                                    size: 13,
-                                    color: Colors.grey500
-                                )
-                                .strikethrough(
-                                    color: Colors.grey500
-                                )
+            VStack(alignment: .leading, spacing: 8) {
+                Text(store.content?.details.title.splitCharacters() ?? "")
+                    .pretendardStyle(
+                        .semiBold,
+                        size: 22,
+                        color: Colors.grey900
+                    )
+                    .frame(
+                        maxWidth: .infinity,
+                        alignment: .leading
+                    )
+                    .overlay {
+                        if store.isLoading {
+                            RoundedRectangle(cornerRadius: 8)
+                                .fill(Colors.grey200)
                         }
-                        .frame(
-                            maxWidth: .infinity,
-                            alignment: .leading
-                        )
-                        Text("\(content.discountedPrice)원")
+                    }
+                /*
+                VStack(spacing: 6) {
+                    HStack(spacing: 8) {
+                        Text("\(content.discountPercentage)%")
                             .pretendardStyle(
                                 .semiBold,
-                                size: 20
+                                size: 14,
+                                color: Colors.error
                             )
-                            .frame(
-                                maxWidth: .infinity,
-                                alignment: .leading
+                        Text("\(content.originalPrice)원")
+                            .pretendardStyle(
+                                .semiBold,
+                                size: 13,
+                                color: Colors.grey500
+                            )
+                            .strikethrough(
+                                color: Colors.grey500
                             )
                     }
-                     */
-                    AvailableTagView(
-                        remainingCapacity: content.remainingCapacity,
-                        currentParticipants: content.currentParticipants,
-                        size: .large
+                    .frame(
+                        maxWidth: .infinity,
+                        alignment: .leading
                     )
-                    if 1...10 ~= content.remainingCapacity {
-                        TagView(
-                            title: "마감임박",
-                            backgroundColor: Colors.secondaryY700
+                    Text("\(content.discountedPrice)원")
+                        .pretendardStyle(
+                            .semiBold,
+                            size: 20
                         )
+                        .frame(
+                            maxWidth: .infinity,
+                            alignment: .leading
+                        )
+                }
+                 */
+                AvailableTagView(
+                    remainingCapacity: store.content?.remainingCapacity ?? 0,
+                    currentParticipants: store.content?.currentParticipants ?? 0,
+                    size: .large
+                )
+                .overlay {
+                    if store.isLoading {
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Colors.grey200)
                     }
                 }
-            } else {
-                // TODO: 로딩
-                EmptyView()
+                if 1...10 ~= (store.content?.remainingCapacity ?? 0) {
+                    TagView(
+                        title: "마감임박",
+                        backgroundColor: Colors.secondaryY700
+                    )
+                }
             }
+            .animation(
+                .easeInOut(duration: 0.3),
+                value: store.isLoading
+            )
         }
     }
 }
@@ -227,48 +243,92 @@ fileprivate struct GoalDescriptionView: View {
     let store: StoreOf<GoalDetailFeature>
     var body: some View {
         WithPerceptionTracking {
-            if let content: GoalContentDetail = store.content {
-                VStack(spacing: 20) {
-                    Group {
-                        SeparatorView()
-                        VStack(spacing: 8) {
-                            LabelView(title: "목표 주제", content: content.details.goalSubject)
-                            LabelView(title: "멘토명", content: content.details.mentor)
-                            LabelView(title: "목표 기간", content: content.details.period)
-                            HStack(spacing: 0) {
-                                Spacer()
-                                    .frame(width: 90)
-                                HStack(alignment: .top, spacing: 10) {
-                                    Images.calendar
-                                        .resized(length: 24)
-                                    VStack(alignment: .leading, spacing: 4) {
-                                        Text("\(content.details.startDate)에 시작해서")
-                                        Text("\(content.details.endDate)에 끝나요")
-                                    }
-                                    .pretendard(.medium, size: 14, color: Colors.grey600)
+            VStack(spacing: 20) {
+                Group {
+                    SeparatorView()
+                    VStack(spacing: 8) {
+                        LabelView(
+                            title: "목표 주제",
+                            isLoading: store.isLoading,
+                            content: store.content?.details.goalSubject
+                        )
+                        LabelView(
+                            title: "멘토명",
+                            isLoading: store.isLoading,
+                            content: store.content?.details.mentor
+                        )
+                        LabelView(
+                            title: "목표 기간",
+                            isLoading: store.isLoading,
+                            content: store.content?.details.period
+                        )
+                        HStack(spacing: 0) {
+                            Spacer()
+                                .frame(width: 90)
+                            HStack(alignment: .top, spacing: 10) {
+                                Images.calendar
+                                    .resized(length: 24)
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("\(store.content?.details.startDate ?? "")에 시작해서")
+                                    Text("\(store.content?.details.endDate ?? "")에 끝나요")
                                 }
-                                .padding(12)
-                                .background(Colors.grey50)
-                                .clipShape(.rect(cornerRadius: 12))
-                                Spacer()
+                                .pretendard(.medium, size: 14, color: Colors.grey600)
+                            }
+                            .padding(12)
+                            .background(Colors.grey50)
+                            .clipShape(.rect(cornerRadius: 12))
+                            .overlay {
+                                if store.isLoading {
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .fill(Colors.grey200)
+                                }
+                            }
+                            Spacer()
+                        }
+                    }
+                    SeparatorView()
+                }
+                .padding(.horizontal, 20)
+                VStack(spacing: 16) {
+                    HStack {
+                        Text("목표 설명")
+                            .pretendard(.semiBold, size: 16, color: Colors.grey500)
+                            .overlay {
+                                if store.isLoading {
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .fill(Colors.grey200)
+                                }
+                            }
+                        Spacer()
+                    }
+                    Text(store.content?.details.goalDescription.splitCharacters() ?? "")
+                        .pretendard(.medium, size: 16, color: Colors.grey900)
+                        .padding(20)
+                        .background(Colors.grey50)
+                        .clipShape(.rect(cornerRadius: 24))
+                        .lineSpacing(3)
+                        .overlay {
+                            if store.isLoading {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(Colors.grey200)
                             }
                         }
-                        SeparatorView()
-                    }
-                    .padding(.horizontal, 20)
+                }
+                .padding(.horizontal, 20)
+                SeparatorView(height: 16)
+                if let content = store.content {
                     VStack(spacing: 16) {
-                        LabelView(title: "목표 설명")
-                        Text(content.details.goalDescription.splitCharacters())
-                            .pretendard(.medium, size: 16, color: Colors.grey900)
-                            .padding(20)
-                            .background(Colors.grey50)
-                            .clipShape(.rect(cornerRadius: 24))
-                            .lineSpacing(3)
-                    }
-                    .padding(.horizontal, 20)
-                    SeparatorView(height: 16)
-                    VStack(spacing: 16) {
-                        LabelView(title: "주차별 목표")
+                        HStack {
+                            Text("주차별 목표")
+                                .pretendard(.semiBold, size: 16, color: Colors.grey500)
+                                .overlay {
+                                    if store.isLoading {
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .fill(Colors.grey200)
+                                    }
+                                }
+                            Spacer()
+                        }
                         VStack(spacing: 10) {
                             ForEach(
                                 Array(content.details.weeklyGoal.enumerated()),
@@ -294,7 +354,17 @@ fileprivate struct GoalDescriptionView: View {
                     .padding(.horizontal, 20)
                     SeparatorView(height: 16)
                     VStack(spacing: 16) {
-                        LabelView(title: "중간 목표")
+                        HStack {
+                            Text("중간 목표")
+                                .pretendard(.semiBold, size: 16, color: Colors.grey500)
+                                .overlay {
+                                    if store.isLoading {
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .fill(Colors.grey200)
+                                    }
+                                }
+                            Spacer()
+                        }
                         VStack(spacing: 10) {
                             ForEach(
                                 Array(content.details.milestoneGoal.enumerated()),
@@ -342,21 +412,23 @@ fileprivate struct GoalDescriptionView: View {
                                         .aspectRatio(contentMode: .fill)
                                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                                 case .failure:
-                                    Image(systemName: "square.and.arrow.up")
-                                        .foregroundColor(.gray)
+                                    EmptyView()
                                 @unknown default:
-                                    Rectangle()
-                                        .fill(.black)
+                                    EmptyView()
                                 }
                             }
                             .frame(maxWidth: .infinity, maxHeight: .infinity)
                             .background(Colors.grey200)
                         }
                     }
+                } else {
+                    EmptyView()
                 }
-            } else {
-                EmptyView()
             }
+            .animation(
+                .easeInOut(duration: 0.3),
+                value: store.isLoading
+            )
         }
     }
 }
@@ -430,29 +502,53 @@ fileprivate struct BottomButtonView: View {
 
 fileprivate struct LabelView: View {
     let title: String
+    let isLoading: Bool
     let content: String?
     init(
         title: String,
+        isLoading: Bool,
         content: String? = nil
     ) {
         self.title = title
+        self.isLoading = isLoading
         self.content = content
     }
     var body: some View {
-        HStack(spacing: 30) {
-            Text(title)
-                .pretendard(.semiBold, size: 16, color: Colors.grey500)
-                .frame(minWidth: 60, alignment: .leading)
-            if let content {
-                Text(content)
+        WithPerceptionTracking {
+            HStack(spacing: 30) {
+                Text(title)
+                    .pretendard(.semiBold, size: 16, color: Colors.grey500)
+                    .frame(minWidth: 60, alignment: .leading)
+                    .overlay {
+                        if isLoading {
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(Colors.grey200)
+                        }
+                    }
+                Text(content ?? "")
                     .lineLimit(2)
                     .truncationMode(.tail)
                     .multilineTextAlignment(.leading)
                     .pretendard(.semiBold, size: 16, color: Colors.grey900)
                     .frame(maxWidth: .infinity, alignment: .leading)
+                    .overlay {
+                        if isLoading {
+                            HStack {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(Colors.grey200)
+                                    .frame(width: 100)
+                                Spacer()
+                            }
+
+                        }
+                    }
+                Spacer()
+                    .frame(minWidth: 0)
             }
-            Spacer()
-                .frame(minWidth: 0)
+            .animation(
+                .easeInOut(duration: 0.3),
+                value: isLoading
+            )
         }
     }
 }

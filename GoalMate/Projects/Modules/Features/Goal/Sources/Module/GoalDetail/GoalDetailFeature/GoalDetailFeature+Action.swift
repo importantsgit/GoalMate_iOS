@@ -28,6 +28,53 @@ extension GoalDetailFeature {
     // MARK: View
     func reduce(into state: inout State, action: ViewAction) -> Effect<Action> {
         switch action {
+        case .retryButtonTapped:
+            state.didFailToLoad = false
+            state.isLoading = true
+            return .run { [contentId = state.contentId ] send in
+                do {
+                    let content = try await goalClient.fetchGoalDetail(goalId: contentId)
+                    let today = Date()
+                    let endDate = Calendar.current.date(
+                        byAdding: .day, value: content.period ?? 0, to: today
+                    ) ?? today
+                    let dateFormatter = DateFormatter()
+                    dateFormatter.dateFormat = "yyyy년 MM월 dd일"
+                    let maxOccupancy = content.participantsLimit ?? 0
+                    let currentParticipants = content.currentParticipants ?? 0
+                    let result: GoalContentDetail = .init(
+                        id: content.id,
+                        details: .init(
+                            title: content.title ?? "",
+                            goalSubject: content.topic ?? "",
+                            mentor: content.mentorName ?? "",
+                            period: "\(content.period ?? 0)",
+                            startDate: dateFormatter.string(from: today),
+                            endDate: dateFormatter.string(from: endDate),
+                            goalDescription: "\"\(content.description ?? "")\"",
+                            weeklyGoal: content.weeklyObjectives.map {
+                                $0.description ?? ""
+                            },
+                            milestoneGoal: content.midObjectives.map {
+                                $0.description ?? ""
+                            }
+                        ),
+                        discountPercentage: 0,
+                        originalPrice: 0,
+                        discountedPrice: 0,
+                        maxOccupancy: maxOccupancy,
+                        remainingCapacity: maxOccupancy - currentParticipants,
+                        currentParticipants: currentParticipants,
+                        thumbnailImages: content.thumbnailImages.compactMap { $0.imageUrl },
+                        contentImages: content.contentImages.compactMap { $0.imageUrl }
+                    )
+                    await send(.feature(.checkFetchDetailResponse(.success(result))))
+                } catch {
+                    await send(
+                        .feature(.checkFetchDetailResponse(.failure(FetchError.networkError)))
+                    )
+                }
+            }
         case .backButtonTapped:
             return .cancel(id: CancelID.initialLoad)
         case .startButtonTapped:
@@ -50,7 +97,7 @@ extension GoalDetailFeature {
         case .checkLogin:
             return .run { send in
                 do {
-                    let loginState = try await authClient.isLogin()
+                    let loginState = try await authClient.checkLoginStatus()
                     await send(.feature(.checkLoginResponss(loginState)))
                 } catch {
                     await send(.feature(.checkLoginResponss(false)))
@@ -109,10 +156,11 @@ extension GoalDetailFeature {
             switch result {
             case let .success(detail):
                 state.content = detail
+                state.isLoading = false
             case let .failure(error):
-                print(error)
+                state.isLoading = true
+                state.didFailToLoad = true
             }
-            state.isLoading = false
             return .none
         case let .showToast(message):
             state.toastState = .display(message)
