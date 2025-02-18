@@ -55,7 +55,6 @@ public final class NetworkService: NSObject {
         case 200...299:
             do {
                 let decodingData: T = try decoder.decode(data)
-                print(decodingData)
                 return decodingData
             } catch let error {
                 switch error as? DecodingError {

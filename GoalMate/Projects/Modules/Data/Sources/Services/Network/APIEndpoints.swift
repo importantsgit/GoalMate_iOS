@@ -11,9 +11,11 @@ struct APIEndpoints {
     // Path prefix에 / 제거
     enum APIPath: String {
         case authLogin          = "auth/login"
-        case refreshLogin       = "auth/reissue"
+        case refreshToken       = "auth/reissue"
+        case validateToken      = "auth/validate"
         case withdraw           = "auth/withdraw"
-
+        case logout             = "auth/logout"
+ 
         case setNickname        = "mentees/my/name"
         case checkNickname      = "mentees/name/validate"
         case joinGoal           = "goals/{goalId}/mentees"
@@ -21,7 +23,7 @@ struct APIEndpoints {
 
         case fetchGoals         = "goals"
         case fetchGoalDetail    = "goals/{goalId}"
-
+        
         func path(with parameters: [String: String]) -> String {
             var result = self.rawValue
             parameters.forEach { key, value in
@@ -41,21 +43,43 @@ struct APIEndpoints {
         )
     }
 
-    static func refreshLoginEndpoint(
-        refreshToken: String
+    static func refreshTokenEndpoint(
+        with request: RefreshTokenRequestDTO
     ) -> Endpoint<AuthLoginResponseDTO> {
         Endpoint(
-            path: APIPath.refreshLogin,
+            path: APIPath.refreshToken,
             method: .put,
+            bodyParametersEncodable: request
+        )
+    }
+
+    static func validateTokenEndpoint(
+        accessToken: String
+    ) -> Endpoint<DefaultResponseDTO> {
+        Endpoint(
+            path: APIPath.validateToken,
+            method: .get,
             headerParameters: [
-                "Authorization": "Bearer \(refreshToken)"
+                "Authorization": "Bearer \(accessToken)"
             ]
         )
     }
-    
+
+    static func authLogoutEndpoint(
+        accessToken: String
+    ) -> Endpoint<DefaultResponseDTO> {
+        Endpoint(
+            path: APIPath.logout,
+            method: .put,
+            headerParameters: [
+                "Authorization": "Bearer \(accessToken)"
+            ]
+        )
+    }
+
     static func withdrawEndpoint(
         accessToken: String
-    ) -> Endpoint<Void> {
+    ) -> Endpoint<DefaultResponseDTO> {
         Endpoint(
             path: .withdraw,
             method: .delete,

@@ -31,7 +31,6 @@ extension KeyboardClient: DependencyKey {
                                 UIResponder.keyboardFrameEndUserInfoKey
                               ] as? CGRect
                         else { return }
-                        print("data: \(keyboardRect.height)")
                         continuation.yield(keyboardRect.height)
                         continuation.finish()  // 첫 번째 높이를 받은 후 즉시 종료
                     }

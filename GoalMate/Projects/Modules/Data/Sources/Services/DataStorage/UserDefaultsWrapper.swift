@@ -21,31 +21,26 @@ struct UserDefaultsWrapper<T: Codable> {
     }
     var wrappedValue: T {
         get {
-            guard let data = userDefaults.data(forKey: key) else {
-                return placeValue
-            }
+            guard let data = userDefaults.data(forKey: key)
+            else { return placeValue }
             let decodingData: Data
             if encrypted {
-                guard let decryptedData = AESHelper.decrypt(data) else {
-                    return placeValue
-                }
+                guard let decryptedData = AESHelper.decrypt(data)
+                else { return placeValue }
                 decodingData = decryptedData
             } else {
                 decodingData = data
             }
-            guard let value = try? JSONDecoder().decode(T.self, from: decodingData) else {
-                return placeValue
-            }
+            guard let value = try? JSONDecoder().decode(T.self, from: decodingData)
+            else { return placeValue }
             return value
         }
         set {
-            guard let encodedData = try? JSONEncoder().encode(newValue) else {
-                return
-            }     
+            guard let encodedData = try? JSONEncoder().encode(newValue)
+            else { return }     
             if encrypted {
-                guard let encryptedData = AESHelper.encrypt(encodedData) else {
-                    return
-                }
+                guard let encryptedData = AESHelper.encrypt(encodedData)
+                else { return }
                 userDefaults.setValue(encryptedData, forKey: key)
             } else {
                 userDefaults.setValue(encodedData, forKey: key)

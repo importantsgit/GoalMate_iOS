@@ -7,12 +7,25 @@
 
 import Foundation
 
+struct DefaultResponseDTO: Codable {
+    let status: String
+    let code: String
+    let message: String
+}
+
 // MARK: - Response
 struct Response<T: Codable>: Codable {
     let status: String
     let code: String
     let message: String
     let data: T
+}
+
+public struct RefreshTokenRequestDTO: Codable {
+    let refreshToken: String
+    enum CodingKeys: String, CodingKey {
+        case refreshToken = "refresh_token"
+    }
 }
 
 public struct AuthLoginRequestDTO: Codable {
@@ -139,8 +152,8 @@ public struct FetchGoalsResponseDTO: Codable {
             public let updatedAt: String?
             public let mainImage: String?
             public enum GoalStatus: String, Codable {
-                case inProgress = "IN_PROGRESS"
-                case notStarted = "NOT_STARTED"
+                case upcoming   = "UPCOMING"
+                case open       = "OPEN"
                 case closed     = "CLOSED"
             }
             public enum CodingKeys: String, CodingKey {
@@ -189,9 +202,9 @@ public struct FetchGoalDetailResponseDTO: Codable {
         public let thumbnailImages: [ContentImage]
         public let contentImages: [ContentImage]
         public enum GoalStatus: String, Codable {
-            case notStarted = "NOT_STARTED"
-            case inProgress = "IN_PROGRESS"
-            case closed = "CLOSED"
+            case upcoming   = "UPCOMING"
+            case open       = "OPEN"
+            case closed     = "CLOSED"
         }
         public enum CodingKeys: String, CodingKey {
             case id, title, topic, description, period
@@ -250,7 +263,7 @@ extension FetchGoalsResponseDTO {
                     participantsLimit: 10,
                     currentParticipants: 5,
                     isClosingSoon: true,
-                    goalStatus: .inProgress,
+                    goalStatus: .open,
                     mentorName: "다온",
                     createdAt: "2025-02-13T15:30:00Z",
                     updatedAt: "2025-02-13T15:30:00Z",
@@ -266,7 +279,7 @@ extension FetchGoalsResponseDTO {
                     participantsLimit: 20,
                     currentParticipants: 15,
                     isClosingSoon: false,
-                    goalStatus: .inProgress,
+                    goalStatus: .closed,
                     mentorName: "건강이",
                     createdAt: "2025-02-13T15:30:00Z",
                     updatedAt: "2025-02-13T15:30:00Z",
@@ -282,7 +295,7 @@ extension FetchGoalsResponseDTO {
                     participantsLimit: 15,
                     currentParticipants: 8,
                     isClosingSoon: false,
-                    goalStatus: .inProgress,
+                    goalStatus: .upcoming,
                     mentorName: "코드마스터",
                     createdAt: "2025-02-13T15:30:00Z",
                     updatedAt: "2025-02-13T15:30:00Z",
@@ -318,7 +331,7 @@ extension FetchGoalDetailResponseDTO {
             participantsLimit: 10,
             currentParticipants: 5,
             isClosingSoon: true,
-            goalStatus: .inProgress,
+            goalStatus: .open,
             mentorName: "다온",
             createdAt: nil,
             updatedAt: nil,

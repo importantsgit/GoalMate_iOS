@@ -44,7 +44,12 @@ public actor DataStorageService {
     public func setUserInfo(_ userInfo: UserInfo) {
         self.userInfo = userInfo
     }
-    public func setTokenInfo(_ tokenInfo: TokenInfo) {
+    public func setTokenInfo(_ tokenInfo: TokenInfo?) {
+        guard let tokenInfo
+        else {
+            self.tokenInfo = .init()
+            return
+        }
         self.isLogin = true
         self.tokenInfo = tokenInfo
     }
