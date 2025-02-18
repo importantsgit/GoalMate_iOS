@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import FeatureCommon
 import Foundation
 
 @Reducer
@@ -23,6 +24,7 @@ public struct WithdrawalFeature {
         var inputText: String
         var confirmText: String
         var isSubmitEnabled: Bool
+        var toastState: ToastState
         public init(
             keyboardHeight: Double = 0,
             inputText: String = "",
@@ -34,6 +36,7 @@ public struct WithdrawalFeature {
             self.inputText = inputText
             self.confirmText = confirmText
             self.isSubmitEnabled = isSubmitEnabled
+            self.toastState = .hide
         }
     }
     public enum Action: BindableAction {
@@ -53,9 +56,11 @@ public struct WithdrawalFeature {
     public enum FeatureAction {
         case updateKeyboardHeight(Double)
         case checkWithdrawalResponse(
-            Result<String, WithdrawalSubmitError>
+            Result<Void, WithdrawalSubmitError>
         )
+        case finish
     }
+    @Dependency(\.authClient) var authClient
     @Dependency(\.keyboardClient) var keyboardClient
     public var body: some Reducer<State, Action> {
         BindingReducer()

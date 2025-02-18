@@ -15,7 +15,6 @@ extension WithdrawalFeature {
         case .onAppear:
             return .run { send in
                 for await height in keyboardClient.observeKeyboardHeight() {
-                    print("높이: \(height)")
                     await send(.feature(.updateKeyboardHeight(height)))
                 }
             }
@@ -28,10 +27,18 @@ extension WithdrawalFeature {
             return .none
         case .confirmButtonTapped:
             return .run { send in
-                
+                do {
+                    try await authClient.withdraw()
+                    await send(.feature(.checkWithdrawalResponse(
+                        .success(())))
+                    )
+                } catch {
+                    await send(.feature(
+                        .checkWithdrawalResponse(.failure(.networkError)))
+                    )
+                }
             }
         case let .nicknameTextInputted(text):
-            print("text: \(text)")
             guard state.inputText != text
             else { return .none }
             state.inputText = text
@@ -45,13 +52,17 @@ extension WithdrawalFeature {
         case let .checkWithdrawalResponse(result):
             switch result {
             case .success:
-                break
+                return .send(.feature(.finish))
             case .failure:
-                break
+                state.toastState = .display(
+                    "네트워크에 문제가 발생했습니다."
+                )
             }
             return .none
         case let .updateKeyboardHeight(height):
             state.keyboardHeight = height
+            return .none
+        case .finish:
             return .none
         }
     }

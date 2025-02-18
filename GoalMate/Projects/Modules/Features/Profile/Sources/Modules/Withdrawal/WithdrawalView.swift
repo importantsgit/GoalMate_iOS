@@ -116,6 +116,7 @@ public struct WithdrawalView: View {
                     .ignoresSafeArea(.keyboard)
                 }
             }
+            .toast(state: $store.toastState)
             .task {
                 store.send(.viewCycling(.onAppear))
                 focusedField = .nickname
