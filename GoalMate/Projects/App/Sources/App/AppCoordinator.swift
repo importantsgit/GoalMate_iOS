@@ -7,16 +7,18 @@
 
 import ComposableArchitecture
 import FeatureHome
+import FeatureIntro
 import FeatureSignUp
 import SwiftUI
 import TCACoordinators
 
 struct AppCoordinatorView: View {
     let store: StoreOf<AppCoordinator>
-
     public var body: some View {
         TCARouter(store.scope(state: \.routes, action: \.router)) { screen in
             switch screen.case {
+            case let .intro(store):
+                IntroCoordinatorView(store: store)
             case let .signUp(store):
                 SignUpCoordinatorView(store: store)
             case let .tab(store):
@@ -30,6 +32,7 @@ struct AppCoordinatorView: View {
 struct AppCoordinator {
     @Reducer(state: .equatable)
     public enum Screen {
+        case intro(IntroCoordinator)
         case signUp(SignUpCoordinator)
         case tab(TabCoordinator)
     }
@@ -41,7 +44,7 @@ struct AppCoordinator {
         init(
             appDelegate: AppDelegateReducer.State = AppDelegateReducer.State(),
             routes: IdentifiedArrayOf<Route<Screen.State>> = [
-                .root(.tab(.init()), embedInNavigationView: true)
+                .root(.intro(.init()), embedInNavigationView: true)
             ]
         ) {
             self.id = UUID()
@@ -66,6 +69,16 @@ struct AppCoordinator {
         Reduce { state, action in
             switch action {
             case .appDelegate:
+                return .none
+            case .router(
+                .routeAction(
+                    _,
+                    action: .intro(.coordinatorFinished)
+                )
+            ):
+                state.routes = [
+                    .root(.tab(.init()))
+                ]
                 return .none
             case .router(
                 .routeAction(
@@ -105,13 +118,15 @@ struct AppCoordinator {
 
 extension AppCoordinator.Screen.State: Identifiable {
     public var id: UUID {
-    switch self {
-    case let .signUp(state):
-      state.id
-    case let .tab(state):
-      state.id
+        switch self {
+        case let .signUp(state):
+            state.id
+        case let .tab(state):
+            state.id
+        case let .intro(state):
+            state.id
+        }
     }
-  }
 }
 
 @available(iOS 17.0, *)

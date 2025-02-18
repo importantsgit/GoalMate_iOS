@@ -11,11 +11,11 @@ import TCACoordinators
 
 public struct IntroCoordinatorView: View {
     let store: StoreOf<IntroCoordinator>
-
+    
     public init(store: StoreOf<IntroCoordinator>) {
         self.store = store
     }
-
+    
     public var body: some View {
         TCARouter(store.scope(state: \.routes, action: \.router)) { screen in
             switch screen.case {
@@ -35,12 +35,14 @@ public struct IntroCoordinator {
     }
     @ObservableState
     public struct State: Equatable {
+        public var id: UUID
         var routes: IdentifiedArrayOf<Route<Screen.State>>
         public init(
             routes: IdentifiedArrayOf<Route<Screen.State>> = [
-                .root(.introStep(.init()), embedInNavigationView: true)
+                .root(.introStep(.init()), embedInNavigationView: false)
             ]
         ) {
+            self.id = UUID()
             self.routes = routes
         }
     }
@@ -55,6 +57,13 @@ public struct IntroCoordinator {
     var core: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
+            case .router(
+                .routeAction(
+                    _,
+                    action: .introStep(.feature(.finishIntro))
+                )
+            ):
+                return .send(.coordinatorFinished)
             default: break
             }
             return .none
@@ -65,9 +74,9 @@ public struct IntroCoordinator {
 
 extension IntroCoordinator.Screen.State: Identifiable {
     public var id: UUID {
-    switch self {
-    case let .introStep(state):
-      state.id
+        switch self {
+        case let .introStep(state):
+            state.id
+        }
     }
-  }
 }
