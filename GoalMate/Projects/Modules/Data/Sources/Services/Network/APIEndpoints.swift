@@ -12,18 +12,26 @@ struct APIEndpoints {
     enum APIPath: String {
         case authLogin          = "auth/login"
         case refreshToken       = "auth/reissue"
-        case validateToken      = "auth/validate"
-        case withdraw           = "auth/withdraw"
-        case logout             = "auth/logout"
- 
-        case setNickname        = "mentees/my/name"
-        case checkNickname      = "mentees/name/validate"
-        case joinGoal           = "goals/{goalId}/mentees"
-        case fetchMenteeInfo    = "mentees/my"
+        case validateToken          = "auth/validate"
+        case withdraw               = "auth/withdraw"
+        case logout                 = "auth/logout"
 
-        case fetchGoals         = "goals"
-        case fetchGoalDetail    = "goals/{goalId}"
+        case setNickname            = "mentees/my/name"
+        case checkNickname          = "mentees/name/validate"
+        case joinGoal               = "goals/{goalId}/mentees"
+        case fetchMenteeInfo        = "mentees/my"
+
+        case fetchGoals             = "goals"
+        case fetchGoalDetail        = "goals/{goalId}"
+
+        case fetchMyGoals           = "mentees/my/goals"
+        case fetchMyGoalDetail      = "mentees/my/goals/{menteeGoalId}"
+        case fetchWeeklyProgress    = "mentees/my/goals/{menteeGoalId}/weekly-progress"
+
+        case updateTodo             = "mentees/my/goals/{menteeGoalId}/todos/{todoId}"
         
+        case fetchCommentRooms      = "comment-rooms/my"
+        case fetchCommentRoomDetail = "comment-rooms/{roomId}/comments"
         func path(with parameters: [String: String]) -> String {
             var result = self.rawValue
             parameters.forEach { key, value in
@@ -118,7 +126,7 @@ struct APIEndpoints {
     }
 
     static func fetchGoalEndpoint(
-        with request: FetchGoalsRequestDTO
+        with request: PaginationRequestDTO
     ) -> Endpoint<FetchGoalsResponseDTO> {
         Endpoint(
             path: .fetchGoals,
@@ -163,6 +171,60 @@ struct APIEndpoints {
             method: .get,
             headerParameters: [
                 "Authorization": "Bearer \(accessToken)"
+            ]
+        )
+    }
+    
+    static func fetchMyGoalsEndpoint(
+        with request: PaginationRequestDTO,
+        accessToken: String
+    ) -> Endpoint<FetchMyGoalsResponseDTO> {
+        return Endpoint(
+            path: .fetchMyGoals,
+            method: .get,
+            headerParameters: [
+                "Authorization": "Bearer \(accessToken)"
+            ],
+            queryParametersEncodable: request
+        )
+    }
+
+    static func fetchMyGoalDetailEndpoint(
+        menteeGoalId: Int,
+        date: String,
+        accessToken: String
+    ) throws -> Endpoint<FetchMyGoalDetailResponseDTO> {
+        try Endpoint(
+            path: .fetchMyGoalDetail,
+            pathParameters: [
+                "menteeGoalId": "\(menteeGoalId)"
+            ],
+            method: .get,
+            headerParameters: [
+                "Authorization": "Bearer \(accessToken)"
+            ],
+            queryParameters: [
+                "date": date
+            ]
+        )
+    }
+
+    static func fetchWeeklyProgressEndpoint(
+        menteeGoalId: Int,
+        date: String,
+        accessToken: String
+    ) throws -> Endpoint<FetchWeeklyProgressResponseDTO> {
+        try Endpoint(
+            path: .fetchWeeklyProgress,
+            pathParameters: [
+                "menteeGoalId": "\(menteeGoalId)"
+            ],
+            method: .get,
+            headerParameters: [
+                "Authorization": "Bearer \(accessToken)"
+            ],
+            queryParameters: [
+                "date": date
             ]
         )
     }

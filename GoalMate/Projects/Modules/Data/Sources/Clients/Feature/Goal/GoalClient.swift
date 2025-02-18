@@ -39,7 +39,7 @@ extension GoalClient: DependencyKey {
         @Dependency(\.authClient) var authClient
         return .init(
             fetchGoals: { page in
-                let requestDTO: FetchGoalsRequestDTO = .init(
+                let requestDTO: PaginationRequestDTO = .init(
                     page: page,
                     size: 10
                 )

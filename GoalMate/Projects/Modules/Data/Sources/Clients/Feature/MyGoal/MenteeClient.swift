@@ -14,12 +14,22 @@ import Utils
 public struct MenteeClient {
     public var fetchMenteeInfo: () async throws -> FetchMenteeInfoResponseDTO.Response
     public var joinGoal: (_ goalId: Int) async throws -> Void
+    public var fetchMyGoals: (_ page: Int) async throws -> FetchMyGoalsResponseDTO.Response
+    public var fetchMyGoalDetail: (_ menteeGoalId: Int, _ date: String) async throws -> FetchMyGoalDetailResponseDTO.Response
+    public var fetchWeeklyProgress: (_ menteeGoalId: Int, _ date: String) async throws -> FetchWeeklyProgressResponseDTO.Response
+    
     public init(
-        fetchMenteeInfo: @escaping () -> FetchMenteeInfoResponseDTO.Response,
-        joinGoal: @escaping (_ goalId: Int) async throws -> Void
+        fetchMenteeInfo: @escaping () async throws -> FetchMenteeInfoResponseDTO.Response,
+        joinGoal: @escaping (_ goalId: Int) -> Void,
+        fetchMyGoals: @escaping (_ page: Int) -> FetchMyGoalsResponseDTO.Response,
+        fetchMyGoalDetail: @escaping (_ menteeGoalId: Int, _ date: String) -> FetchMyGoalDetailResponseDTO.Response,
+        fetchWeeklyProgress: @escaping (_ menteeGoalId: Int, _ date: String) async throws -> FetchWeeklyProgressResponseDTO.Response
     ) {
         self.fetchMenteeInfo = fetchMenteeInfo
         self.joinGoal = joinGoal
+        self.fetchMyGoals = fetchMyGoals
+        self.fetchMyGoalDetail = fetchMyGoalDetail
+        self.fetchWeeklyProgress = fetchWeeklyProgress
     }
 }
 
@@ -39,7 +49,7 @@ extension MenteeClient: DependencyKey {
                 return try await action(accessToken)
             } catch let error as NetworkError {
                 if case let .statusCodeError(code) = error,
-                    code == 401 {
+                   code == 401 {
                     let newAccessToken = try await authClient.refresh()
                     return try await action(newAccessToken)
                 }
@@ -73,18 +83,76 @@ extension MenteeClient: DependencyKey {
                     }
                     throw NetworkError.statusCodeError(code: code)
                 }
+            },
+            fetchMyGoals: { page in
+                try await executeWithTokenValidation { accessToken in
+                    let requestDTO = PaginationRequestDTO(
+                        page: page, size: 10
+                    )
+                    let endpoint = APIEndpoints.fetchMyGoalsEndpoint(
+                        with: requestDTO,
+                        accessToken: accessToken
+                    )
+                    let response = try await networkClient.asyncRequest(with: endpoint)
+                    guard let data = response.data
+                    else { throw NetworkError.emptyData }
+                    return data
+                }
+            },
+            fetchMyGoalDetail: { menteeGoalId, date in
+                try await executeWithTokenValidation { accessToken in
+                    let endpoint = try APIEndpoints.fetchMyGoalDetailEndpoint(
+                        menteeGoalId: menteeGoalId,
+                        date: date,
+                        accessToken: accessToken
+                    )
+                    let response = try await networkClient.asyncRequest(with: endpoint)
+                    guard let data = response.data
+                    else { throw NetworkError.emptyData }
+                    return data
+                }
+                
+            },
+            fetchWeeklyProgress: { menteeGoalId, date in
+                try await executeWithTokenValidation { accessToken in
+                    let endpoint = try APIEndpoints.fetchWeeklyProgressEndpoint(
+                        menteeGoalId: menteeGoalId,
+                        date: date,
+                        accessToken: accessToken
+                    )
+                    let response = try await networkClient.asyncRequest(with: endpoint)
+                    guard let data = response.data
+                    else { throw NetworkError.emptyData }
+                    return data
+                }
             }
         )
     }
-
+    
     public static var testValue = MenteeClient(
         fetchMenteeInfo: { FetchMenteeInfoResponseDTO.dummy.data! },
-        joinGoal: { _ in }
+        joinGoal: { _ in },
+        fetchMyGoals: { _ in
+            FetchMyGoalsResponseDTO.dummy.data!
+        },
+        fetchMyGoalDetail: { _, _ in
+            FetchMyGoalDetailResponseDTO.dummy.data!
+        },
+        fetchWeeklyProgress: { _, _ in FetchWeeklyProgressResponseDTO.dummy.data!
+        }
     )
-
+    
     public static var previewValue = MenteeClient(
         fetchMenteeInfo: { FetchMenteeInfoResponseDTO.dummy.data! },
-        joinGoal: { _ in }
+        joinGoal: { _ in },
+        fetchMyGoals: { _ in
+            FetchMyGoalsResponseDTO.dummy.data!
+        },
+        fetchMyGoalDetail: { _, _ in
+            FetchMyGoalDetailResponseDTO.dummy.data!
+        },
+        fetchWeeklyProgress: { _, _ in FetchWeeklyProgressResponseDTO.dummy.data!
+        }
     )
 }
 
