@@ -6,13 +6,12 @@
 //
 
 import ComposableArchitecture
-import FeatureCommon
 import SwiftUI
 
 public struct GoalDetailView: View {
-    @State var progress: Double
+    @State private var progress: Double
     @Perception.Bindable var store: StoreOf<GoalDetailFeature>
-    init(
+    public init(
         progress: Double = 0.1,
         store: StoreOf<GoalDetailFeature>
     ) {
@@ -41,6 +40,7 @@ public struct GoalDetailView: View {
                         }
                     )
                     .padding(.horizontal, 16)
+                    .frame(height: 64)
                     .background(Color.white)
                     ScrollView(.vertical) {
                         VStack(spacing: 0) {
@@ -56,10 +56,15 @@ public struct GoalDetailView: View {
                                 .frame(height: 120)
                         }
                     }
+                    .loadingFailure(didFailToLoad: store.didFailToLoad) {
+                        store.send(.view(.retryButtonTapped))
+                    }
                 }
-                VStack {
-                    Spacer()
-                    BottomButtonView(store: store)
+                if store.didFailToLoad == false {
+                    VStack {
+                        Spacer()
+                        BottomButtonView(store: store)
+                    }
                 }
                 if store.isShowUnavailablePopup {
                     PopupView(isPresented: $store.isShowUnavailablePopup) {
@@ -75,9 +80,6 @@ public struct GoalDetailView: View {
                             .pretendard(.medium, size: 16, color: .black)
                     }
                 }
-            }
-            .loadingFailure(didFailToLoad: store.didFailToLoad) {
-                store.send(.view(.retryButtonTapped))
             }
             .task {
                 store.send(.viewCycling(.onAppear))
@@ -163,7 +165,7 @@ fileprivate struct TitleView: View {
     var body: some View {
         WithPerceptionTracking {
             VStack(alignment: .leading, spacing: 8) {
-                Text(store.content?.details.title.splitCharacters() ?? "")
+                Text(store.content?.details.title.splitCharacters() ?? " ")
                     .pretendardStyle(
                         .semiBold,
                         size: 22,
