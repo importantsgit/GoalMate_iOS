@@ -25,7 +25,7 @@ struct GoalListView: View {
                     }
                 )
                 .frame(height: 64)
-                InfiniteScrollView {
+                ScrollView {
                     LazyVGrid(
                         columns: [
                             GridItem(.flexible(), spacing: .grid(2)),
@@ -35,18 +35,24 @@ struct GoalListView: View {
                         spacing: 30
                     ) {
                         ForEach(store.goalContents) { content in
-                            WithPerceptionTracking {
-                                Button {
-                                    store.send(.view(.contentTapped(content.id)))
-                                } label: {
-                                    getGoalContentCell(content: content)
+                            Button {
+                                store.send(.view(.contentTapped(content.id)))
+                            } label: {
+                                getGoalContentCell(content: content)
+                            }
+                            .task {
+                                if store.isLoading == false &&
+                                    store.totalCount > 10 &&
+                                    store.goalContents[store.totalCount-10].id == content.id {
+                                    store.send(.view(.onLoadMore))
                                 }
                             }
                         }
                     }
-                } onLoadMore: {
-                    if store.isLoading == false {
-                        store.send(.view(.onLoadMore))
+                    if store.isLoading {
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .scaleEffect(1.7, anchor: .center)
                     }
                 }
                 .padding(.horizontal, 20)
