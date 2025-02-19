@@ -25,6 +25,8 @@ public struct MyGoalCoordinatorView: View {
                     MyGoalListView(store: store)
                 case let .myGoalDetail(store):
                     MyGoalDetailView(store: store)
+                case let .goalDetail(store):
+                    GoalDetailView(store: store)
                 }
             }
             .toolbar(.hidden)
@@ -39,6 +41,7 @@ public struct MyGoalCoordinator {
     public enum Screen {
         case myGoalList(MyGoalListFeature)
         case myGoalDetail(MyGoalDetailFeature)
+        case goalDetail(GoalDetailFeature)
     }
 
     @ObservableState
@@ -60,6 +63,8 @@ public struct MyGoalCoordinator {
         case router(IdentifiedRouterActionOf<Screen>)
         case showMyGoalDetail(Int)
         case coordinatorFinished
+        case showLogin
+        case showGoalList
     }
 
     public var body: some Reducer<State, Action> {
@@ -70,17 +75,20 @@ public struct MyGoalCoordinator {
     var core: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-            case let .router(.routeAction(_, action: .myGoalList(.showMyGoalDetail(data)))):
-                state.routes.push(.myGoalDetail(.init(
-                    goalId: data.id,
-                    startDate: data.startDate,
-                    endDate: data.endDate
-                )))
-            case let .router(.routeAction(_, action: .myGoalList(.showGoalDetail(id)))):
-                state.routes.pop()
-                return .send(.showMyGoalDetail(id))
-            case .router(.routeAction(_, action: .myGoalDetail(.backButtonTapped))):
-                state.routes.popToRoot()
+            case .router(.routeAction(_, action: .myGoalList(.delegate(.showLogin)))):
+                return .send(.showLogin)
+            case .router(.routeAction(_, action: .myGoalList(.delegate(.showGoalList)))):
+                return .send(.showGoalList)
+            case let .router(.routeAction(
+                _,
+                action: .myGoalList(.delegate(.showGoalDetail(contentId))))):
+                state.routes.presentCover(.goalDetail(.init(contentId: contentId)))
+                return .none
+            case let .router(.routeAction(
+                _,
+                action: .myGoalList(.delegate(.showMyGoalDetail(contentId))))):
+                state.routes.presentCover(.myGoalDetail(.init(contentId: contentId)))
+                return .none
             default: return .none
             }
             return .none
@@ -95,6 +103,8 @@ extension MyGoalCoordinator.Screen.State: Identifiable {
     case let .myGoalList(state):
         state.id
     case let .myGoalDetail(state):
+        state.id
+    case let .goalDetail(state):
         state.id
     }
   }

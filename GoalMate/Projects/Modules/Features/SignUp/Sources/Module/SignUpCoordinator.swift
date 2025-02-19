@@ -68,29 +68,19 @@ public struct SignUpCoordinator {
     var core: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-            case let .router(
-                .routeAction(
-                    _,
-                    action: .signUp(.feature(.checkSignUpResponse(isSuccess)))
-                )):
-                if isSuccess {
-                    state
-                        .routes
-                        .presentSheet(
-                            .termsAgreement(.init())
-                        )
-                } else {
-                    break
-                }
+            case .router(
+                .routeAction(_, action: .signUp(.delegate(.authenticationCompleted)))):
+                state.routes.presentSheet(.termsAgreement(.init()))
                 return .none
-            case .router(.routeAction(_, action: .termsAgreement(.view(.startButtonTapped)))):
+            case .router(
+                .routeAction(_, action: .termsAgreement(.delegate(.termsAgreementFinished)))):
                 state.routes.dismiss()
                 guard case let .signUp(signUp) = state.routes.first?.screen else { return .none }
                 return .send(.router(.routeAction(
                     id: signUp.id,
-                    action: .signUp(.feature(.showNicknameView))
+                    action: .signUp(.delegate(.termsAgreementCompleted))
                 )))
-            case .router(.routeAction(_, action: .signUp(.signUpSuccess(.finishButtonTapped)))):
+            case .router(.routeAction(_, action: .signUp(.delegate(.loginFinished)))):
                 return .send(.coordinatorFinished)
             default: break
             }

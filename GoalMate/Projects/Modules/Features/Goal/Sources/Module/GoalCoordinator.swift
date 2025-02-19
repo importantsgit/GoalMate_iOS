@@ -7,6 +7,7 @@
 
 import ComposableArchitecture
 import Data
+import FeatureCommon
 import SwiftUI
 import TCACoordinators
 import Utils
@@ -91,8 +92,8 @@ public struct GoalCoordinator {
                 .routeAction(
                     id: _,
                     action: .goalList(
-                        .view(
-                            .contentTapped(contentId)
+                        .delegate(
+                            .showGoalDetail(contentId)
                         )
                     )
                 )
