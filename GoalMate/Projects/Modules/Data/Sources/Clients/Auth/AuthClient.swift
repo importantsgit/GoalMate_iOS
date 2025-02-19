@@ -62,23 +62,6 @@ public struct AuthClient {
     public var checkLoginStatus: () async throws -> Bool
     public var logout: () async throws -> Void
     public var withdraw: () async throws -> Void
-    init(
-        loginWithKakao: @escaping () -> AuthenticationType,
-        loginWithApple: @escaping () -> AuthenticationType,
-        validateSession: @escaping () -> Bool,
-        refresh: @escaping () -> String,
-        checkLoginStatus: @escaping () -> Bool,
-        logout: @escaping () -> Void,
-        withdraw: @escaping () -> Void
-    ) {
-        self.loginWithKakao = loginWithKakao
-        self.loginWithApple = loginWithApple
-        self.validateSession = validateSession
-        self.refresh = refresh
-        self.checkLoginStatus = checkLoginStatus
-        self.logout = logout
-        self.withdraw = withdraw
-    }
 }
 
 extension AuthClient: DependencyKey {
@@ -153,14 +136,24 @@ extension AuthClient: DependencyKey {
                 return response.code == "200" ? .signIn : .signUp
             },
             validateSession: {
+                // 1 Step: 액세스 토큰 유효성 검사
+                let tokenInfo = await dataStorageClient.tokenInfo
+                if let accessToken = tokenInfo.accessToken {
+                    let endpoint = APIEndpoints.validateTokenEndpoint(accessToken: accessToken)
+                    let response = try? await networkClient.asyncRequest(with: endpoint)
+                    if response?.code == "200" {
+                        return true
+                    }
+                }
+                // 2 Step: 액세스 토큰 유효성 실패 시, 리프레시 토큰으로 재발급 시도 (값 존재하면 유효성 0)
                 do {
                     _ = try await refreshToken()
                     return true
                 } catch {
-                    print(error.localizedDescription)
                     if let error = error as? NetworkError,
                        case let .statusCodeError(code) = error,
                        code == 401 {
+                        // 3 Step 만약 리프레시 토큰 유효성 실패 시, 로그아웃
                         await dataStorageClient.setTokenInfo(nil)
                     }
                     return false
