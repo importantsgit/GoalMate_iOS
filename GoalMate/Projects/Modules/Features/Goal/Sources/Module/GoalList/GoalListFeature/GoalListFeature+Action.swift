@@ -66,7 +66,7 @@ extension GoalListFeature {
                                     response.page?.hasNext ?? false
                                 )
                             )))
-                } catch let error as NetworkError {
+                } catch is NetworkError {
                     await send(
                         .feature(.checkFetchGoalListResponse(.networkError))
                     )

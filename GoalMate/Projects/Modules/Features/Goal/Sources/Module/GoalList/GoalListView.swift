@@ -21,10 +21,13 @@ struct GoalListView: View {
                 NavigationBar(
                     leftContent: {
                         Images.logoSub
-                            .resized(size: .init(width: 88, height: 24))
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 88, height: 24)
                     }
                 )
                 .frame(height: 64)
+                .padding(.horizontal, 20)
                 ScrollView {
                     LazyVGrid(
                         columns: [
@@ -59,6 +62,7 @@ struct GoalListView: View {
                 .onAppear {
                     store.send(.viewCycling(.onAppear))
                 }
+                .scrollIndicators(.hidden)
             }
         }
     }

@@ -29,6 +29,7 @@ extension MyGoalListFeature {
     func reduce(into state: inout State, action: ViewAction) -> Effect<Action> {
         switch action {
         case .retryButtonTapped, .onLoadMore:
+            guard state.hasMorePages else { return .none }
             state.isLoading = true
             return .run { send in
                 await send(.feature(.fetchMyGoals))
@@ -71,7 +72,9 @@ extension MyGoalListFeature {
                             )
                     }
                     await send(
-                        .feature(.checkFetchMyGoalResponse(.success(list)))
+                        .feature(
+                            .checkFetchMyGoalResponse(.success(list, response.page?.hasNext ?? false))
+                        )
                     )
                 } catch let error as NetworkError {
                     if case let .statusCodeError(code) = error,
@@ -90,13 +93,15 @@ extension MyGoalListFeature {
             }
         case .loginFailed:
             state.isLogin = false
+            state.isLoading = false
             return .none
         case let .checkFetchMyGoalResponse(result):
             switch result {
-            case let .success(myGoals):
+            case let .success(myGoals, hasNext):
                 state.myGoalList += myGoals
                 state.totalCount += myGoals.count
                 state.currentPage += 1
+                state.hasMorePages = hasNext
             case .networkError:
                 state.didFailToLoad = true
             case .failed:

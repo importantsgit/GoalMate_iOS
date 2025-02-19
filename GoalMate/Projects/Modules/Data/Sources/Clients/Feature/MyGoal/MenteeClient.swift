@@ -162,7 +162,7 @@ extension MenteeClient: DependencyKey {
                 },
                 page: .init(
                     totalElements: 50, // 전체 데이터 수
-                    totalPages: 5,     // 전체 페이지 수
+                    totalPages: 100,     // 전체 페이지 수
                     currentPage: page,
                     pageSize: 10,
                     nextPage: page < 5 ? page + 1 : nil,

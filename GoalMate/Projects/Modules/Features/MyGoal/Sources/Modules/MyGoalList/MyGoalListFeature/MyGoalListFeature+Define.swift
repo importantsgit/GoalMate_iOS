@@ -13,7 +13,7 @@ extension MyGoalListFeature {
         case restart(Int)
     }
     public enum FetchMyGoalsResult {
-        case success([MyGoalContent])
+        case success([MyGoalContent], Bool)
         case networkError
         case failed
     }

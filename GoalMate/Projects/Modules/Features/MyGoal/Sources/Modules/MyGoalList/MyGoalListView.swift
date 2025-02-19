@@ -25,7 +25,7 @@ public struct MyGoalListView: View {
                     }
                 )
                 .frame(height: 64)
-                .padding(20)
+                .padding(.horizontal, 20)
                 ZStack {
                     myGoalListView
                     if store.isLoading == false &&
@@ -73,6 +73,7 @@ public struct MyGoalListView: View {
                         .scaleEffect(1.7, anchor: .center)
                 }
             }
+            .scrollIndicators(.hidden)
 //            VStack {
 //                List {
 //                    ForEach(store.myGoalList, id: \.id) { content in
