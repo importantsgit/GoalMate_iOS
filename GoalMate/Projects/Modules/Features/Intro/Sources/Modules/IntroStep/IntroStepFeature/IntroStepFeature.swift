@@ -7,6 +7,7 @@
 
 import ComposableArchitecture
 import Data
+import Dependencies
 import SwiftUI
 
 @Reducer
@@ -23,6 +24,7 @@ public struct IntroStepFeature {
     public enum Action: BindableAction {
         case viewCycling(ViewCyclingAction)
         case feature(FeatureAction)
+        case delegate(DelegateAction)
         case binding(BindingAction<State>)
     }
     public enum ViewCyclingAction {
@@ -30,11 +32,14 @@ public struct IntroStepFeature {
     }
     public enum FeatureAction {
         case checkUpdate
+        case checkJailBreak
+        case checkPermission
         case checkLogin
-        case check
+    }
+    public enum DelegateAction {
         case finishIntro
     }
-    @Dependency(\.authClient) var authClient
+    @Dependency(\.introClient) var introClient
     public var body: some Reducer<State, Action> {
         BindingReducer()
         Reduce { state, action in
@@ -43,10 +48,11 @@ public struct IntroStepFeature {
                 return reduce(into: &state, action: action)
             case let .feature(action):
                 return reduce(into: &state, action: action)
-            case .binding(_):
+            case let .delegate(action):
+                return reduce(into: &state, action: action)
+            case .binding:
                 return .none
             }
         }
     }
 }
-

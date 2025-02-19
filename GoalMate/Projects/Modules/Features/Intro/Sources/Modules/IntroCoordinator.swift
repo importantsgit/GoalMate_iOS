@@ -60,7 +60,7 @@ public struct IntroCoordinator {
             case .router(
                 .routeAction(
                     _,
-                    action: .introStep(.feature(.finishIntro))
+                    action: .introStep(.delegate(.finishIntro))
                 )
             ):
                 return .send(.coordinatorFinished)
