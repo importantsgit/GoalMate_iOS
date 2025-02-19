@@ -12,38 +12,10 @@ import FeatureCommon
 import UIKit
 import Utils
 
+
 @Reducer
 public struct SignUpFeature {
-    public enum SignUpProvider {
-        case apple
-        case kakao
-    }
-    public enum NicknameSubmitError: Error {
-        case duplicateName
-        case networkError
-        case unknown
-    }
-    public enum TextFieldState {
-        case idle
-        case duplicate
-        case invalid
-        case valid
-        public var message: String {
-            switch self {
-            case .idle:
-                return ""
-            case .duplicate:
-                return "이미 있는 닉네임이에요 :("
-            case .invalid:
-                return "2~5글자 닉네임을 입력해주세요."
-            case .valid:
-                return "사용 가능한 닉네임이에요 :)"
-            }
-        }
-    }
-    // Swift의 Observation 프레임워크를 TCA에 통합
-    // iOS 17 미만에서는 WithPerceptionTracking 필요
-    @ObservableState // obserableframework
+    @ObservableState
     public struct State: Equatable {
         var id: UUID
         // 페이지 상태
@@ -94,8 +66,8 @@ public struct SignUpFeature {
         case nickname(NicknameAction)
         case signUpSuccess(SignUpSuccessAction)
         case feature(FeatureAction)
+        case delegate(DelegateAction)
         case binding(BindingAction<State>)
-        case nicknameTextInputted(String)
     }
     public enum ViewCyclingAction {
         case onAppear
@@ -113,11 +85,15 @@ public struct SignUpFeature {
         case finishButtonTapped
     }
     public enum FeatureAction {
-        case checkSignUpResponse(Bool)
-        case showNicknameView
-        case checkDuplicateResponse(Result<String, NicknameSubmitError>)
-        case nicknameSubmitted(Result<String, NicknameSubmitError>)
+        case checkAuthenticationResponse(AuthenticationResult)
+        case checkDuplicateResponse(NicknameCheckResult)
+        case nicknameSubmitted(NicknameSubmitResult)
         case updateKeyboardHeight(CGFloat)
+    }
+    public enum DelegateAction {
+        case authenticationCompleted
+        case termsAgreementCompleted
+        case loginFinished
     }
     @Dependency(\.authClient) var authClient
     @Dependency(\.keyboardClient) var keyboardClient
@@ -136,10 +112,8 @@ public struct SignUpFeature {
                 return reduce(into: &state, action: action)
             case let .feature(action):
                 return reduce(into: &state, action: action)
-                // Success
-            case let .nicknameTextInputted(text):
-                print(text)
-                return .none
+            case let .delegate(action):
+                return reduce(into: &state, action: action)
             case .binding:
                 print(action)
                 return .none
