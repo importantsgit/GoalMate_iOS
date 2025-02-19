@@ -78,7 +78,7 @@ extension MenteeClient: DependencyKey {
             fetchMyGoals: { page in
                 try await executeWithTokenValidation { accessToken in
                     let requestDTO = PaginationRequestDTO(
-                        page: page, size: 10
+                        page: page, size: 20
                     )
                     let endpoint = APIEndpoints.fetchMyGoalsEndpoint(
                         with: requestDTO,
@@ -102,7 +102,6 @@ extension MenteeClient: DependencyKey {
                     else { throw NetworkError.emptyData }
                     return data
                 }
-                
             },
             fetchWeeklyProgress: { menteeGoalId, date in
                 try await executeWithTokenValidation { accessToken in
@@ -119,7 +118,7 @@ extension MenteeClient: DependencyKey {
             }
         )
     }
-    
+
     public static var testValue = MenteeClient(
         fetchMenteeInfo: { FetchMenteeInfoResponseDTO.dummy.data! },
         joinGoal: { _ in },
@@ -132,12 +131,46 @@ extension MenteeClient: DependencyKey {
         fetchWeeklyProgress: { _, _ in FetchWeeklyProgressResponseDTO.dummy.data!
         }
     )
-    
+
     public static var previewValue = MenteeClient(
         fetchMenteeInfo: { FetchMenteeInfoResponseDTO.dummy.data! },
         joinGoal: { _ in },
-        fetchMyGoals: { _ in
-            FetchMyGoalsResponseDTO.dummy.data!
+        fetchMyGoals: { page in
+            try await Task.sleep(nanoseconds: 1_000_000_000)
+            let startId = (page - 1) * 20 + 1
+            return FetchMyGoalsResponseDTO.Response.init(
+                menteeGoals: (0..<20).map { index in
+                    let id = startId + index
+                    return FetchMyGoalsResponseDTO.Response.MenteeGoal(
+                        id: id,
+                        title: "목표 #\(id)",
+                        topic: "주제 #\(id)",
+                        mentorName: "멘토 #\(id)",
+                        mainImage: "https://example.com/image-\(id).jpg",
+                        startDate: "2025-01-01",
+                        endDate: "2025-12-31",
+                        finalComment: nil,
+                        todayTodoCount: 5,
+                        todayCompletedCount: 3,
+                        todayRemainingCount: 2,
+                        totalTodoCount: 100,
+                        totalCompletedCount: id * 5, // 진행도를 다르게 보여주기 위해
+                        menteeGoalStatus: [.inProgress, .completed].randomElement()!,
+                        createdAt: "2025-01-01",
+                        updatedAt: "2025-02-19"
+                    )
+                },
+                page: .init(
+                    totalElements: 50, // 전체 데이터 수
+                    totalPages: 5,     // 전체 페이지 수
+                    currentPage: page,
+                    pageSize: 10,
+                    nextPage: page < 5 ? page + 1 : nil,
+                    prevPage: page > 1 ? page - 1 : nil,
+                    hasNext: page < 5,
+                    hasPrev: page > 1
+                )
+            )
         },
         fetchMyGoalDetail: { _, _ in
             FetchMyGoalDetailResponseDTO.dummy.data!

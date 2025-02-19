@@ -260,7 +260,7 @@ public struct FetchMyGoalsResponseDTO: Codable {
            case menteeGoals = "mentee_goals"
            case page
        }
-       
+
        // MARK: - MenteeGoal
        public struct MenteeGoal: Codable {
            public let id: Int
@@ -279,14 +279,12 @@ public struct FetchMyGoalsResponseDTO: Codable {
            public let menteeGoalStatus: MenteeGoalStatus?
            public let createdAt: String?
            public let updatedAt: String?
-           
            public enum MenteeGoalStatus: String, Codable {
                case inProgress  = "IN_PROGRESS"
                case completed   = "COMPLETED"
                case failed      = "FAILED"
                case canceled    = "CANCELED"
            }
-           
            public enum CodingKeys: String, CodingKey {
                case id, title, topic
                case mentorName = "mentor_name"
@@ -399,13 +397,13 @@ public struct FetchMyGoalDetailResponseDTO: Codable {
            public let description: String?
            public let mentorTip: String?
            public let todoStatus: TodoStatus?
-           
+ 
            public enum TodoStatus: String, Codable {
                case todo = "TODO"
                case inProgress = "IN_PROGRESS"
                case completed = "COMPLETED"
            }
-           
+  
            public enum CodingKeys: String, CodingKey {
                case id
                case todoDate = "todo_date"
@@ -620,6 +618,114 @@ extension FetchMyGoalsResponseDTO {
                 ),
                 Response.MenteeGoal(
                     id: 2,
+                    title: "하루 30분 코딩 챌린지",
+                    topic: "프로그래밍",
+                    mentorName: "지훈",
+                    mainImage: "https://example.com/images/coding.jpg",
+                    startDate: "2025-02-10",
+                    endDate: "2025-03-10",
+                    finalComment: "코딩의 기초를 다져봅시다",
+                    todayTodoCount: 3,
+                    todayCompletedCount: 3,
+                    todayRemainingCount: 0,
+                    totalTodoCount: 90,
+                    totalCompletedCount: 20,
+                    menteeGoalStatus: .inProgress,
+                    createdAt: "2025-02-10T10:00:00.000Z",
+                    updatedAt: "2025-02-19T14:20:00.000Z"
+                ),
+                Response.MenteeGoal(
+                    id: 3,
+                    title: "다온과 함께하는 영어 완전 정복 30일 목표, 다온과 함께하는 영어 완전 정복 30일 목표",
+                    topic: "영어",
+                    mentorName: "다온",
+                    mainImage: "https://example.com/images/english-study.jpg",
+                    startDate: "2025-02-01",
+                    endDate: "2025-03-01",
+                    finalComment: "열심히 해봅시다!",
+                    todayTodoCount: 5,
+                    todayCompletedCount: 3,
+                    todayRemainingCount: 2,
+                    totalTodoCount: 100,
+                    totalCompletedCount: 45,
+                    menteeGoalStatus: .inProgress,
+                    createdAt: "2025-02-01T09:00:00.000Z",
+                    updatedAt: "2025-02-19T15:30:00.000Z"
+                ),
+                Response.MenteeGoal(
+                    id: 4,
+                    title: "하루 30분 코딩 챌린지",
+                    topic: "프로그래밍",
+                    mentorName: "지훈",
+                    mainImage: "https://example.com/images/coding.jpg",
+                    startDate: "2025-02-10",
+                    endDate: "2025-03-10",
+                    finalComment: "코딩의 기초를 다져봅시다",
+                    todayTodoCount: 3,
+                    todayCompletedCount: 3,
+                    todayRemainingCount: 0,
+                    totalTodoCount: 90,
+                    totalCompletedCount: 20,
+                    menteeGoalStatus: .inProgress,
+                    createdAt: "2025-02-10T10:00:00.000Z",
+                    updatedAt: "2025-02-19T14:20:00.000Z"
+                ),
+                Response.MenteeGoal(
+                    id: 5,
+                    title: "다온과 함께하는 영어 완전 정복 30일 목표",
+                    topic: "영어",
+                    mentorName: "다온",
+                    mainImage: "https://example.com/images/english-study.jpg",
+                    startDate: "2025-02-01",
+                    endDate: "2025-03-01",
+                    finalComment: "열심히 해봅시다!",
+                    todayTodoCount: 5,
+                    todayCompletedCount: 3,
+                    todayRemainingCount: 2,
+                    totalTodoCount: 100,
+                    totalCompletedCount: 45,
+                    menteeGoalStatus: .inProgress,
+                    createdAt: "2025-02-01T09:00:00.000Z",
+                    updatedAt: "2025-02-19T15:30:00.000Z"
+                ),
+                Response.MenteeGoal(
+                    id: 6,
+                    title: "하루 30분 코딩 챌린지",
+                    topic: "프로그래밍",
+                    mentorName: "지훈",
+                    mainImage: "https://example.com/images/coding.jpg",
+                    startDate: "2025-02-10",
+                    endDate: "2025-03-10",
+                    finalComment: "코딩의 기초를 다져봅시다",
+                    todayTodoCount: 3,
+                    todayCompletedCount: 3,
+                    todayRemainingCount: 0,
+                    totalTodoCount: 90,
+                    totalCompletedCount: 20,
+                    menteeGoalStatus: .inProgress,
+                    createdAt: "2025-02-10T10:00:00.000Z",
+                    updatedAt: "2025-02-19T14:20:00.000Z"
+                ),
+                Response.MenteeGoal(
+                    id: 7,
+                    title: "다온과 함께하는 영어 완전 정복 30일 목표",
+                    topic: "영어",
+                    mentorName: "다온",
+                    mainImage: "https://example.com/images/english-study.jpg",
+                    startDate: "2025-02-01",
+                    endDate: "2025-03-01",
+                    finalComment: "열심히 해봅시다!",
+                    todayTodoCount: 5,
+                    todayCompletedCount: 3,
+                    todayRemainingCount: 2,
+                    totalTodoCount: 100,
+                    totalCompletedCount: 45,
+                    menteeGoalStatus: .inProgress,
+                    createdAt: "2025-02-01T09:00:00.000Z",
+                    updatedAt: "2025-02-19T15:30:00.000Z"
+                ),
+                Response.MenteeGoal(
+                    id: 8,
                     title: "하루 30분 코딩 챌린지",
                     topic: "프로그래밍",
                     mentorName: "지훈",
