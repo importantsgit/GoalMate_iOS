@@ -12,13 +12,6 @@ import DependenciesMacros
 public struct NicknameClient {
     public var setNickname: (String) async throws -> Void
     public var isUniqueNickname: (String) async throws -> Bool
-    public init(
-        setNickname: @escaping (String) -> Void,
-        isUniqueNickname: @escaping (String) -> Bool
-    ) {
-        self.setNickname = setNickname
-        self.isUniqueNickname = isUniqueNickname
-    }
 }
 
 extension NicknameClient: DependencyKey {
@@ -26,7 +19,6 @@ extension NicknameClient: DependencyKey {
         @Dependency(\.authClient) var authClient
         @Dependency(\.networkClient) var networkClient
         @Dependency(\.dataStorageClient) var dataStorageClient
-        
         func executeWithTokenValidation<T>(
             action: (_ accessToken: String) async throws -> T
         ) async throws -> T {
@@ -52,7 +44,7 @@ extension NicknameClient: DependencyKey {
                         with: requestDTO,
                         accessToken: accessToken
                     )
-                    _ = try await networkClient.asyncRequest(with: endpoint)
+                    let result = try await networkClient.asyncRequest(with: endpoint)
                     await dataStorageClient.setUserInfo(
                         .init(nickname: nickname)
                     )
@@ -66,9 +58,8 @@ extension NicknameClient: DependencyKey {
                         accessToken: accessToken
                     )
                     let response = try await networkClient.asyncRequest(with: endpoint)
-                    guard let data = response.data else {
-                        throw NetworkError.emptyData
-                    }
+                    guard let data = response.data
+                    else { throw NetworkError.emptyData }
                     return data.isAvailable
                 }
             }

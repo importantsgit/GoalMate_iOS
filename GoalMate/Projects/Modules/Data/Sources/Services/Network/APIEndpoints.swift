@@ -10,8 +10,8 @@ import Foundation
 struct APIEndpoints {
     // Path prefix에 / 제거
     enum APIPath: String {
-        case authLogin          = "auth/login"
-        case refreshToken       = "auth/reissue"
+        case authLogin              = "auth/login"
+        case refreshToken           = "auth/reissue"
         case validateToken          = "auth/validate"
         case withdraw               = "auth/withdraw"
         case logout                 = "auth/logout"

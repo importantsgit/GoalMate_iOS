@@ -18,17 +18,6 @@ public struct GoalClient {
     public var fetchGoalDetail: (
         _ goalId: Int
     ) async throws -> FetchGoalDetailResponseDTO.Response
-    init(
-        fetchGoals: @escaping (
-            _ page: Int
-        ) -> FetchGoalsResponseDTO.Response,
-        fetchGoalDetail: @escaping (
-            _ goalId: Int
-        ) -> FetchGoalDetailResponseDTO.Response
-    ) {
-        self.fetchGoals = fetchGoals
-        self.fetchGoalDetail = fetchGoalDetail
-    }
 }
 
 // MARK: - Live Implementation

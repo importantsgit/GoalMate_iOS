@@ -15,22 +15,14 @@ public struct MenteeClient {
     public var fetchMenteeInfo: () async throws -> FetchMenteeInfoResponseDTO.Response
     public var joinGoal: (_ goalId: Int) async throws -> Void
     public var fetchMyGoals: (_ page: Int) async throws -> FetchMyGoalsResponseDTO.Response
-    public var fetchMyGoalDetail: (_ menteeGoalId: Int, _ date: String) async throws -> FetchMyGoalDetailResponseDTO.Response
-    public var fetchWeeklyProgress: (_ menteeGoalId: Int, _ date: String) async throws -> FetchWeeklyProgressResponseDTO.Response
-    
-    public init(
-        fetchMenteeInfo: @escaping () async throws -> FetchMenteeInfoResponseDTO.Response,
-        joinGoal: @escaping (_ goalId: Int) -> Void,
-        fetchMyGoals: @escaping (_ page: Int) -> FetchMyGoalsResponseDTO.Response,
-        fetchMyGoalDetail: @escaping (_ menteeGoalId: Int, _ date: String) -> FetchMyGoalDetailResponseDTO.Response,
-        fetchWeeklyProgress: @escaping (_ menteeGoalId: Int, _ date: String) async throws -> FetchWeeklyProgressResponseDTO.Response
-    ) {
-        self.fetchMenteeInfo = fetchMenteeInfo
-        self.joinGoal = joinGoal
-        self.fetchMyGoals = fetchMyGoals
-        self.fetchMyGoalDetail = fetchMyGoalDetail
-        self.fetchWeeklyProgress = fetchWeeklyProgress
-    }
+    public var fetchMyGoalDetail: (
+        _ menteeGoalId: Int,
+        _ date: String
+    ) async throws -> FetchMyGoalDetailResponseDTO.Response
+    public var fetchWeeklyProgress: (
+        _ menteeGoalId: Int,
+        _ date: String
+    ) async throws -> FetchWeeklyProgressResponseDTO.Response
 }
 
 // MARK: - Live Implementation
@@ -42,9 +34,8 @@ extension MenteeClient: DependencyKey {
         func executeWithTokenValidation<T>(
             action: (_ accessToken: String) async throws -> T
         ) async throws -> T {
-            guard let accessToken = await dataStorageClient.tokenInfo.accessToken else {
-                throw AuthError.needLogin
-            }
+            guard let accessToken = await dataStorageClient.tokenInfo.accessToken
+            else { throw AuthError.needLogin }
             do {
                 return try await action(accessToken)
             } catch let error as NetworkError {
