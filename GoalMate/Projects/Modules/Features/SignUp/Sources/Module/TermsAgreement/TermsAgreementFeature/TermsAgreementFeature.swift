@@ -32,6 +32,7 @@ public struct TermsAgreementFeature {
         case viewCycling(ViewCyclingAction)
         case view(ViewAction)
         case feature(FeatureAction)
+        case delegate(DelegateAction)
         case binding(BindingAction<State>)
     }
     public enum ViewCyclingAction {}
@@ -44,6 +45,9 @@ public struct TermsAgreementFeature {
         case startButtonTapped
     }
     public enum FeatureAction {}
+    public enum DelegateAction {
+        case termsAgreementFinished
+    }
     @Dependency(\.openURL) var openURL
     public var body: some Reducer<State, Action> {
         BindingReducer()
@@ -54,6 +58,8 @@ public struct TermsAgreementFeature {
             case let .view(action):
                 return reduce(into: &state, action: action)
             case let .feature(action):
+                return reduce(into: &state, action: action)
+            case let .delegate(action):
                 return reduce(into: &state, action: action)
             case .binding(_):
                 return .none

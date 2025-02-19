@@ -55,10 +55,13 @@ extension TermsAgreementFeature {
                 _ = await openURL(url)
             }
         case .startButtonTapped:
-            return .none
+            return .send(.delegate(.termsAgreementFinished))
         }
     }
     func reduce(into state: inout State, action: FeatureAction) -> Effect<Action> {
+        return .none
+    }
+    func reduce(into state: inout State, action: DelegateAction) -> Effect<Action> {
         return .none
     }
 }
