@@ -21,8 +21,9 @@ extension GoalListFeature {
     // MARK: View
     func reduce(into state: inout State, action: ViewAction) -> Effect<Action> {
         switch action {
-        case .onLoadMore, .retryButtonTapped:
-            guard state.hasMorePages else { return .none }
+        case .retryButtonTapped:
+            return .send(.feature(.fetchGoals))
+        case .onLoadMore:
             return .send(.feature(.fetchGoals))
         case let .contentTapped(contentId):
             return .send(.delegate(.showGoalDetail(contentId)))
@@ -32,6 +33,12 @@ extension GoalListFeature {
     func reduce(into state: inout State, action: FeatureAction) -> Effect<Action> {
         switch action {
         case .fetchGoals:
+            guard state.hasMorePages
+            else {
+                state.isLoading = false
+                return .none
+            }
+            state.isScrollFetching = true
             return .run { [currentPage = state.currentPage] send in
                 do {
                     let response = try await goalClient.fetchGoals(page: currentPage)
@@ -89,10 +96,11 @@ extension GoalListFeature {
                 break
             }
             state.isLoading = false
+            state.isScrollFetching = false
             return .none
         }
     }
-    
+
     func reduce(into state: inout State, action: DelegateAction) -> Effect<Action> {
         return .none
     }

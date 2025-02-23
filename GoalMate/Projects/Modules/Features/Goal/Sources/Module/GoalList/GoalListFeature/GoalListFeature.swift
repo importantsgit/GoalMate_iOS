@@ -21,6 +21,7 @@ public struct GoalListFeature {
     public struct State: Equatable {
         public let id: UUID
         var isLoading: Bool
+        var isScrollFetching: Bool
         var didFailToLoad: Bool
         var goalContents: [GoalContent]
         
@@ -33,6 +34,7 @@ public struct GoalListFeature {
         ) {
             self.id = UUID()
             self.isLoading = true
+            self.isScrollFetching = false
             self.didFailToLoad = false
             self.goalContents = goalContents
             self.hasMorePages = true

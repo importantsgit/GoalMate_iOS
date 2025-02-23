@@ -44,7 +44,7 @@ struct GoalListView: View {
                                 getGoalContentCell(content: content)
                             }
                             .task {
-                                if store.isLoading == false &&
+                                if store.isScrollFetching == false &&
                                     store.totalCount > 10 &&
                                     store.goalContents[store.totalCount-10].id == content.id {
                                     store.send(.view(.onLoadMore))
@@ -52,10 +52,16 @@ struct GoalListView: View {
                             }
                         }
                     }
-                    if store.isLoading {
+                    if store.isScrollFetching {
                         ProgressView()
                             .progressViewStyle(.circular)
                             .scaleEffect(1.7, anchor: .center)
+                    }
+                }
+                .overlay {
+                    if store.isLoading {
+                        skeletonView
+                            .transition(.opacity)
                     }
                 }
                 .padding(.horizontal, 20)
@@ -63,26 +69,92 @@ struct GoalListView: View {
                     store.send(.viewCycling(.onAppear))
                 }
                 .scrollIndicators(.hidden)
+                .animation(
+                    .easeInOut(duration: 0.2),
+                    value: store.isLoading)
             }
         }
     }
+
+    @ViewBuilder
+    var skeletonView: some View {
+        VStack {
+            LazyVGrid(
+                columns: [
+                    GridItem(.flexible(), spacing: .grid(2)),
+                    GridItem(.flexible())
+                ],
+                alignment: .center,
+                spacing: 30
+            ) {
+                ForEach(0...3, id: \.self) { _ in
+                    VStack(alignment: .leading) {
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Colors.grey200)
+                            .aspectRatio(158/118, contentMode: .fill)
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Colors.grey200)
+                            .frame(height: 20)
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Colors.grey200)
+                            .frame(width: 100, height: 24)
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Colors.grey200)
+                            .frame(width: 100, height: 24)
+                    }
+                }
+            }
+            Spacer()
+        }
+        .background(.white)
+    }
+
     @ViewBuilder
     func getGoalContentCell(content: GoalContent) -> some View {
         WithPerceptionTracking {
             VStack(spacing: 10) {
-                ZStack {
-                    CachedImageView(url: content.imageURL)
-                    if content.remainingCapacity == 0 {
-                        Colors.grey300
-                            .overlay {
-                                Images.comingSoon
-                                    .resizable()
-                                    .aspectRatio(158/64, contentMode: .fit)
-                            }
-                    }
-                }
-                .clipShape(.rect(cornerRadius: 4))
-                .aspectRatio(158.0/118.0, contentMode: .fit)
+                if let imageUrl = URL(string: content.imageURL) {
+                     AsyncImage(
+                         url: imageUrl
+                     ) { phase in
+                         switch phase {
+                         case .empty:
+                             Rectangle()
+                                 .fill(Colors.grey200)
+                                 .overlay {
+                                     ProgressView()
+                                         .progressViewStyle(.circular)
+                                 }
+                         case .success(let image):
+                             image
+                                 .resizable()
+                         case .failure:
+                             Images.placeholder
+                                 .resizable()
+                         @unknown default:
+                             Rectangle()
+                                 .fill(.black)
+                         }
+                     }
+                     .aspectRatio(158/118, contentMode: .fit)  // 컨테이너 비율 설정
+                     .clipShape(.rect(cornerRadius: 4))
+                     .overlay {
+                         if content.remainingCapacity == 0 {
+                             Colors.grey300
+                                 .overlay {
+                                     Images.comingSoon
+                                         .resizable()
+                                         .aspectRatio(158/64, contentMode: .fit)
+                                 }
+                         }
+                     }
+                 } else {
+                     Images.placeholder
+                         .resizable()
+                         .aspectRatio(contentMode: .fill)
+                         .aspectRatio(158/118, contentMode: .fit)
+                         .clipShape(.rect(cornerRadius: 4))
+                 }
 
                 VStack(alignment: .leading, spacing: 8) {
                     Text(content.title.splitCharacters())
