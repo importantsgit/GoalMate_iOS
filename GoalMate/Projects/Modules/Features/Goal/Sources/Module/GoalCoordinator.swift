@@ -38,7 +38,8 @@ public struct GoalCoordinatorView: View {
                     PaymentCompletedView(store: store)
                 }
             }
-            .toolbar(.hidden)
+            .toolbar(.hidden, for: .navigationBar)
+            .toolbar(.hidden, for: .tabBar)
         }
     }
 }
@@ -71,8 +72,11 @@ public struct GoalCoordinator {
 
     public enum Action {
         case router(IdentifiedRouterActionOf<Screen>)
+        case delegate(DelegateAction)
+    }
+    public enum DelegateAction {
+        case setTabbarVisibility(Bool)
         case showMyGoal
-        case coordinatorFinished
         case showLogin
     }
 
@@ -86,43 +90,26 @@ public struct GoalCoordinator {
     @ReducerBuilder<State, Action>
     var core: some Reducer<State, Action> {
         Reduce { state, action in
-            print("action: \(action)")
             switch action {
-            case let .router(
-                .routeAction(
-                    id: _,
-                    action: .goalList(
-                        .delegate(
-                            .showGoalDetail(contentId)
-                        )
-                    )
+            case let .router(.routeAction(
+                _,
+                action: .goalList(.delegate(.showGoalDetail(contentId))))):
+                state.routes
+                    .push(.goalDetail(.init(contentId: contentId))
                 )
-            ):
-                state.routes.presentCover(
-                    .goalDetail(
-                        .init(
-                            contentId: contentId
-                        )
-                    )
-                )
-                return .none
-            case .router(.routeAction(_, action: .goalDetail(.view(.backButtonTapped)))):
-                state.routes.dismiss()
-                return .none
-            case .router(
-                .routeAction(
-                    _,
-                    action: .goalDetail(.view(.loginButtonTapped))
-                )
-            ):
-                state.routes.dismiss()
-                return .send(.showLogin)
-            case let .router(
-                .routeAction(
-                    _,
-                    action: .goalDetail(.feature(.showPurchaseSheet(content)))
-                )
-            ):
+                return .send(.delegate(.setTabbarVisibility(state.routes.count == 1)))
+            case .router(.routeAction(
+                _,
+                action: .goalDetail(.view(.backButtonTapped)))):
+                state.routes.pop()
+                return .send(.delegate(.setTabbarVisibility(state.routes.count == 1)))
+            case .router(.routeAction(
+                _,
+                action: .goalDetail(.view(.loginButtonTapped)))):
+                return .send(.delegate(.showLogin))
+            case let .router(.routeAction(
+                _,
+                action: .goalDetail(.delegate(.showPurchaseSheet(content))))):
                 state.routes.presentSheet(
                     .goalPurchaseSheet(
                         .init(
@@ -137,56 +124,39 @@ public struct GoalCoordinator {
                     )
                 )
                 return .none
-            case let .router(.routeAction(_, action: .goalPurchaseSheet(.feature(
-                .checkPurchaseResponse(result)
-            )))):
-                switch result {
-                case .success(let content):
-                    return Effect.routeWithDelaysIfUnsupported(state.routes, action: \.router) {
-                        $0.dismiss()
-                        $0.presentCover(.paymentCompleted(
-                            .init(content: .init(
-                                contentId: content.contentId,
-                                title: content.title,
-                                mentor: content.mentor,
-                                originalPrice: content.originalPrice,
-                                discountedPrice: content.discountedPrice
-                            )))
-                        )
-                    }
-                case let .failure(error):
-                    state.routes.dismiss()
-                    var message: String = "네트워크에 문제가 발생했습니다."
-                    if let error = error as? NetworkError,
-                       case let .statusCodeError(code) = error {
-                        if code == 403 {
-                            message = "참여 인원 초과 또는 무료 참여 횟수 초과"
-                            print("참여 인원 초과 또는 무료 참여 횟수 초과")
-                        } else if code == 404 {
-                            message = "존재하지 않는 목표"
-                            print("존재하지 않는 목표")
-                        } else if code == 409 {
-                            message = "이미 참여중인 목표"
-                            print("이미 참여중인 목표")
-                        }
-                    }
-                    if let goalDetail = state.routes.first(where: {
-                        if case .goalDetail = $0.screen { return true }
-                        return false
-                    })?.screen as? GoalDetailFeature.State {
-                        return .send(.router(.routeAction(
-                            id: goalDetail.id,
-                            action: .goalDetail(.feature(.showToast(message)))
+            case let .router(.routeAction(
+                _,
+                action: .goalPurchaseSheet(.delegate(.finishPurchase(content))))):
+                return Effect.routeWithDelaysIfUnsupported(state.routes, action: \.router) {
+                    $0.dismiss()
+                    $0.push(.paymentCompleted(
+                        .init(content: .init(
+                            contentId: content.contentId,
+                            title: content.title,
+                            mentor: content.mentor,
+                            originalPrice: content.originalPrice,
+                            discountedPrice: content.discountedPrice
                         )))
-                    }
+                    )
                 }
+            case let .router(.routeAction(
+                _,
+                action: .goalPurchaseSheet(.delegate(.failed(message))))):
+                guard case let .goalDetail(goalDetail) = state.routes.first?.screen
+                else { return .none }
+                return .send(.router(.routeAction(
+                    id: goalDetail.id,
+                    action: .goalDetail(.feature(.showToast(message))))))
+            case .router(.routeAction(
+                _,
+                action: .paymentCompleted(.backButtonTapped))):
+                state.routes.pop()
                 return .none
-            case .router(.routeAction(_, action: .paymentCompleted(.backButtonTapped))):
-                state.routes.dismiss()
-                return .none
-            case .router(.routeAction(_, action: .paymentCompleted(.startButtonTapped))):
-                state.routes.dismissAll()
-                return .send(.showMyGoal)
+            case .router(.routeAction(
+                _,
+                action: .paymentCompleted(.startButtonTapped))):
+                state.routes.popToRoot()
+                return .send(.delegate(.showMyGoal))
             default: return .none
             }
         }

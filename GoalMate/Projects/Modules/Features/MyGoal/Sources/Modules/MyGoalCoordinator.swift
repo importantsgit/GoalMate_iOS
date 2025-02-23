@@ -25,11 +25,16 @@ public struct MyGoalCoordinatorView: View {
                     MyGoalListView(store: store)
                 case let .myGoalDetail(store):
                     MyGoalDetailView(store: store)
+                case let .myGoalCompletion(store):
+                    MyGoalCompletionView(store: store)
                 case let .goalDetail(store):
                     GoalDetailView(store: store)
+                case let .commentDetail(store):
+                    CommentDetailView(store: store)
                 }
             }
-            .toolbar(.hidden)
+            .toolbar(.hidden, for: .navigationBar)
+            .toolbar(.hidden, for: .tabBar)
         }
     }
 }
@@ -41,7 +46,9 @@ public struct MyGoalCoordinator {
     public enum Screen {
         case myGoalList(MyGoalListFeature)
         case myGoalDetail(MyGoalDetailFeature)
+        case myGoalCompletion(MyGoalCompletionFeature)
         case goalDetail(GoalDetailFeature)
+        case commentDetail(CommentDetailFeature)
     }
 
     @ObservableState
@@ -51,7 +58,7 @@ public struct MyGoalCoordinator {
 
         public init(
             routes: IdentifiedArrayOf<Route<Screen.State>> = [
-                .root(.myGoalList(.init()))
+                .root(.myGoalList(.init()), embedInNavigationView: true)
             ]
         ) {
             self.id = UUID()
@@ -61,37 +68,95 @@ public struct MyGoalCoordinator {
 
     public enum Action {
         case router(IdentifiedRouterActionOf<Screen>)
-        case showMyGoalDetail(Int)
-        case coordinatorFinished
-        case showLogin
+        case delegate(DelegateAction)
+    }
+    public enum DelegateAction {
+        case setTabbarVisibility(Bool)
         case showGoalList
     }
 
     public var body: some Reducer<State, Action> {
         self.core
+//            .dependency(\.authClient, .previewValue)
+//            .dependency(\.goalClient, .previewValue)
+//            .dependency(\.menteeClient, .previewValue)
     }
 
     @ReducerBuilder<State, Action>
     var core: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-            case .router(.routeAction(_, action: .myGoalList(.delegate(.showLogin)))):
-                return .send(.showLogin)
-            case .router(.routeAction(_, action: .myGoalList(.delegate(.showGoalList)))):
-                return .send(.showGoalList)
-            case let .router(.routeAction(
+            case .router(.routeAction(
                 _,
-                action: .myGoalList(.delegate(.showGoalDetail(contentId))))):
-                state.routes.presentCover(.goalDetail(.init(contentId: contentId)))
-                return .none
+                action: .myGoalList(.delegate(.showGoalList)))):
+                return .send(.delegate(.showGoalList))
             case let .router(.routeAction(
                 _,
                 action: .myGoalList(.delegate(.showMyGoalDetail(contentId))))):
-                state.routes.presentCover(.myGoalDetail(.init(contentId: contentId)))
+                state.routes.push(.myGoalDetail(.init(menteeGoalId: contentId)))
+                return .send(.delegate(.setTabbarVisibility(state.routes.count == 1)))
+            case let .router(.routeAction(
+                _,
+                action: .myGoalList(.delegate(.showMyGoalCompletion(contentId))))):
+                state.routes.push(.myGoalCompletion(.init(contentId: contentId)))
+                return .send(.delegate(.setTabbarVisibility(state.routes.count == 1)))
+            case let .router(.routeAction(
+                _,
+                action: .myGoalDetail(.delegate(
+                    .showComment(commentRoomId, title, startDate))))):
+                state.routes.push(.commentDetail(
+                    .init(roomId: commentRoomId, title: title, startDate: startDate)))
                 return .none
-            default: return .none
+            case .router(.routeAction(
+                _,
+                action: .myGoalDetail(.delegate(.closeView)))):
+                state.routes.pop()
+                return .send(.delegate(.setTabbarVisibility(state.routes.count == 1)))
+            case let .router(.routeAction(
+                _,
+                action: .myGoalDetail(.delegate(.showGoalDetail(contentId))))):
+                state.routes.push(
+                    .goalDetail(.init(
+                        contentId: contentId, isShowButton: false)))
+                return .none
+            case .router(.routeAction(
+                _,
+                action: .goalDetail(.delegate(.closeView)))):
+                state.routes.pop()
+                return .send(.delegate(.setTabbarVisibility(state.routes.count == 1)))
+            case .router(.routeAction(
+                _,
+                action: .myGoalCompletion(.delegate(.closeView)))):
+                state.routes.pop()
+                return .send(.delegate(.setTabbarVisibility(state.routes.count == 1)))
+            case let .router(.routeAction(
+                _,
+                action: .myGoalCompletion(
+                    .delegate(.showComment(commentRoomId, title, startDate))))):
+                state.routes.push(.commentDetail(
+                    .init(roomId: commentRoomId, title: title, startDate: startDate)))
+                return .none
+            case .router(.routeAction(
+                _,
+                action: .myGoalCompletion(.delegate(.showGoalList)))):
+                // showGoalList
+                state.routes.popToRoot()
+                return .send(.delegate(.showGoalList))
+            case let .router(.routeAction(
+                _,
+                action: .myGoalCompletion(.delegate(.showGoalDetail(contentId))))):
+                state.routes.push(
+                    .goalDetail(.init(
+                        contentId: contentId, isShowButton: false)))
+                return .none
+            case .router(.routeAction(
+                _,
+                action: .commentDetail(.delegate(.closeView)))):
+                state.routes.pop()
+                return .none
+            default:
+                return .none
             }
-            return .none
         }
         .forEachRoute(\.routes, action: \.router)
     }
@@ -104,7 +169,11 @@ extension MyGoalCoordinator.Screen.State: Identifiable {
         state.id
     case let .myGoalDetail(state):
         state.id
+    case let .myGoalCompletion(state):
+        state.id
     case let .goalDetail(state):
+        state.id
+    case let .commentDetail(state):
         state.id
     }
   }
