@@ -11,16 +11,13 @@ import SwiftUI
 
 @Reducer
 public struct GoalDetailFeature {
-    public enum FetchError: Error {
-        case networkError
-        case emptyData
-    }
     public init() {}
     @ObservableState
     public struct State: Equatable {
         public let id: UUID
         let contentId: Int
         var content: GoalContentDetail?
+        var isShowButton: Bool
         var isShowUnavailablePopup: Bool
         var currentPage: Int
         var isLoading: Bool
@@ -29,6 +26,7 @@ public struct GoalDetailFeature {
         var toastState: ToastState
         public init(
             contentId: Int,
+            isShowButton: Bool = true,
             isShowUnavailablePopup: Bool = false,
             currentPage: Int = 0,
             isLoading: Bool = true,
@@ -36,6 +34,7 @@ public struct GoalDetailFeature {
         ) {
             self.id = UUID()
             self.contentId = contentId
+            self.isShowButton = isShowButton
             self.isShowUnavailablePopup = isShowUnavailablePopup
             self.currentPage = currentPage
             self.isLoading = true
@@ -49,6 +48,7 @@ public struct GoalDetailFeature {
         case viewCycling(ViewCyclingAction)
         case view(ViewAction)
         case feature(FeatureAction)
+        case delegate(DelegateAction)
         case binding(BindingAction<State>)
     }
     public enum ViewCyclingAction {
@@ -62,12 +62,15 @@ public struct GoalDetailFeature {
         case retryButtonTapped
     }
     public enum FeatureAction {
+        case checkLogin(Bool)
         case fetchDetail
-        case checkLogin
-        case checkLoginResponss(Bool)
         case checkFetchDetailResponse(Result<GoalContentDetail, Error>)
-        case showPurchaseSheet(GoalContentDetail)
         case showToast(String)
+    }
+    public enum DelegateAction {
+        case showPurchaseSheet(GoalContentDetail)
+        case showLogin
+        case closeView
     }
     @Dependency(\.goalClient) var goalClient
     @Dependency(\.authClient) var authClient
@@ -81,9 +84,18 @@ public struct GoalDetailFeature {
                 return reduce(into: &state, action: action)
             case let .feature(action):
                 return reduce(into: &state, action: action)
+            case let .delegate(action):
+                return reduce(into: &state, action: action)
             case .binding:
                 return .none
             }
         }
+    }
+}
+
+extension GoalDetailFeature {
+    public enum FetchError: Error {
+        case networkError
+        case emptyData
     }
 }

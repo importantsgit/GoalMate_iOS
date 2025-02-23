@@ -18,16 +18,18 @@ extension GoalDetailFeature {
         switch action {
         case .onAppear:
             state.isLoading = true
-            return .merge(
-                .send(.feature(.checkLogin)),
-                .send(.feature(.fetchDetail))
-            )
-            .cancellable(id: CancelID.initialLoad)
+            return .run { send in
+                await send(
+                    .feature(.checkLogin(try await authClient.checkLoginStatus()))
+                )
+            }
         }
     }
     // MARK: View
     func reduce(into state: inout State, action: ViewAction) -> Effect<Action> {
         switch action {
+        case .loginButtonTapped:
+            return .send(.delegate(.showLogin))
         case .retryButtonTapped:
             state.didFailToLoad = false
             state.isLoading = true
@@ -42,6 +44,10 @@ extension GoalDetailFeature {
                     dateFormatter.dateFormat = "yyyy년 MM월 dd일"
                     let maxOccupancy = content.participantsLimit ?? 0
                     let currentParticipants = content.currentParticipants ?? 0
+                    let weeklyObjectives = content.weeklyObjectives
+                        .sorted { ($0.weekNumber ?? 0) < ($1.weekNumber ?? 0) }
+                    let milestoneObjectives = content.midObjectives
+                        .sorted { ($0.number ?? 0) < ($1.number ?? 0) }
                     let result: GoalContentDetail = .init(
                         id: content.id,
                         details: .init(
@@ -52,10 +58,10 @@ extension GoalDetailFeature {
                             startDate: dateFormatter.string(from: today),
                             endDate: dateFormatter.string(from: endDate),
                             goalDescription: "\"\(content.description ?? "")\"",
-                            weeklyGoal: content.weeklyObjectives.map {
+                            weeklyGoal: weeklyObjectives.map {
                                 $0.description ?? ""
                             },
-                            milestoneGoal: content.midObjectives.map {
+                            milestoneGoal: milestoneObjectives.map {
                                 $0.description ?? ""
                             }
                         ),
@@ -76,34 +82,26 @@ extension GoalDetailFeature {
                 }
             }
         case .backButtonTapped:
-            return .cancel(id: CancelID.initialLoad)
+            return .send(.delegate(.closeView))
         case .startButtonTapped:
             guard let content = state.content
             else { return .none }
             return
                 .concatenate(
                     .cancel(id: CancelID.initialLoad),
-                    .send(.feature(.showPurchaseSheet(content)))
+                    .send(.delegate(.showPurchaseSheet(content)))
                 )
         case .popupButtonTapped:
             state.isShowUnavailablePopup = false
             return .none
-        default: return .none
         }
     }
     // MARK: Feature
     func reduce(into state: inout State, action: FeatureAction) -> Effect<Action> {
         switch action {
-        case .checkLogin:
-            return .run { send in
-                do {
-                    let loginState = try await authClient.checkLoginStatus()
-                    await send(.feature(.checkLoginResponss(loginState)))
-                } catch {
-                    await send(.feature(.checkLoginResponss(false)))
-                }
-
-            }
+        case let .checkLogin(isLogin):
+            state.isLogin = isLogin
+            return .send(.feature(.fetchDetail))
         case .fetchDetail:
             return .run { [contentId = state.contentId] send in
                 do {
@@ -149,9 +147,6 @@ extension GoalDetailFeature {
                     )
                 }
             }
-        case let .checkLoginResponss(isLogin):
-            state.isLogin = isLogin
-            return .none
         case let .checkFetchDetailResponse(result):
             switch result {
             case let .success(detail):
@@ -167,5 +162,8 @@ extension GoalDetailFeature {
             return .none
         default: return .none
         }
+    }
+    func reduce(into state: inout State, action: DelegateAction) -> Effect<Action> {
+        return .none
     }
 }

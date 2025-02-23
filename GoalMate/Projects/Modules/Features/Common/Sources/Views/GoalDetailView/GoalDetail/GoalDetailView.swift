@@ -10,7 +10,7 @@ import SwiftUI
 
 public struct GoalDetailView: View {
     @State private var progress: Double
-    @Perception.Bindable var store: StoreOf<GoalDetailFeature>
+    @Bindable var store: StoreOf<GoalDetailFeature>
     public init(
         progress: Double = 0.1,
         store: StoreOf<GoalDetailFeature>
@@ -56,11 +56,13 @@ public struct GoalDetailView: View {
                                 .frame(height: 120)
                         }
                     }
+                    .scrollIndicators(.hidden)
                     .loadingFailure(didFailToLoad: store.didFailToLoad) {
                         store.send(.view(.retryButtonTapped))
                     }
                 }
-                if store.didFailToLoad == false {
+                if store.didFailToLoad == false,
+                    store.isShowButton {
                     VStack {
                         Spacer()
                         BottomButtonView(store: store)
@@ -112,8 +114,9 @@ private extension GoalDetailView {
                                     .aspectRatio(contentMode: .fill)
                                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                             case .failure:
-                                Image(systemName: "square.and.arrow.up")
-                                    .foregroundColor(.gray)
+                                Images.placeholder
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fit)
                             @unknown default:
                                 Rectangle()
                                     .fill(.black)
