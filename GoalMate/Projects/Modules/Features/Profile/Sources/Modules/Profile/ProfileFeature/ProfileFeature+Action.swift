@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import Data
 import Foundation
 import Utils
 
@@ -15,23 +16,9 @@ extension ProfileFeature {
         case .onAppear:
             state.isLoading = true
             return .run { send in
-                do {
-                    let response = try await menteeClient.fetchMenteeInfo()
-                    let content = ProfileContent(
-                        name: response.name ?? "",
-                        state: .init(
-                            inProgressCount: response.inProgressGoalCount ?? 0,
-                            completedCount: response.completedGoalCount ?? 0
-                        )
-                    )
-                    await send(
-                        .feature(.fetchMyGoalCount(.success(content)))
-                    )
-                } catch {
-                    await send(
-                        .feature(.fetchMyGoalCount(.failure(error)))
-                    )
-                }
+                await send(.feature(.checkLogin(
+                    try await authClient.checkLoginStatus()
+                )))
             }
         }
     }
@@ -39,7 +26,7 @@ extension ProfileFeature {
         switch action {
         case .nicknameEditButtonTapped:
             return .send(
-                .feature(.showNicknameEdit(state.profile?.name ?? ""))
+                .delegate(.showNicknameEdit(state.profile?.name ?? ""))
             )
         case .qnaButtonTapped:
             guard let url = URL(
@@ -66,13 +53,44 @@ extension ProfileFeature {
                 _ = await openURL(url)
             }
         case .withdrawalButtonTapped:
-            return .none
-        case let .setNickname(nickname):
-            state.profile?.name = nickname
-            return .none
+            return .send(.delegate(.showWithdrawal))
         case .retryButtonTapped:
             state.didFailToLoad = false
             state.isLoading = true
+            return .send(.feature(.fetchProfile))
+        case .loginButtonTapped:
+            return .send(.delegate(.showLogin))
+        case .logoutButtonTapped:
+//            state.isShowPopup = true
+            return .send(.feature(.logout))
+        case .goalStatusButtonTapped:
+            return .send(.delegate(.showMyGoalList))
+        case .logoutConfirmButtonTapped:
+            return .send(.feature(.logout))
+        }
+    }
+    func reduce(into state: inout State, action: FeatureAction) -> Effect<Action> {
+        switch action {
+        case .logout:
+            return .run { send in
+                do {
+                    try await authClient.logout()
+                    await send(.feature(.checkLogout(true)))
+                } catch {
+                    await send(.feature(.checkLogout(false)))
+                }
+            }
+        case let .checkLogout(isLogout):
+            return isLogout ? .send(.delegate(.showGoalList)) : .none
+        case let .checkLogin(isLogin):
+            state.isLogin = isLogin
+            if isLogin == false {
+                state.isLoading = false
+                return .none
+            } else {
+                return .send(.feature(.fetchProfile))
+            }
+        case .fetchProfile:
             return .run { send in
                 do {
                     let response = try await menteeClient.fetchMenteeInfo()
@@ -84,29 +102,37 @@ extension ProfileFeature {
                         )
                     )
                     await send(
-                        .feature(.fetchMyGoalCount(.success(content)))
+                        .feature(.checkProfileResponse(.success(content)))
+                    )
+                } catch is NetworkError {
+                    await send(
+                        .feature(.checkProfileResponse(.networkError))
                     )
                 } catch {
                     await send(
-                        .feature(.fetchMyGoalCount(.failure(error)))
+                        .feature(.checkProfileResponse(.failed))
                     )
                 }
             }
-        }
-    }
-    func reduce(into state: inout State, action: FeatureAction) -> Effect<Action> {
-        switch action {
-        case .showNicknameEdit:
-            return .none
-        case let .fetchMyGoalCount(result):
+        case let .checkProfileResponse(result):
             switch result {
-            case  let .success(content):
+            case let .success(content):
                 state.profile = content
-            case let .failure(error):
-                print(error)
+            case .networkError:
                 state.didFailToLoad = true
+            case .failed:
+                break
             }
             state.isLoading = false
+            return .none
+        }
+    }
+    func reduce(into state: inout State, action: DelegateAction) -> Effect<Action> {
+        switch action {
+        case let .setNickname(nickname):
+            state.profile?.name = nickname
+            return .none
+        default:
             return .none
         }
     }
