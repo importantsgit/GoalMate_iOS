@@ -12,7 +12,7 @@ public extension Project {
     
     static let productName: String = "GoalMate"
     
-    static let deployTarget: DeploymentTargets = .iOS("16.0")
+    static let deployTarget: DeploymentTargets = .iOS("17.0")
     
     static let teamId = "com.goalmate"
     

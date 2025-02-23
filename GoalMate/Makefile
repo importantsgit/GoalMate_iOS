@@ -25,6 +25,9 @@ generate-mygoal:
 	
 generate-profile:
 	$(MAKE) TUIST_TYPE=PROFILE PROJECT_TYPE=PROFILE clean generate
+	
+generate-comment:
+	$(MAKE) TUIST_TYPE=PROFILE PROJECT_TYPE=COMMENT clean generate
 
 # Graph 상위 Tasks
 # : 뒤에 명령어를 쓴다면 해당 task가 실행하기 전에 해당 명령어를 사용하라는 뜻임
@@ -48,6 +51,9 @@ graph-mygoal:
 
 graph-profile:
 	$(MAKE) TUIST_TYPE=PROFILE PROJECT_TYPE=PROFILE graph
+	
+graph-comment:
+	$(MAKE) TUIST_TYPE=PROFILE PROJECT_TYPE=COMMENT graph
 
 # 하위 Task (Target)
 clean:
@@ -77,6 +83,10 @@ clean:
 	@if [ "$(PROJECT_TYPE)" != "PROFILE" ]; then \
 		echo "Cleaning PROFILE"; \
 		rm -rf $(TUIST_ROOT_DIR)/Projects/App/DemoProfileFeature.xcodeproj; \
+	fi
+	@if [ "$(PROJECT_TYPE)" != "COMMENT" ]; then \
+		echo "Cleaning COMMENT"; \
+		rm -rf $(TUIST_ROOT_DIR)/Projects/App/DemoCommentFeature.xcodeproj; \
 	fi
 	@if [ "$(PROJECT_TYPE)" != "APP" ]; then \
 		echo "Cleaning APP"; \

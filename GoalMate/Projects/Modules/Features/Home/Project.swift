@@ -14,6 +14,7 @@ let featureHome = Project.framework(
         Module.feature(.Goal).project,
         Module.feature(.MyGoal).project,
         Module.feature(.Profile).project,
+        Module.feature(.Comment).project,
         Module.Utils.project
     ]
 )

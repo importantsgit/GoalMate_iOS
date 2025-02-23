@@ -17,6 +17,7 @@ public enum Module {
         case SignUp
         case Home
         case Goal
+        case Comment
         case MyGoal
         case Profile
         case Common

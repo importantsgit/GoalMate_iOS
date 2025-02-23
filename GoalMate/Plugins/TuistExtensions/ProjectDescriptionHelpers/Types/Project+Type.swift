@@ -44,6 +44,8 @@ public struct ProjectType {
             return "../Demos/GoalFeatureDemo/"
         case "PROFILE":
             return "../Demos/ProfileFeatureDemo/"
+        case "Comment":
+            return "../Demos/CommentFeatureDemo/"
         default:
             return ""
         }
@@ -128,6 +130,20 @@ public struct ProjectType {
                 name: "DemoProfileFeature",
                 dependencies: [
                     Module.feature(.Profile).project,
+                    Module.feature(.Common).project
+                ],
+                sources: [
+                    "\(getSourcePath(value))Sources/**",
+                ],
+                testSources: [
+                    "\(getSourcePath(value))Tests/**",
+                ]
+            )
+        case "Comment":
+            return Config(
+                name: "CommentProfileFeature",
+                dependencies: [
+                    Module.feature(.Comment).project,
                     Module.feature(.Common).project
                 ],
                 sources: [
