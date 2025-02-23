@@ -9,8 +9,9 @@ import Foundation
 
 extension MyGoalListFeature {
     public enum ButtonType {
-        case showDetail(Int)
-        case restart(Int)
+        case showGoalCompletion(Int)
+        case showGoalDetail(Int)
+        case showGoalRestart(Int)
     }
     public enum FetchMyGoalsResult {
         case success([MyGoalContent], Bool)

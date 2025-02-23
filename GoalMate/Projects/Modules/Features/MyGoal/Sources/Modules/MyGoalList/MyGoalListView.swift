@@ -32,6 +32,7 @@ public struct MyGoalListView: View {
                        (store.isLogin == false || store.myGoalList.isEmpty) {
                         emptyMyGoalView
                     }
+                    if store.isLoading {}
                 }
                 .loadingFailure(didFailToLoad: store.didFailToLoad) {
                     store.send(.view(.retryButtonTapped))
@@ -67,46 +68,91 @@ public struct MyGoalListView: View {
                         }
                     }
                 }
-                if store.isLoading {
+                if store.isScrollFetching {
                     ProgressView()
                         .progressViewStyle(.circular)
                         .scaleEffect(1.7, anchor: .center)
                 }
             }
+            .overlay {
+                if store.isLoading {
+                    skeletonView
+                        .transition(.opacity)
+                }
+            }
             .scrollIndicators(.hidden)
-//            VStack {
-//                List {
-//                    ForEach(store.myGoalList, id: \.id) { content in
-//                        VStack(spacing: 0) {
-//                            MyGoalContentItem(content: content) { type in
-//                                store.send(.view(.buttonTapped(type)))
-//                            }
-//                            .task {
-//                                if store.isLoading == false &&
-//                                    store.myGoalList[store.totalCount-10].id == content.id {
-//                                    store.send(.view(.onLoadMore))
-//                                }
-//                            }
-//                            Rectangle()
-//                                .fill(Colors.grey50)
-//                                .frame(height: 16)
-//                        }
-//                    }
-//                    .listRowSeparator(.hidden)
-//                    .listRowInsets(EdgeInsets())
-//                    .listRowBackground(Color.clear)
-//                    if store.isLoading {
-//                        ProgressView()
-//                            .progressViewStyle(.circular)
-//                            .scaleEffect(1.7, anchor: .center)
-//                    }
-//                }
-//                .listStyle(.plain)
-//                .background(Color.clear)
-//                .scrollContentBackground(.hidden)
-//                .scrollIndicators(.hidden)
-//            }
+            .animation(
+                .easeInOut(duration: 0.2),
+                value: store.isLoading)
         }
+    }
+    
+    @ViewBuilder
+    var skeletonView: some View {
+        VStack {
+            ForEach(0...1, id: \.self) { _ in
+                Spacer()
+                    .frame(height: 40)
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack {
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Colors.grey200)
+                            .frame(width: 80, height: 20)
+                        Spacer()
+                    }
+                    Spacer()
+                        .frame(height: 16)
+                    HStack {
+                        VStack {
+                            HStack {
+                                RoundedRectangle(cornerRadius: 4)
+                                    .fill(Colors.grey200)
+                                    .frame(width: 120)
+                                VStack(alignment: .leading) {
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .fill(Colors.grey200)
+                                        .frame(width: 120, height: 20)
+                                    Spacer()
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .fill(Colors.grey200)
+                                        .frame(width: 150, height: 40)
+                                }
+                            }
+                        }
+                        .frame(height: 90)
+                    }
+                    Spacer()
+                        .frame(height: 16)
+                    HStack {
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Colors.grey200)
+                            .frame(width: 80, height: 18)
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Colors.grey200)
+                            .frame(height: 20)
+                            .frame(maxWidth: .infinity)
+                    }
+                    Spacer()
+                        .frame(height: 4)
+                    HStack {
+                        Spacer()
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Colors.grey200)
+                            .frame(height: 20)
+                            .frame(maxWidth: 40)
+                    }
+                    Spacer()
+                        .frame(height: 16)
+                    RoundedRectangle(cornerRadius: 25)
+                        .fill(Colors.grey200)
+                        .frame(height: 50)
+                        .frame(maxWidth: .infinity)
+                }
+            }
+            Spacer()
+        }
+        .padding(.horizontal, 20)
+        .background(.white)
     }
 
     @ViewBuilder
@@ -176,7 +222,26 @@ fileprivate struct MyGoalContentItem: View {
                 Spacer()
                     .frame(height: 14)
                 HStack(spacing: 10) {
-                    CachedImageView(url: content.mainImageURL)
+                    if let imageUrl = URL(string: content.mainImageURL) {
+                        AsyncImage(
+                            url: imageUrl
+                        ) { phase in
+                            switch phase {
+                            case .empty:
+                                ProgressView()
+                                    .progressViewStyle(.circular)
+                            case .success(let image):
+                                image
+                                    .resizable()
+                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                            case .failure:
+                                Images.placeholder
+                                    .resizable()
+                            @unknown default:
+                                Rectangle()
+                                    .fill(.black)
+                            }
+                        }
                         .frame(width: 120, height: 90)
                         .overlay {
                             if isExpired {
@@ -187,6 +252,14 @@ fileprivate struct MyGoalContentItem: View {
                             }
                         }
                         .clipShape(.rect(cornerRadius: 4))
+                    } else {
+                        Images.placeholder
+                            .resizable()
+                            .aspectRatio(contentMode: .fill)
+                            .frame(width: 120, height: 90)
+                            .clipShape(.rect(cornerRadius: 4))
+                    }
+
                     VStack(alignment: .leading) {
                         Text(content.title)
                             .pretendard(
@@ -236,7 +309,7 @@ fileprivate struct MyGoalContentItem: View {
                         }
                     }
                     LinearProgressView(
-                        progress: .constant(content.progress),
+                        progress: content.progress,
                         progressColor: isExpired ? Colors.grey400 : Colors.primary,
                         backgroundColor: isExpired ? Colors.grey100 : Colors.primary50,
                         lineWidth: 14
@@ -256,7 +329,7 @@ fileprivate struct MyGoalContentItem: View {
                             ),
                             height: 44,
                             buttonTapped: {
-                                buttonTapped(.restart(content.id))
+                                buttonTapped(.showGoalRestart(content.id))
                             },
                             label: {
                                 Text("다시 시작가기")
@@ -267,7 +340,7 @@ fileprivate struct MyGoalContentItem: View {
                             buttonType: FilledStyle(backgroundColor: Colors.primary),
                             height: 44,
                             buttonTapped: {
-                                buttonTapped(.showDetail(content.id))
+                                buttonTapped(.showGoalCompletion(content.id))
                             },
                             label: {
                                 Text("보러가기")
@@ -280,7 +353,7 @@ fileprivate struct MyGoalContentItem: View {
                         buttonType: FilledStyle(backgroundColor: Colors.primary),
                         height: 44,
                         buttonTapped: {
-                            buttonTapped(.showDetail(content.id))
+                            buttonTapped(.showGoalDetail(content.id))
                         },
                         label: {
                             Text("진행하기")
@@ -309,7 +382,6 @@ fileprivate struct MyGoalContentItem: View {
 
 @available(iOS 17.0, *)
 #Preview {
-    
     MyGoalListView(
         store: .init(
             initialState: .init(
@@ -322,8 +394,6 @@ fileprivate struct MyGoalContentItem: View {
             } operation: {
                 MyGoalListFeature()
             }
-
-            
         }
     )
 }

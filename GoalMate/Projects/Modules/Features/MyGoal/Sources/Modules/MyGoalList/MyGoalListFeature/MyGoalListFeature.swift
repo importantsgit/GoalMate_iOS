@@ -24,6 +24,7 @@ public struct MyGoalListFeature {
         public let id: UUID
         var isLogin: Bool
         var isLoading: Bool
+        var isScrollFetching: Bool
         var didFailToLoad: Bool
 
         var totalCount: Int
@@ -36,6 +37,7 @@ public struct MyGoalListFeature {
             self.id = UUID()
             self.isLogin = true
             self.isLoading = true
+            self.isScrollFetching = false
             self.didFailToLoad = false
             self.myGoalList = myGoalList
             self.totalCount = 0
@@ -61,14 +63,13 @@ public struct MyGoalListFeature {
     }
     public enum FeatureAction {
         case fetchMyGoals
-        case loginFailed
         case checkFetchMyGoalResponse(FetchMyGoalsResult)
+        case loginFailed
     }
     public enum DelegateAction {
-        case showLogin
         case showGoalList
+        case showMyGoalCompletion(Int)
         case showMyGoalDetail(Int)
-        case showGoalDetail(Int)
     }
     @Dependency(\.authClient) var authClient
     @Dependency(\.menteeClient) var menteeClient

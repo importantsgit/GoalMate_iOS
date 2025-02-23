@@ -31,29 +31,28 @@ extension MyGoalListFeature {
         case .retryButtonTapped, .onLoadMore:
             guard state.hasMorePages else { return .none }
             state.isLoading = true
-            return .run { send in
-                await send(.feature(.fetchMyGoals))
-            }
+            return .send(.feature(.fetchMyGoals))
         case let .buttonTapped(type):
             switch type {
-            case let .restart(contentId):
-                return .send(.delegate(.showGoalDetail(contentId)))
-            case let .showDetail(contentId):
+            case let .showGoalRestart(contentId):
+                return .send(.delegate(.showGoalList))
+            case let .showGoalDetail(contentId):
                 return .send(.delegate(.showMyGoalDetail(contentId)))
+            case let .showGoalCompletion(contentId):
+                return .send(.delegate(.showMyGoalCompletion(contentId)))
             }
         case .showMoreButtonTapped:
-            if state.isLogin {
-                // login
-                return .send(.delegate(.showLogin))
-            } else {
-                // Home
-                return .send(.delegate(.showGoalList))
-            }
+            return .send(.delegate(.showGoalList))
         }
     }
     func reduce(into state: inout State, action: FeatureAction) -> Effect<Action> {
         switch action {
         case .fetchMyGoals:
+            guard state.hasMorePages else {
+                state.isLoading = false
+                return .none
+            }
+            state.isScrollFetching = true
             return .run { [currentPage = state.currentPage] send in
                 do {
                     let response = try await menteeClient.fetchMyGoals(currentPage)
@@ -63,8 +62,8 @@ extension MyGoalListFeature {
                             .init(
                                 id: goal.id,
                                 title: goal.title,
-                                progress: CGFloat((goal.totalTodoCount ?? 1) /
-                                                  (goal.totalCompletedCount ?? 0)),
+                                progress: CGFloat((goal.totalCompletedCount ?? 0) /
+                                                  (goal.totalTodoCount ?? 1)),
                                 startDate: goal.startDate,
                                 endDate: goal.endDate,
                                 mainImageURL: goal.mainImage,
@@ -108,6 +107,7 @@ extension MyGoalListFeature {
                 break
             }
             state.isLoading = false
+            state.isScrollFetching = false
             return .none
         }
     }
