@@ -10,7 +10,7 @@ import FeatureCommon
 import SwiftUI
 
 public struct GoalDetailSheetView: View {
-    @Perception.Bindable var store: StoreOf<GoalDetailSheetFeature>
+    @Bindable var store: StoreOf<GoalDetailSheetFeature>
     public init(store: StoreOf<GoalDetailSheetFeature>) {
         self.store = store
     }
@@ -93,6 +93,7 @@ public struct GoalDetailSheetView: View {
                 }
             }
             .padding(.horizontal, 20)
+            .toast(state: $store.toastState, position: .bottom)
         }
     }
 }

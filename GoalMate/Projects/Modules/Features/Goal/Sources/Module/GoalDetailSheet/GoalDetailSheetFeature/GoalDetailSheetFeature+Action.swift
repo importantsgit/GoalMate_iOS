@@ -31,26 +31,40 @@ extension GoalDetailSheetFeature {
                     print(error.localizedDescription)
                     if let error = error as? NetworkError,
                        case let .statusCodeError(code) = error {
+                        let message: String
                         if code == 403 {
-                            print("참여 인원 초과 또는 무료 참여 횟수 초과")
+                            message = "참여 인원 초과 또는 무료 참여 횟수 초과입니다."
                         } else if code == 404 {
-                            print("존재하지 않는 목표")
+                            message = "존재하지 않는 목표입니다."
                         } else if code == 409 {
-                            print("이미 참여중인 목표")
+                            message = "이미 참여중인 목표입니다."
+                        } else {
+                            message = "알 수 없는 오류가 발생했습니다."
                         }
+                        await send(
+                            .feature(.checkPurchaseResponse(.failed(message))))
                     }
-                    await send(
-                        .feature(
-                            .checkPurchaseResponse(
-                                .failure(error)
-                            )
-                        )
-                    )
+                    await send(.feature(.checkPurchaseResponse(.networkError)))
                 }
             }
         }
     }
     func reduce(into state: inout State, action: FeatureAction) -> Effect<Action> {
+        switch action {
+        case let .checkPurchaseResponse(result):
+            switch result {
+            case let .success(result):
+                return .send(.delegate(.finishPurchase(result)))
+            case let .failed(message):
+                state.toastState = .display(message)
+                return .send(.delegate(.failed(message)))
+            case .networkError:
+                state.toastState = .display("네트워크 오류가 발생했습니다.")
+                return .send(.delegate(.failed("네트워크 오류가 발생했습니다.")))
+            }
+        }
+    }
+    func reduce(into state: inout State, action: DelegateAction) -> Effect<Action> {
         return .none
     }
 }

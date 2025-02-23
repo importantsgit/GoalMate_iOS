@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import FeatureCommon
 import Foundation
 
 @Reducer
@@ -14,17 +15,20 @@ public struct GoalDetailSheetFeature {
     public struct State: Equatable {
         var id: UUID
         let content: GoalDetailSheetContent
+        var toastState: ToastState
         public init(
             content: GoalDetailSheetContent
         ) {
             self.id = UUID()
             self.content = content
+            self.toastState = .hide
         }
     }
     public enum Action: BindableAction {
         case viewCycling(ViewCyclingAction)
         case view(ViewAction)
         case feature(FeatureAction)
+        case delegate(DelegateAction)
         case binding(BindingAction<State>)
     }
     public enum ViewCyclingAction {}
@@ -32,7 +36,11 @@ public struct GoalDetailSheetFeature {
         case purchaseButtonTapped
     }
     public enum FeatureAction {
-        case checkPurchaseResponse(Result<GoalDetailSheetContent, Error>)
+        case checkPurchaseResponse(PurchaseResult)
+    }
+    public enum DelegateAction {
+        case finishPurchase(GoalDetailSheetContent)
+        case failed(String)
     }
     @Dependency(\.menteeClient) var menteeClient
     public var body: some Reducer<State, Action> {
@@ -45,9 +53,19 @@ public struct GoalDetailSheetFeature {
                 return reduce(into: &state, action: action)
             case let .feature(action):
                 return reduce(into: &state, action: action)
+            case let .delegate(action):
+                return reduce(into: &state, action: action)
             case .binding(_):
                 return .none
             }
         }
+    }
+}
+
+extension GoalDetailSheetFeature {
+    public enum PurchaseResult {
+        case success(GoalDetailSheetContent)
+        case failed(String)
+        case networkError
     }
 }
