@@ -5,6 +5,7 @@
 //  Created by 이재훈 on 1/7/25.
 //
 
+import ComposableArchitecture
 import SwiftUI
 
 public extension View {
@@ -58,6 +59,10 @@ public extension View {
                 retryAction: retryAction
             )
         )
+    }
+
+    func hideWithScreenshot() -> some View {
+        modifier(HideWithScreenshot())
     }
 }
 

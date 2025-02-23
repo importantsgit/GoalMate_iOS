@@ -159,8 +159,10 @@ struct ToastModifier: ViewModifier {
                 toastView
                     .transition(
                         .asymmetric(
-                            insertion: .move(edge: .top),
-                            removal: .move(edge: .top)
+                            insertion: .move(
+                                edge: position == .top ? .top : .bottom),
+                            removal: .move(
+                                edge: position == .top ? .top : .bottom)
                         )
                     )
                     .onTapGesture {
@@ -243,5 +245,29 @@ struct LoadingFailureModifier: ViewModifier {
                 }
             }
         }
+    }
+}
+
+struct HideWithScreenshot: ViewModifier {
+    @State private var size: CGSize?
+    @Environment(\.safeAreaInsets) private var safeAreaInsets
+
+    func body(content: Content) -> some View {
+        ScreenshotPreventView {
+            ZStack {
+                content
+                    .padding(.top, safeAreaInsets.top)
+                    .padding(.bottom, safeAreaInsets.bottom)
+                    .background(
+                        GeometryReader { proxy in
+                            Color.clear
+                                .onAppear {
+                                    size = proxy.size
+                                }
+                        }
+                    )
+            }
+        }
+        .frame(width: size?.width, height: size?.height)
     }
 }
