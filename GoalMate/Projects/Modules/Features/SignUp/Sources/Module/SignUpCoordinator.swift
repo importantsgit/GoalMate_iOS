@@ -29,6 +29,7 @@ public struct SignUpCoordinatorView: View {
                 }
             }
         }
+        .toolbar(.hidden)
     }
 }
 
@@ -68,19 +69,22 @@ public struct SignUpCoordinator {
     var core: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-            case .router(
-                .routeAction(_, action: .signUp(.delegate(.authenticationCompleted)))):
+            case .router(.routeAction(
+                _,
+                action: .signUp(.delegate(.authenticationCompleted)))):
                 state.routes.presentSheet(.termsAgreement(.init()))
                 return .none
-            case .router(
-                .routeAction(_, action: .termsAgreement(.delegate(.termsAgreementFinished)))):
+            case .router(.routeAction(
+                _,
+                action: .termsAgreement(.delegate(.termsAgreementFinished)))):
                 state.routes.dismiss()
                 guard case let .signUp(signUp) = state.routes.first?.screen else { return .none }
                 return .send(.router(.routeAction(
                     id: signUp.id,
-                    action: .signUp(.delegate(.termsAgreementCompleted))
-                )))
-            case .router(.routeAction(_, action: .signUp(.delegate(.loginFinished)))):
+                    action: .signUp(.delegate(.termsAgreementCompleted)))))
+            case .router(.routeAction(
+                _,
+                action: .signUp(.delegate(.loginFinished)))):
                 return .send(.coordinatorFinished)
             default: break
             }

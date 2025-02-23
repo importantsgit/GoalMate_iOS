@@ -12,7 +12,6 @@ import FeatureCommon
 import UIKit
 import Utils
 
-
 @Reducer
 public struct SignUpFeature {
     @ObservableState
@@ -96,7 +95,7 @@ public struct SignUpFeature {
         case loginFinished
     }
     @Dependency(\.authClient) var authClient
-    @Dependency(\.keyboardClient) var keyboardClient
+    @Dependency(\.environmentClient) var environmentClient
     @Dependency(\.nicknameClient) var nicknameClient
     public var body: some Reducer<State, Action> {
         BindingReducer()
@@ -115,7 +114,6 @@ public struct SignUpFeature {
             case let .delegate(action):
                 return reduce(into: &state, action: action)
             case .binding:
-                print(action)
                 return .none
             }
         }

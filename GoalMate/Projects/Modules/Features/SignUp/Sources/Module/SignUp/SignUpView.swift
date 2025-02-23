@@ -13,7 +13,7 @@ struct SignUpView: View {
     enum FocusableField: Hashable {
         case nickname
     }
-    @Perception.Bindable var store: StoreOf<SignUpFeature>
+    @Bindable var store: StoreOf<SignUpFeature>
     @FocusState private var focusedField: FocusableField?
     @State private var keyboardHeight: CGFloat = 0
 
@@ -274,7 +274,7 @@ struct SignUpView: View {
             reducer: {
                 withDependencies {
                     $0.authClient = .previewValue
-                    $0.keyboardClient = .previewValue
+                    $0.environmentClient = .previewValue
                 } operation: {
                     SignUpFeature()
                 }

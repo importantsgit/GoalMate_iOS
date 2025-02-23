@@ -14,7 +14,7 @@ extension SignUpFeature {
         switch action {
         case .onAppear:
             return .run { send in
-                for await height in keyboardClient.observeKeyboardHeight() {
+                for await height in environmentClient.observeKeyboardHeight() {
                     print("높이: \(height)")
                     await send(.feature(.updateKeyboardHeight(height)))
                 }
@@ -24,6 +24,8 @@ extension SignUpFeature {
     // MARK: Auth
     func reduce(into state: inout State, action: AuthAction) -> Effect<Action> {
         switch action {
+        case .backButtonTapped:
+            return .send(.delegate(.loginFinished))
         case let .signUpButtonTapped(provider):
             state.isLoading = true
             return .run { [provider] send in

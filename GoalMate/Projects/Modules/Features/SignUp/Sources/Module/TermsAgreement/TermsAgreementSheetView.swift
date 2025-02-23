@@ -11,7 +11,7 @@ import SwiftUI
 import Utils
 
 public struct TermsAgreementSheetView: View {
-    @Perception.Bindable var store: StoreOf<TermsAgreementFeature>
+    @Bindable var store: StoreOf<TermsAgreementFeature>
     // obseravable framework 알아야함
     // 선언해줄테니까 써라 16.0 이하 /
     public init(store: StoreOf<TermsAgreementFeature>) {
@@ -141,7 +141,7 @@ public struct TermsAgreementSheetView: View {
                 reducer: {
                     withDependencies {
                         $0.authClient = .previewValue
-                        $0.keyboardClient = .previewValue
+                        $0.environmentClient = .previewValue
                     } operation: {
                         TermsAgreementFeature()
                     }
