@@ -14,7 +14,7 @@ extension WithdrawalFeature {
         switch action {
         case .onAppear:
             return .run { send in
-                for await height in keyboardClient.observeKeyboardHeight() {
+                for await height in environmentClient.observeKeyboardHeight() {
                     await send(.feature(.updateKeyboardHeight(height)))
                 }
             }
@@ -24,7 +24,7 @@ extension WithdrawalFeature {
     func reduce(into state: inout State, action: ViewAction) -> Effect<Action> {
         switch action {
         case .backButtonTapped:
-            return .none
+            return .send(.delegate(.closeView))
         case .confirmButtonTapped:
             return .run { send in
                 do {
@@ -33,6 +33,7 @@ extension WithdrawalFeature {
                         .success(())))
                     )
                 } catch {
+                    print(error)
                     await send(.feature(
                         .checkWithdrawalResponse(.failure(.networkError)))
                     )
@@ -65,5 +66,8 @@ extension WithdrawalFeature {
         case .finish:
             return .none
         }
+    }
+    func reduce(into state: inout State, action: DelegateAction) -> Effect<Action> {
+        return .none
     }
 }

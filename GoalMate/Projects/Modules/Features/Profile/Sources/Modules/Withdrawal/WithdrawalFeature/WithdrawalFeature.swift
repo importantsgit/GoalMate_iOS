@@ -43,6 +43,7 @@ public struct WithdrawalFeature {
         case viewCycling(ViewCyclingAction)
         case view(ViewAction)
         case feature(FeatureAction)
+        case delegate(DelegateAction)
         case binding(BindingAction<State>)
     }
     public enum ViewCyclingAction {
@@ -60,8 +61,11 @@ public struct WithdrawalFeature {
         )
         case finish
     }
+    public enum DelegateAction {
+        case closeView
+    }
     @Dependency(\.authClient) var authClient
-    @Dependency(\.keyboardClient) var keyboardClient
+    @Dependency(\.environmentClient) var environmentClient
     public var body: some Reducer<State, Action> {
         BindingReducer()
         Reduce { state, action in
@@ -71,6 +75,8 @@ public struct WithdrawalFeature {
             case let .view(action):
                 return reduce(into: &state, action: action)
             case let .feature(action):
+                return reduce(into: &state, action: action)
+            case let .delegate(action):
                 return reduce(into: &state, action: action)
             case .binding:
                 print(action)

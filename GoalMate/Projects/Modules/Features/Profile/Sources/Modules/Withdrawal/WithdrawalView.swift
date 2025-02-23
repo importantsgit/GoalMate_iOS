@@ -14,7 +14,7 @@ public struct WithdrawalView: View {
     enum FocusableField: Hashable {
         case nickname
     }
-    @Perception.Bindable var store: StoreOf<WithdrawalFeature>
+    @Bindable var store: StoreOf<WithdrawalFeature>
     @FocusState private var focusedField: FocusableField?
     public init(store: StoreOf<WithdrawalFeature>) {
         self.store = store
