@@ -36,6 +36,8 @@ public extension Images {
     static let launchScreenLogo = Asset.Assets.launchScreenLogo.swiftUIImage
     static let pencil = Asset.Assets.pencil.swiftUIImage
     static let calendar = Asset.Assets.calendar.swiftUIImage
+    static let commentSelected = Asset.Assets.commentSelected.swiftUIImage
+    static let comment = Asset.Assets.comment.swiftUIImage
 }
 
 public extension Image {
