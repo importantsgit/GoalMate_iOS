@@ -14,7 +14,7 @@ struct NicknameEditView: View {
     enum FocusableField: Hashable {
         case nickname
     }
-    @Perception.Bindable var store: StoreOf<NicknameEditFeature>
+    @Bindable var store: StoreOf<NicknameEditFeature>
     @FocusState private var focusedField: FocusableField?
     @State private var keyboardHeight: CGFloat = 0
     var body: some View {
@@ -88,10 +88,7 @@ struct NicknameEditView: View {
                     HStack {
                         TextField(
                             "",
-                            text: .init(get: { store.nicknameFormState.inputText },
-                                      set: {
-                                          store.send(.view(.nicknameTextInputted($0)))
-                                      }),
+                            text: $store.inputText.sending(\.nicknameTextInputted),
                             prompt: Text("2~5글자 닉네임을 입력해주세요.")
                                 .foregroundColor(Colors.grey400)
                         )
@@ -162,7 +159,7 @@ struct NicknameEditView: View {
                 reducer: {
                     withDependencies {
                         $0.authClient = .previewValue
-                        $0.keyboardClient = .previewValue
+                        $0.environmentClient = .previewValue
                     } operation: {
                         NicknameEditFeature()
                     }
