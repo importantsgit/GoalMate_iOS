@@ -8,7 +8,7 @@
 import SwiftUI
 
 public struct LinearProgressView: View {
-    @Binding var progress: Double
+    var progress: Double
     let title: String?
     let progressColor: Color
     let backgroundColor: Color
@@ -16,13 +16,13 @@ public struct LinearProgressView: View {
 
     public init(
         title: String? = nil,
-        progress: Binding<Double>,
+        progress: Double,
         progressColor: Color,
         backgroundColor: Color,
         lineWidth: CGFloat
     ) {
         self.title = title
-        self._progress = progress
+        self.progress = progress
         self.progressColor = progressColor
         self.backgroundColor = backgroundColor
         self.lineWidth = lineWidth
@@ -80,28 +80,28 @@ public struct LinearProgressView: View {
 #Preview {
     LinearProgressView(
         title: "전체 진척율",
-        progress: .constant(0.0),
+        progress: 0.0,
         progressColor: .blue,
         backgroundColor: .gray.opacity(0.2),
         lineWidth: 20
     )
     .padding(30)
     LinearProgressView(
-        progress: .constant(0.3),
+        progress: 0.3,
         progressColor: .blue,
         backgroundColor: .gray.opacity(0.2),
         lineWidth: 20
     )
     .padding(30)
     LinearProgressView(
-        progress: .constant(0.8),
+        progress: 0.8,
         progressColor: .blue,
         backgroundColor: .gray.opacity(0.2),
         lineWidth: 20
     )
     .padding(30)
     LinearProgressView(
-        progress: .constant(1),
+        progress: 1,
         progressColor: .blue,
         backgroundColor: .gray.opacity(0.2),
         lineWidth: 20

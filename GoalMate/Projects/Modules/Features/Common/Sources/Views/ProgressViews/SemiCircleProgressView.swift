@@ -5,60 +5,100 @@
 //  Created by Importants on 1/17/25.
 //
 
+import ComposableArchitecture
 import SwiftUI
 
 public struct SemiCircleProgressView: View {
-    @Binding var progress: Double
+    var progress: Double
     let progressColor: Color
     let backgroundColor: Color
     let lineWidth: CGFloat
 
     public init(
-        progress: Binding<Double>,
+        progress: Double,
         progressColor: Color,
         backgroundColor: Color,
         lineWidth: CGFloat
     ) {
-        self._progress = progress
+        self.progress = progress
         self.progressColor = progressColor
         self.backgroundColor = backgroundColor
         self.lineWidth = lineWidth
     }
 
     public var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                makeCirclePath(in: geometry)
-                    .stroke(
-                        backgroundColor,
-                        style: StrokeStyle(
-                            lineWidth: lineWidth,
-                            lineCap: .round
-                        )
-                    )
-                makeCirclePath(in: geometry)
-                    .trim(
-                        from: 0,
-                        to: min(max(calculateProgress(progress), 0), 1)
-                    )
-                    .stroke(
-                        progressColor,
-                        style: StrokeStyle(
-                            lineWidth: lineWidth,
-                            lineCap: .round
-                        )
-                    )
-                VStack {
-                    Spacer()
-                    Text("\(Int(calculateProgress(progress) * 100))%")
-                        .pretendardStyle(.semiBold, size: 20, color: Colors.grey700)
-                    Spacer()
-                        .frame(height: 20)
+        WithPerceptionTracking {
+            VStack(spacing: 24) {
+                GeometryReader { geometry in
+                    ZStack {
+                        makeCirclePath(in: geometry)
+                            .stroke(
+                                backgroundColor,
+                                style: StrokeStyle(
+                                    lineWidth: lineWidth,
+                                    lineCap: .round
+                                )
+                            )
+                        makeCirclePath(in: geometry)
+                            .trim(
+                                from: 0,
+                                to: min(max(calculateProgress(progress), 0), 1)
+                            )
+                            .stroke(
+                                progressColor,
+                                style: StrokeStyle(
+                                    lineWidth: lineWidth,
+                                    lineCap: .round
+                                )
+                            )
+                        VStack {
+                            Spacer()
+                            Text("\(Int(calculateProgress(progress) * 100))%")
+                                .pretendardStyle(.semiBold, size: 20, color: Colors.grey700)
+                            Spacer()
+                                .frame(height: 20)
+                        }
+                    }
                 }
+                .aspectRatio(2/1, contentMode: .fit)
+                .frame(width: 200, height: 100)
+                .animation(.easeInOut, value: progress)
+                Text(text)
+                    .pretendardStyle(
+                        .medium,
+                        size: 14,
+                        color: Colors.grey800
+                    )
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 45)
+                    .background(Colors.grey100)
+                    .clipShape(.rect(cornerRadius: 14))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 14)
+                            .stroke(Colors.grey100, lineWidth: 1)
+                    }
             }
         }
-        .aspectRatio(2/1, contentMode: .fit)
-        .animation(.easeInOut, value: progress)
+    }
+
+    private var text: String {
+        switch progress {
+        case 0.0..<0.1:
+            return "미션을 시작해주세요."
+        case 0.1..<0.2:
+            return "시작이 반이에요!"
+        case 0.2..<0.4:
+            return "좋아요. 잘하고 있어요!"
+        case 0.4..<0.6:
+            return "벌써 절반이에요!"
+        case 0.6..<0.8:
+            return "조금만 더 힘내요. 얼마 안 남았어요!"
+        case 0.8..<0.99:
+            return "마무리까지 힘내요!"
+        case 0.99...1:
+            return "수고했어요! 오늘의 목표를 완료했어요!"
+        default: return ""
+        }
     }
 
     private func makeCirclePath(in geometry: GeometryProxy) -> Path {
@@ -90,7 +130,7 @@ public struct SemiCircleProgressView: View {
 @available(iOS 17.0, *)
 #Preview {
     SemiCircleProgressView(
-        progress: .constant(0.5),
+        progress: 0.5,
         progressColor: .blue,
         backgroundColor: .gray.opacity(0.2),
         lineWidth: 20
