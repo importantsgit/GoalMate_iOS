@@ -41,7 +41,11 @@ extension GoalClient: DependencyKey {
                 return data
             },
             fetchGoalDetail: { goalId in
-                let endPoint = try APIEndpoints.fetchGoalDetailEndpoint(goalId: goalId)
+                let accessToken = await dataStorageClient.tokenInfo.accessToken
+                let endPoint = try APIEndpoints.fetchGoalDetailEndpoint(
+                    goalId: goalId,
+                    accessToken: accessToken
+                )
                 let response = try await networkClient.asyncRequest(with: endPoint)
                 guard let data = response.data
                 else { throw NetworkError.emptyData }
@@ -49,12 +53,18 @@ extension GoalClient: DependencyKey {
             }
         )
     }
-
-    public static var testValue = GoalClient(
-        fetchGoals: { _ in FetchGoalsResponseDTO.dummyList.data! },
-        fetchGoalDetail: { _ in FetchGoalDetailResponseDTO.dummy.data! }
-    )
-
+    public static var testValue: GoalClient {
+        @Dependency(\.dataStorageClient) var dataStorageClient
+        return .init(
+            fetchGoals: { _ in FetchGoalsResponseDTO.dummyList.data! },
+            fetchGoalDetail: { _ in
+                var isParticipated = await dataStorageClient.tokenInfo.accessToken != nil
+                return FetchGoalDetailResponseDTO.getDummy(
+                    isParticipated: isParticipated
+                ).data!
+            }
+        )
+    }
     public static var previewValue = GoalClient(
         fetchGoals: { page in
             try await Task.sleep(nanoseconds: 1_000_000_000)
@@ -72,7 +82,7 @@ extension GoalClient: DependencyKey {
                         participantsLimit: 100,
                         currentParticipants: id * 3,
                         isClosingSoon: id % 2 == 0,
-                        goalStatus: [.upcoming, .open].randomElement()!,
+                        goalStatus: [.closed, .open].randomElement()!,
                         mentorName: "멘토 #\(id)",
                         createdAt: "2025-01-01",
                         updatedAt: "2025-02-19",
@@ -91,7 +101,11 @@ extension GoalClient: DependencyKey {
                 )
             )
         },
-        fetchGoalDetail: { _ in FetchGoalDetailResponseDTO.dummy.data! }
+        fetchGoalDetail: { _ in
+            FetchGoalDetailResponseDTO.getDummy(
+                isParticipated: true
+            ).data!
+        }
     )
 }
 

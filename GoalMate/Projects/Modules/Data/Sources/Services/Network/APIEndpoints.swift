@@ -29,9 +29,10 @@ struct APIEndpoints {
         case fetchWeeklyProgress    = "mentees/my/goals/{menteeGoalId}/weekly-progress"
 
         case updateTodo             = "mentees/my/goals/{menteeGoalId}/todos/{todoId}"
-        
+
         case fetchCommentRooms      = "comment-rooms/my"
-        case fetchCommentRoomDetail = "comment-rooms/{roomId}/comments"
+        case getPostMessage          = "comment-rooms/{roomId}/comments"
+        case updateDeleteMessage    = "comments/{commentId}"
         func path(with parameters: [String: String]) -> String {
             var result = self.rawValue
             parameters.forEach { key, value in
@@ -136,14 +137,22 @@ struct APIEndpoints {
     }
 
     static func fetchGoalDetailEndpoint(
-        goalId: Int
+        goalId: Int,
+        accessToken: String? = nil
     ) throws -> Endpoint<FetchGoalDetailResponseDTO> {
-        try Endpoint(
+        var headerParameters: [String: String] = [:]
+        if let accessToken {
+            headerParameters = [
+                "Authorization": "Bearer \(accessToken)"
+            ]
+        }
+        return try Endpoint(
             path: .fetchGoalDetail,
             pathParameters: [
                 "goalId": "\(goalId)"
             ],
-            method: .get
+            method: .get,
+            headerParameters: headerParameters
         )
     }
 
@@ -174,7 +183,7 @@ struct APIEndpoints {
             ]
         )
     }
-    
+
     static func fetchMyGoalsEndpoint(
         with request: PaginationRequestDTO,
         accessToken: String
@@ -225,6 +234,114 @@ struct APIEndpoints {
             ],
             queryParameters: [
                 "date": date
+            ]
+        )
+    }
+
+    static func patchMenteeTodo(
+        with request: PatchTodoRequestDTO,
+        menteeGoalId: Int,
+        todoId: Int,
+        accessToken: String
+    ) throws -> Endpoint<PatchTodoResponseDTO> {
+        try Endpoint(
+            path: .updateTodo,
+            pathParameters: [
+                "menteeGoalId": "\(menteeGoalId)",
+                "todoId": "\(todoId)"
+            ],
+            method: .patch,
+            headerParameters: [
+                "Authorization": "Bearer \(accessToken)"
+            ],
+            bodyParametersEncodable: request
+        )
+    }
+
+    static func fetchCommentRooms(
+        with request: PaginationRequestDTO,
+        accessToken: String
+    ) -> Endpoint<FecthCommentRoomsResponseDTO> {
+        Endpoint(
+            path: .fetchCommentRooms,
+            method: .get,
+            headerParameters: [
+                "Authorization": "Bearer \(accessToken)"
+            ],
+            queryParametersEncodable: request
+        )
+    }
+    
+    static func fetchComentDetil(
+        with request: PaginationRequestDTO,
+        roomId: Int,
+        accessToken: String
+    ) throws -> Endpoint<FetchCommentDetailResponseDTO> {
+        try Endpoint(
+            path: .getPostMessage,
+            pathParameters: [
+                "roomId": "\(roomId)"
+            ],
+            method: .get,
+            headerParameters: [
+                "Authorization": "Bearer \(accessToken)"
+            ],
+            queryParametersEncodable: request
+        )
+    }
+
+    static func postComentDetil(
+        roomId: Int,
+        comment: String,
+        accessToken: String
+    ) throws -> Endpoint<PostSendCommentResponseDTO> {
+        try Endpoint(
+            path: .getPostMessage,
+            pathParameters: [
+                "roomId": "\(roomId)"
+            ],
+            method: .post,
+            headerParameters: [
+                "Authorization": "Bearer \(accessToken)"
+            ],
+            bodyParameters: [
+                "comment": comment
+            ]
+        )
+    }
+
+    static func updateComment(
+        commentId: Int,
+        comment: String,
+        accessToken: String
+    ) throws -> Endpoint<PostSendCommentResponseDTO> {
+        try Endpoint(
+            path: .updateDeleteMessage,
+            pathParameters: [
+                "commentId": "\(commentId)"
+            ],
+            method: .put,
+            headerParameters: [
+                "Authorization": "Bearer \(accessToken)"
+            ],
+            bodyParameters: [
+                "comment": comment
+            ]
+        )
+    }
+
+    static func deleteComment(
+        commentId: Int,
+        accessToken: String
+    ) throws -> Endpoint<DefaultResponseDTO> {
+        try Endpoint(
+            path: .updateDeleteMessage,
+            pathParameters: [
+                "commentId": "\(commentId)"
+            ],
+            method: .delete,
+            headerParameters: [
+                "Authorization": "Bearer \(accessToken)"
             ]
         )
     }

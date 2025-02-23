@@ -23,6 +23,27 @@ public struct MenteeClient {
         _ menteeGoalId: Int,
         _ date: String
     ) async throws -> FetchWeeklyProgressResponseDTO.Response
+    public var updateTodo: (
+        _ menteeGoalId: Int,
+        _ todoId: Int,
+        _ status: TodoStatus
+    ) async throws -> Todo
+    public var fetchCommentRooms: (
+        _ page: Int
+    ) async throws -> FecthCommentRoomsResponseDTO.Response
+    public var fetchCommentDetail: (
+        _ page: Int,
+        _ roomId: Int
+    ) async throws -> FetchCommentDetailResponseDTO.Response
+    public var postMessage: (
+        _ roomId: Int,
+        _ comment: String
+    ) async throws -> CommentContent
+    public var updateMessage: (
+        _ commentId: Int,
+        _ comment: String
+    ) async throws -> CommentContent
+    public var deleteMessage: (_ commentId: Int) async throws -> Void
 }
 
 // MARK: - Live Implementation
@@ -69,6 +90,7 @@ extension MenteeClient: DependencyKey {
                     if response.code == "200" {
                         return
                     }
+                    print(response)
                     guard let code = Int(response.code) else {
                         throw NetworkError.invaildResponse
                     }
@@ -115,12 +137,97 @@ extension MenteeClient: DependencyKey {
                     else { throw NetworkError.emptyData }
                     return data
                 }
+            },
+            updateTodo: { menteeGoalId, todoId, status in
+                try await executeWithTokenValidation { accessToken in
+                    let  requestDTO = PatchTodoRequestDTO(
+                        todoStatus: status
+                    )
+                    let endpoint = try APIEndpoints.patchMenteeTodo(
+                        with: requestDTO,
+                        menteeGoalId: menteeGoalId,
+                        todoId: todoId,
+                        accessToken: accessToken
+                    )
+                    let response = try await networkClient.asyncRequest(with: endpoint)
+                    guard let data = response.data
+                    else { throw NetworkError.emptyData }
+                    return data
+                }
+            },
+            fetchCommentRooms: { page in
+                try await executeWithTokenValidation { accessToken in
+                    let requestDTO = PaginationRequestDTO(
+                        page: page,
+                        size: 20
+                    )
+                    let endpoint = APIEndpoints.fetchCommentRooms(
+                        with: requestDTO,
+                        accessToken: accessToken
+                    )
+                    let response = try await networkClient.asyncRequest(with: endpoint)
+                    guard let data = response.data
+                    else { throw NetworkError.emptyData }
+                    return data
+                }
+            },
+            fetchCommentDetail: { page, roomId in
+                try await executeWithTokenValidation { accessToken in
+                    let requestDTO = PaginationRequestDTO(
+                        page: page,
+                        size: 20
+                    )
+                    let endpoint = try APIEndpoints.fetchComentDetil(
+                        with: requestDTO,
+                        roomId: roomId,
+                        accessToken: accessToken
+                    )
+                    let response = try await networkClient.asyncRequest(with: endpoint)
+                    guard let data = response.data
+                    else { throw NetworkError.emptyData }
+                    return data
+                }
+            },
+            postMessage: { roomId, comment in
+                try await executeWithTokenValidation { accessToken in
+                    let endpoint = try APIEndpoints.postComentDetil(
+                        roomId: roomId,
+                        comment: comment,
+                        accessToken: accessToken
+                    )
+                    let response = try await networkClient.asyncRequest(with: endpoint)
+                    return response.data
+                }
+            },
+            updateMessage: { commentId, comment in
+                try await executeWithTokenValidation { accessToken in
+                    let endpoint = try APIEndpoints.updateComment(
+                        commentId: commentId,
+                        comment: comment,
+                        accessToken: accessToken
+                    )
+                    let response = try await networkClient.asyncRequest(with: endpoint)
+                    return response.data
+                }
+            },
+            deleteMessage: { commentId in
+                try await executeWithTokenValidation { accessToken in
+                    let endpoint = try APIEndpoints.deleteComment(
+                        commentId: commentId,
+                        accessToken: accessToken
+                    )
+                    let response = try await networkClient.asyncRequest(with: endpoint)
+                    guard "200" == response.code
+                    else { throw NetworkError.invaildResponse }
+                    return
+                }
             }
         )
     }
 
     public static var testValue = MenteeClient(
-        fetchMenteeInfo: { FetchMenteeInfoResponseDTO.dummy.data! },
+        fetchMenteeInfo: { FetchMenteeInfoResponseDTO.dummy.data!
+        },
         joinGoal: { _ in },
         fetchMyGoals: { _ in
             FetchMyGoalsResponseDTO.dummy.data!
@@ -129,14 +236,95 @@ extension MenteeClient: DependencyKey {
             FetchMyGoalDetailResponseDTO.dummy.data!
         },
         fetchWeeklyProgress: { _, _ in FetchWeeklyProgressResponseDTO.dummy.data!
-        }
+        },
+        updateTodo: { _, _, status in
+            return Todo.dummy
+        },
+        fetchCommentRooms: { page in
+            let startId = (page - 1) * 20 + 1
+            return .init(
+                commentRooms: (0..<20).map { index in
+                    let id = startId + index
+                    return CommentRoom(
+                        id: id,
+                        menteeGoalId: id + 100,
+                        menteeGoalTitle: "목표 제목 #\(id)",
+                        startDate: "2025-01-\(String(format: "%02d", id % 28 + 1))",
+                        endDate: "2025-02-\(String(format: "%02d", id % 28 + 1))",
+                        menteeName: "멘티 #\(id)",
+                        mentorName: "멘토 #\(id)",
+                        mentorProfileImage: "https://example.com/profile-\(id).jpg",
+                        newCommentsCount: Int.random(in: 0...5)
+                    )
+                },
+                page: .init(
+                    totalElements: 123,
+                    totalPages: 13,
+                    currentPage: page,
+                    pageSize: 10,
+                    nextPage: page < 13 ? page + 1 : page,
+                    prevPage: page > 1 ? page - 1 : page,
+                    hasNext: page < 13,
+                    hasPrev: page > 1
+                )
+            )
+        },
+        fetchCommentDetail: { page, _ in
+            let startId = (page - 1) * 20 + 1
+            
+            return .init(
+                comments: (0..<20).map { index in
+                    let id = startId + index
+                    let isEven = id % 2 == 0
+                    return CommentContent(
+                        id: id,
+                        comment: "안녕하세요 #\(id) 영어 단어 암기는 이렇게 하시면 될 것 같아요! 좋은 하루 보내세요 :)",
+                        commentedAt: "2025-02-\(String(format: "%02d", id % 28 + 1))T01:00:00.000Z",
+                        writer: isEven ? "ANNA" : "USER",
+                        writerRole: isEven ? .mentor : .mentee
+                    )
+                },
+                page: .init(
+                    totalElements: 123,
+                    totalPages: 13,
+                    currentPage: page,
+                    pageSize: 10,
+                    nextPage: page < 13 ? page + 1 : page,
+                    prevPage: page > 1 ? page - 1 : page,
+                    hasNext: page < 13,
+                    hasPrev: page > 1
+                )
+            )
+        },
+        postMessage: { _, comment in
+            return .init(
+                id: 100001,
+                comment: comment,
+                commentedAt: "2025-02-22T17:52:07.898Z",
+                writer: "",
+                writerRole: .mentee
+            )
+        },
+        updateMessage: { commentId, comment in
+            return .init(
+                id: commentId,
+                comment: comment,
+                commentedAt: "2025-02-22T17:52:07.898Z",
+                writer: "sd",
+                writerRole: .mentee
+            )
+        },
+        deleteMessage: { commentId in }
     )
 
     public static var previewValue = MenteeClient(
-        fetchMenteeInfo: { FetchMenteeInfoResponseDTO.dummy.data! },
+        fetchMenteeInfo: {
+            try await Task.sleep(nanoseconds: 2_000_000_000)
+            return FetchMenteeInfoResponseDTO.dummy.data!
+        },
         joinGoal: { _ in },
         fetchMyGoals: { page in
-            try await Task.sleep(nanoseconds: 1_000_000_000)
+            try await Task.sleep(nanoseconds: 2_000_000_000)
             let startId = (page - 1) * 20 + 1
             return FetchMyGoalsResponseDTO.Response.init(
                 menteeGoals: (0..<20).map { index in
@@ -173,10 +361,99 @@ extension MenteeClient: DependencyKey {
             )
         },
         fetchMyGoalDetail: { _, _ in
-            FetchMyGoalDetailResponseDTO.dummy.data!
+            try await Task.sleep(nanoseconds: 4_000_000_000)
+            return FetchMyGoalDetailResponseDTO.dummy.data!
         },
-        fetchWeeklyProgress: { _, _ in FetchWeeklyProgressResponseDTO.dummy.data!
-        }
+        fetchWeeklyProgress: { _, _ in
+            try await Task.sleep(nanoseconds: 2_000_000_000)
+            return FetchWeeklyProgressResponseDTO.dummy.data!
+        },
+        updateTodo: { _, todoId, status in
+            try await Task.sleep(nanoseconds: 2_000_000_000)
+            return .init(
+                id: todoId,
+                todoDate: nil,
+                estimatedMinutes: 50,
+                description: "hello",
+                mentorTip: "hello",
+                todoStatus: status == .completed ? .todo : .completed
+            )
+        },
+        fetchCommentRooms: { page in
+            let startId = (page - 1) * 10 + 1
+            return .init(
+                commentRooms: (0..<10).map { index in
+                    let id = startId + index
+                    return CommentRoom(
+                        id: id,
+                        menteeGoalId: id + 100,
+                        menteeGoalTitle: "목표 제목 #\(id)",
+                        startDate: "2025-01-\(String(format: "%02d", id % 28 + 1))",
+                        endDate: "2025-02-\(String(format: "%02d", id % 28 + 1))",
+                        menteeName: "멘티 #\(id)",
+                        mentorName: "멘토 #\(id)",
+                        mentorProfileImage: "https://example.com/profile-\(id).jpg",
+                        newCommentsCount: Int.random(in: 0...5)
+                    )
+                },
+                page: .init(
+                    totalElements: 123,
+                    totalPages: 13,
+                    currentPage: page,
+                    pageSize: 10,
+                    nextPage: page < 13 ? page + 1 : page,
+                    prevPage: page > 1 ? page - 1 : page,
+                    hasNext: page < 13,
+                    hasPrev: page > 1
+                )
+            )
+        }, fetchCommentDetail: { page, _ in
+            let startId = 20 * (20 - page + 1) // 가장 높은 ID부터 시작
+            return .init(
+                comments: (0..<20).map { index in
+                    let id = startId - index
+                    let isEven = id % 2 == 0
+                    return CommentContent(
+                        id: id,
+                        comment: "안녕하세요 #\(id) 영어 단어 암기는 이렇게 하시면 될 것 같아요! 좋은 하루 보내세요 :)",
+                        commentedAt: "2025-02-\(String(format: "%02d", id % 28 + 1))T01:00:00.000Z",
+                        writer: isEven ? "ANNA" : "USER",
+                        writerRole: isEven ? .mentor : .mentee
+                    )
+                },
+                page: .init(
+                    totalElements: 400,
+                    totalPages: 20,
+                    currentPage: page,
+                    pageSize: 10,
+                    nextPage: page < 20 ? page + 1 : page,
+                    prevPage: page > 1 ? page - 1 : page,
+                    hasNext: page < 20,
+                    hasPrev: page > 1
+                )
+            )
+        },
+        postMessage: { _, comment in
+            return .init(
+                id: 100001,
+                comment: comment,
+                commentedAt: "2025-02-22T17:52:07.898Z",
+                writer: "",
+                writerRole: .mentee
+            )
+        },
+        updateMessage: {
+            commentId,
+            comment in
+            return .init(
+                id: commentId,
+                comment: comment,
+                commentedAt: "2025-02-22T17:52:07.898Z",
+                writer: "sd",
+                writerRole: .mentee
+            )
+        },
+        deleteMessage: { commentId in }
     )
 }
 

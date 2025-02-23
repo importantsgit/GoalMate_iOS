@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Utils
 
 struct DefaultResponseDTO: Codable {
     let status: String
@@ -152,7 +153,6 @@ public struct FetchGoalsResponseDTO: Codable {
             public let updatedAt: String?
             public let mainImage: String?
             public enum GoalStatus: String, Codable {
-                case upcoming   = "UPCOMING"
                 case open       = "OPEN"
                 case closed     = "CLOSED"
             }
@@ -168,12 +168,6 @@ public struct FetchGoalsResponseDTO: Codable {
                 case updatedAt = "updated_at"
                 case mainImage = "main_image"
             }
-        }
-        // MARK: - Page
-        public struct Page: Codable {
-            let totalElements, totalPages, currentPage, pageSize: Int?
-            let nextPage, prevPage: Int?
-            public let hasNext, hasPrev: Bool?
         }
     }
 }
@@ -201,8 +195,8 @@ public struct FetchGoalDetailResponseDTO: Codable {
         public let midObjectives: [MidObjective]
         public let thumbnailImages: [ContentImage]
         public let contentImages: [ContentImage]
+        public let isParticipated: Bool
         public enum GoalStatus: String, Codable {
-            case upcoming   = "UPCOMING"
             case open       = "OPEN"
             case closed     = "CLOSED"
         }
@@ -220,6 +214,7 @@ public struct FetchGoalDetailResponseDTO: Codable {
             case midObjectives = "mid_objectives"
             case thumbnailImages = "thumbnail_images"
             case contentImages = "content_images"
+            case isParticipated = "is_participated"
         }
         public struct WeeklyObjective: Codable {
             public let weekNumber: Int?
@@ -244,224 +239,309 @@ struct JoinGoalResponseDTO: Codable {
     let status: String
     let code: String
     let message: String
+    let data: Int
 }
 
 public struct FetchMyGoalsResponseDTO: Codable {
-   let status: String
-   let code: String
-   let message: String
-   let data: Response?
-   
-   public struct Response: Codable {
-       public let menteeGoals: [MenteeGoal]
-       public let page: Page?
-       
-       public enum CodingKeys: String, CodingKey {
-           case menteeGoals = "mentee_goals"
-           case page
-       }
+    let status: String
+    let code: String
+    let message: String
+    let data: Response?
 
-       // MARK: - MenteeGoal
-       public struct MenteeGoal: Codable {
-           public let id: Int
-           public let title: String?
-           public let topic: String?
-           public let mentorName: String?
-           public let mainImage: String?
-           public let startDate: String?
-           public let endDate: String?
-           public let finalComment: String?
-           public let todayTodoCount: Int?
-           public let todayCompletedCount: Int?
-           public let todayRemainingCount: Int?
-           public let totalTodoCount: Int?
-           public let totalCompletedCount: Int?
-           public let menteeGoalStatus: MenteeGoalStatus?
-           public let createdAt: String?
-           public let updatedAt: String?
-           public enum MenteeGoalStatus: String, Codable {
-               case inProgress  = "IN_PROGRESS"
-               case completed   = "COMPLETED"
-               case failed      = "FAILED"
-               case canceled    = "CANCELED"
-           }
-           public enum CodingKeys: String, CodingKey {
-               case id, title, topic
-               case mentorName = "mentor_name"
-               case mainImage = "main_image"
-               case startDate = "start_date"
-               case endDate = "end_date"
-               case finalComment = "final_comment"
-               case todayTodoCount = "today_todo_count"
-               case todayCompletedCount = "today_completed_count"
-               case todayRemainingCount = "today_remaining_count"
-               case totalTodoCount = "total_todo_count"
-               case totalCompletedCount = "total_completed_count"
-               case menteeGoalStatus = "mentee_goal_status"
-               case createdAt = "created_at"
-               case updatedAt = "updated_at"
-           }
-       }
-       
-       // MARK: - Page
-       public struct Page: Codable {
-           public let totalElements: Int?
-           public let totalPages: Int?
-           public let currentPage: Int?
-           public let pageSize: Int?
-           public let nextPage: Int?
-           public let prevPage: Int?
-           public let hasNext: Bool?
-           public let hasPrev: Bool?
-           
-           public enum CodingKeys: String, CodingKey {
-               case totalElements = "totalElements"
-               case totalPages = "totalPages"
-               case currentPage = "currentPage"
-               case pageSize = "pageSize"
-               case nextPage = "nextPage"
-               case prevPage = "prevPage"
-               case hasNext = "hasNext"
-               case hasPrev = "hasPrev"
-           }
-       }
-   }
+    public struct Response: Codable {
+        public let menteeGoals: [MenteeGoal]
+        public let page: Page?
+
+        public enum CodingKeys: String, CodingKey {
+            case menteeGoals = "mentee_goals"
+            case page
+        }
+
+        // MARK: - MenteeGoal
+        public struct MenteeGoal: Codable {
+            public let id: Int
+            public let title: String?
+            public let topic: String?
+            public let mentorName: String?
+            public let mainImage: String?
+            public let startDate: String?
+            public let endDate: String?
+            public let finalComment: String?
+            public let todayTodoCount: Int?
+            public let todayCompletedCount: Int?
+            public let todayRemainingCount: Int?
+            public let totalTodoCount: Int?
+            public let totalCompletedCount: Int?
+            public let menteeGoalStatus: MenteeGoalStatus?
+            public let createdAt: String?
+            public let updatedAt: String?
+            public enum MenteeGoalStatus: String, Codable {
+                case inProgress  = "IN_PROGRESS"
+                case completed   = "COMPLETED"
+                case failed      = "FAILED"
+                case canceled    = "CANCELED"
+            }
+            public enum CodingKeys: String, CodingKey {
+                case id, title, topic
+                case mentorName = "mentor_name"
+                case mainImage = "main_image"
+                case startDate = "start_date"
+                case endDate = "end_date"
+                case finalComment = "final_comment"
+                case todayTodoCount = "today_todo_count"
+                case todayCompletedCount = "today_completed_count"
+                case todayRemainingCount = "today_remaining_count"
+                case totalTodoCount = "total_todo_count"
+                case totalCompletedCount = "total_completed_count"
+                case menteeGoalStatus = "mentee_goal_status"
+                case createdAt = "created_at"
+                case updatedAt = "updated_at"
+            }
+        }
+    }
 }
 
 public struct FetchMyGoalDetailResponseDTO: Codable {
-   let status: String
-   let code: String
-   let message: String
-   let data: Response?
-   
-   public struct Response: Codable {
-       public let date: String?
-       public let menteeGoal: MenteeGoal?
-       public let todos: [Todo]?
-       
-       public enum CodingKeys: String, CodingKey {
-           case date
-           case menteeGoal = "mentee_goal"
-           case todos
-       }
-       
-       // MARK: - MenteeGoal
-       public struct MenteeGoal: Codable {
-           public let id: Int
-           public let title: String?
-           public let topic: String?
-           public let mentorName: String?
-           public let mainImage: String?
-           public let startDate: String?
-           public let endDate: String?
-           public let mentorLetter: String?
-           public let todayTodoCount: Int?
-           public let todayCompletedCount: Int?
-           public let todayRemainingCount: Int?
-           public let totalTodoCount: Int?
-           public let totalCompletedCount: Int?
-           public let menteeGoalStatus: MenteeGoalStatus?
-           public let createdAt: String?
-           public let updatedAt: String?
-           
-           public enum MenteeGoalStatus: String, Codable {
-               case inProgress = "IN_PROGRESS"
-               case completed = "COMPLETED"
-               case failed = "FAILED"
-               case canceled = "CANCELED"
-           }
-           
-           public enum CodingKeys: String, CodingKey {
-               case id, title, topic
-               case mentorName = "mentor_name"
-               case mainImage = "main_image"
-               case startDate = "start_date"
-               case endDate = "end_date"
-               case mentorLetter = "mentor_letter"
-               case todayTodoCount = "today_todo_count"
-               case todayCompletedCount = "today_completed_count"
-               case todayRemainingCount = "today_remaining_count"
-               case totalTodoCount = "total_todo_count"
-               case totalCompletedCount = "total_completed_count"
-               case menteeGoalStatus = "mentee_goal_status"
-               case createdAt = "created_at"
-               case updatedAt = "updated_at"
-           }
-       }
-       
-       // MARK: - Todo
-       public struct Todo: Codable {
-           public let id: Int
-           public let todoDate: String?
-           public let estimatedMinutes: Int?
-           public let description: String?
-           public let mentorTip: String?
-           public let todoStatus: TodoStatus?
- 
-           public enum TodoStatus: String, Codable {
-               case todo = "TODO"
-               case inProgress = "IN_PROGRESS"
-               case completed = "COMPLETED"
-           }
-  
-           public enum CodingKeys: String, CodingKey {
-               case id
-               case todoDate = "todo_date"
-               case estimatedMinutes = "estimated_minutes"
-               case description
-               case mentorTip = "mentor_tip"
-               case todoStatus = "todo_status"
-           }
-       }
-   }
+    let status: String
+    let code: String
+    let message: String
+    let data: Response?
+
+    public struct Response: Codable, Identifiable, Equatable {
+        public var id: String { date }
+
+        public let date: String
+        public var menteeGoal: MenteeGoal?
+        public var todos: [Todo]
+
+        public enum CodingKeys: String, CodingKey {
+            case date
+            case menteeGoal = "mentee_goal"
+            case todos
+        }
+
+        // MARK: - MenteeGoal
+        public struct MenteeGoal: Codable, Identifiable, Equatable {
+            public let id: Int
+            public let title: String?
+            public let topic: String?
+            public let mentorName: String?
+            public let mainImage: String?
+            public let startDate: String?
+            public let endDate: String?
+            public let mentorLetter: String?
+            public let todayTodoCount: Int?
+            public var todayCompletedCount: Int?
+            public var todayRemainingCount: Int?
+            public let totalTodoCount: Int?
+            public let totalCompletedCount: Int?
+            public let menteeGoalStatus: MenteeGoalStatus?
+            public let createdAt: String?
+            public let updatedAt: String?
+            public let commentRoomId: Int
+
+            public enum MenteeGoalStatus: String, Codable {
+                case inProgress = "IN_PROGRESS"
+                case completed = "COMPLETED"
+                case failed = "FAILED"
+                case canceled = "CANCELED"
+            }
+
+            public enum CodingKeys: String, CodingKey {
+                case id, title, topic
+                case mentorName = "mentor_name"
+                case mainImage = "main_image"
+                case startDate = "start_date"
+                case endDate = "end_date"
+                case mentorLetter = "mentor_letter"
+                case todayTodoCount = "today_todo_count"
+                case todayCompletedCount = "today_completed_count"
+                case todayRemainingCount = "today_remaining_count"
+                case totalTodoCount = "total_todo_count"
+                case totalCompletedCount = "total_completed_count"
+                case menteeGoalStatus = "mentee_goal_status"
+                case createdAt = "created_at"
+                case updatedAt = "updated_at"
+                case commentRoomId = "comment_room_id"
+            }
+        }
+
+        public static func == (
+            lhs: FetchMyGoalDetailResponseDTO.Response,
+            rhs: FetchMyGoalDetailResponseDTO.Response) -> Bool {
+            lhs.id == rhs.id
+        }
+    }
 }
 
 public struct FetchWeeklyProgressResponseDTO: Codable {
+    let status: String
+    let code: String
+    let message: String
+    let data: Response?
+
+    public struct Response: Codable {
+        public let progress: [DailyProgress]
+        public let hasLastWeek: Bool?
+        public let hasNextWeek: Bool?
+
+        public enum CodingKeys: String, CodingKey {
+            case progress
+            case hasLastWeek = "has_last_week"
+            case hasNextWeek = "has_next_week"
+        }
+    }
+}
+
+public struct PatchTodoRequestDTO: Codable {
+    let todoStatus: TodoStatus
+    public enum CodingKeys: String, CodingKey {
+        case todoStatus = "todo_status"
+    }
+}
+
+public struct PatchTodoResponseDTO: Codable {
    let status: String
    let code: String
    let message: String
-   let data: Response?
-   
-   public struct Response: Codable {
-       public let progress: [DailyProgress]?
-       public let hasLastWeek: Bool?
-       public let hasNextWeek: Bool?
-       
-       public enum CodingKeys: String, CodingKey {
-           case progress
-           case hasLastWeek = "has_last_week"
-           case hasNextWeek = "has_next_week"
-       }
-       
-       // MARK: - DailyProgress
-       public struct DailyProgress: Codable {
-           public let dailyTodoCount: Int?
-           public let completedDailyTodoCount: Int?
-           public let date: String?
-           public let dayOfWeek: DayOfWeek?
-           public let isValid: Bool?
-           
-           public enum DayOfWeek: String, Codable {
-               case sunday = "SUN"
-               case monday = "MON"
-               case tuesday = "TUE"
-               case wednesday = "WED"
-               case thursday = "THU"
-               case friday = "FRI"
-               case saturday = "SAT"
-           }
-           
-           public enum CodingKeys: String, CodingKey {
-               case dailyTodoCount = "daily_todo_count"
-               case completedDailyTodoCount = "completed_daily_todo_count"
-               case date
-               case dayOfWeek = "day_of_week"
-               case isValid = "is_valid"
-           }
-       }
-   }
+   let data: Todo?
 }
 
+public struct FecthCommentRoomsResponseDTO: Codable {
+    let status: String
+    let code: String
+    let message: String
+    let data: Response?
+
+    public struct Response: Codable {
+        public let commentRooms: [CommentRoom]
+        public let page: Page
+
+        enum CodingKeys: String, CodingKey {
+            case commentRooms = "comment_rooms"
+            case page
+        }
+    }
+}
+
+public struct FetchCommentDetailResponseDTO: Codable {
+    let status: String
+    let code: String
+    let message: String
+    let data: Response?
+    
+    public struct Response: Codable {
+        public let comments: [CommentContent]
+        public let page: Page
+    }
+}
+
+public struct PostSendCommentResponseDTO: Codable {
+    let status: String
+    let code: String
+    let message: String
+    let data: CommentContent
+}
+
+public struct CreateCommentRequestDTO: Codable {
+    let comment: String
+}
+
+public struct Page: Codable {
+    let totalElements, totalPages, currentPage, pageSize: Int?
+    let nextPage, prevPage: Int?
+    public let hasNext, hasPrev: Bool?
+}
+
+public struct Todo: Identifiable, Codable, Hashable, Equatable {
+    public let id: Int
+    public let todoDate: String?
+    public let estimatedMinutes: Int?
+    public let description: String?
+    public let mentorTip: String?
+    public var isShowTip: Bool = false
+    public var todoStatus: TodoStatus
+    public enum CodingKeys: String, CodingKey {
+        case id
+        case todoDate = "todo_date"
+        case estimatedMinutes = "estimated_minutes"
+        case description
+        case mentorTip = "mentor_tip"
+        case todoStatus = "todo_status"
+    }
+}
+
+public enum TodoStatus: String, Codable {
+    case todo = "TODO"           // 할일
+    case completed = "COMPLETED" // 완료
+}
+
+public struct DailyProgress: Codable, Hashable, Equatable, Identifiable {
+    public var id: String { date ?? "" }  // date를 id로 사용
+    public let dailyTodoCount: Int?
+    public let completedDailyTodoCount: Int?
+    public let date: String?
+    public let dayOfWeek: DayOfWeek?
+    public let isValid: Bool?
+    public enum DayOfWeek: String, Codable {
+        case sunday = "SUNDAY"
+        case monday = "MONDAY"
+        case tuesday = "TUESDAY"
+        case wednesday = "WEDNESDAY"
+        case thursday = "THURSDAY"
+        case friday = "FRIDAY"
+        case saturday = "SATURDAY"
+    }
+    public enum CodingKeys: String, CodingKey {
+        case dailyTodoCount = "daily_todo_count"
+        case completedDailyTodoCount = "completed_daily_todo_count"
+        case date
+        case dayOfWeek = "day_of_week"
+        case isValid = "is_valid"
+    }
+}
+
+// MARK: - CommentRoom
+public struct CommentRoom: Codable, Identifiable, Equatable {
+    public let id: Int
+    public let menteeGoalId: Int
+    public let menteeGoalTitle: String?
+    public let startDate: String?
+    public let endDate: String?
+    public let menteeName: String?
+    public let mentorName: String?
+    public let mentorProfileImage: String?
+    public let newCommentsCount: Int?
+
+    enum CodingKeys: String, CodingKey {
+        case id = "comment_room_id"
+        case menteeGoalId = "mentee_goal_id"
+        case menteeGoalTitle = "mentee_goal_title"
+        case startDate = "start_date"
+        case endDate = "end_date"
+        case menteeName = "mentee_name"
+        case mentorName = "mentor_name"
+        case mentorProfileImage = "mentor_profile_image"
+        case newCommentsCount = "new_comments_count"
+    }
+}
+
+public struct CommentContent: Codable, Identifiable, Equatable {
+    public let id: Int
+    public let comment: String?
+    public let commentedAt: String?
+    public let writer: String?
+    public let writerRole: WriterRole?
+    public enum CodingKeys: String, CodingKey {
+        case id, comment, writer
+        case commentedAt = "commented_at"
+        case writerRole = "writer_role"
+    }
+    public enum WriterRole: String, Codable {
+        case mentor = "MENTOR"
+        case mentee = "MENTEE"
+    }
+}
 
 extension FetchGoalsResponseDTO {
     static let dummyList = FetchGoalsResponseDTO(
@@ -512,7 +592,7 @@ extension FetchGoalsResponseDTO {
                     participantsLimit: 15,
                     currentParticipants: 8,
                     isClosingSoon: false,
-                    goalStatus: .upcoming,
+                    goalStatus: .open,
                     mentorName: "코드마스터",
                     createdAt: "2025-02-13T15:30:00Z",
                     updatedAt: "2025-02-13T15:30:00Z",
@@ -534,45 +614,48 @@ extension FetchGoalsResponseDTO {
 }
 
 extension FetchGoalDetailResponseDTO {
-    static let dummy = FetchGoalDetailResponseDTO(
-        status: "SUCCESS",
-        code: "200",
-        message: "정상적으로 처리되었습니다.",
-        data: .init(
-            id: 1,
-            title: "다온과 함께하는 영어 완전 정복 30일 목표",
-            topic: "영어",
-            description: "영어를 하고 싶었지만 어떤 방법으로 해야 할 지, 루틴을 세우지만 어떤 방법이 효율적일지 고민이 많지 않았나요?",
-            period: 30,
-            dailyDuration: 4,
-            participantsLimit: 10,
-            currentParticipants: 5,
-            isClosingSoon: true,
-            goalStatus: .open,
-            mentorName: "다온",
-            createdAt: nil,
-            updatedAt: nil,
-            weeklyObjectives: [
-                .init(weekNumber: 1, description: "간단한 단어부터 시작하기"),
-                .init(weekNumber: 2, description: "기초 문법 마스터하기"),
-                .init(weekNumber: 3, description: "일상 회화 연습하기"),
-                .init(weekNumber: 4, description: "자신감 있게 대화하기")
-            ],
-            midObjectives: [
-                .init(number: 1, description: "영어로 원어민과 편안하게 대화하는 법"),
-                .init(number: 2, description: "영어 공부 루틴 만들기"),
-                .init(number: 3, description: "회화에 자주 쓰이는 표현 익히기")
-            ],
-            thumbnailImages: [
-                .init(sequence: 1, imageUrl: "https://example.com/thumbnail1.jpg"),
-                .init(sequence: 1, imageUrl: "https://example.com/thumbnail2.jpg")
-            ],
-            contentImages: [
-                .init(sequence: 1, imageUrl: "https://example.com/thumbnail1.jpg"),
-                .init(sequence: 1, imageUrl: "https://example.com/thumbnail2.jpg")
-            ]
+    static func getDummy(isParticipated: Bool) -> FetchGoalDetailResponseDTO {
+        FetchGoalDetailResponseDTO(
+            status: "SUCCESS",
+            code: "200",
+            message: "정상적으로 처리되었습니다.",
+            data: .init(
+                id: 1,
+                title: "다온과 함께하는 영어 완전 정복 30일 목표",
+                topic: "영어",
+                description: "영어를 하고 싶었지만 어떤 방법으로 해야 할 지, 루틴을 세우지만 어떤 방법이 효율적일지 고민이 많지 않았나요?",
+                period: 30,
+                dailyDuration: 4,
+                participantsLimit: 10,
+                currentParticipants: 5,
+                isClosingSoon: true,
+                goalStatus: .open,
+                mentorName: "다온",
+                createdAt: nil,
+                updatedAt: nil,
+                weeklyObjectives: [
+                    .init(weekNumber: 1, description: "간단한 단어부터 시작하기"),
+                    .init(weekNumber: 2, description: "기초 문법 마스터하기"),
+                    .init(weekNumber: 3, description: "일상 회화 연습하기"),
+                    .init(weekNumber: 4, description: "자신감 있게 대화하기")
+                ],
+                midObjectives: [
+                    .init(number: 1, description: "영어로 원어민과 편안하게 대화하는 법"),
+                    .init(number: 2, description: "영어 공부 루틴 만들기"),
+                    .init(number: 3, description: "회화에 자주 쓰이는 표현 익히기")
+                ],
+                thumbnailImages: [
+                    .init(sequence: 1, imageUrl: "https://example.com/thumbnail1.jpg"),
+                    .init(sequence: 1, imageUrl: "https://example.com/thumbnail2.jpg")
+                ],
+                contentImages: [
+                    .init(sequence: 1, imageUrl: "https://example.com/thumbnail1.jpg"),
+                    .init(sequence: 1, imageUrl: "https://example.com/thumbnail2.jpg")
+                ],
+                isParticipated: isParticipated
+            )
         )
-    )
+    }
 }
 
 extension FetchMenteeInfoResponseDTO {
@@ -743,7 +826,7 @@ extension FetchMyGoalsResponseDTO {
                     updatedAt: "2025-02-19T14:20:00.000Z"
                 )
             ],
-            page: Response.Page(
+            page: Page(
                 totalElements: 8,
                 totalPages: 4,
                 currentPage: 1,
@@ -758,90 +841,153 @@ extension FetchMyGoalsResponseDTO {
 }
 
 extension FetchMyGoalDetailResponseDTO {
-   public static let dummy = FetchMyGoalDetailResponseDTO(
-       status: "SUCCESS",
-       code: "200",
-       message: "정상적으로 처리되었습니다.",
-       data: Response(
-           date: "2025-02-18",
-           menteeGoal: Response.MenteeGoal(
-               id: 1,
-               title: "다온과 함께하는 영어 완전 정복 30일 목표",
-               topic: "영어",
-               mentorName: "다온",
-               mainImage: "https://main-image.url",
-               startDate: "2025-02-18",
-               endDate: "2025-02-18",
-               mentorLetter: "오늘도 열심히 해봅시다!",
-               todayTodoCount: 5,
-               todayCompletedCount: 3,
-               todayRemainingCount: 2,
-               totalTodoCount: 100,
-               totalCompletedCount: 50,
-               menteeGoalStatus: .inProgress,
-               createdAt: "2025-02-18T17:56:07.894Z",
-               updatedAt: "2025-02-18T17:56:07.894Z"
-           ),
-           todos: [
-               Response.Todo(
-                   id: 1,
-                   todoDate: "2025-02-18",
-                   estimatedMinutes: 50,
-                   description: "영어 단어 보카 30개 암기",
-                   mentorTip: "예문을 반드시 5회 이상 읽어보세요!",
-                   todoStatus: .todo
-               ),
-               Response.Todo(
-                   id: 2,
-                   todoDate: "2025-02-18",
-                   estimatedMinutes: 30,
-                   description: "리스닝 연습하기",
-                   mentorTip: "스크립트를 먼저 읽고 들어보세요",
-                   todoStatus: .completed
-               )
-           ]
-       )
-   )
+    public static let dummy = FetchMyGoalDetailResponseDTO(
+        status: "SUCCESS",
+        code: "200",
+        message: "정상적으로 처리되었습니다.",
+        data: Response(
+            date: "2025-02-18",
+            menteeGoal: Response.MenteeGoal(
+                id: 1,
+                title: "다온과 함께하는 영어 완전 정복 30일 목표",
+                topic: "영어",
+                mentorName: "다온",
+                mainImage: "https://main-image.url",
+                startDate: "2025-02-18",
+                endDate: "2025-03-24",
+                mentorLetter: "오늘도 열심히 해봅시다!",
+                todayTodoCount: 4,
+                todayCompletedCount: 0,
+                todayRemainingCount: 4,
+                totalTodoCount: 100,
+                totalCompletedCount: 50,
+                menteeGoalStatus: .inProgress,
+                createdAt: "2025-02-18T17:56:07.894Z",
+                updatedAt: "2025-02-18T17:56:07.894Z",
+                commentRoomId: 1
+            ),
+            todos: [
+                Todo(
+                    id: 1,
+                    todoDate: "2025-02-18",
+                    estimatedMinutes: 50,
+                    description: "영어 단어 보카 30개 암기",
+                    mentorTip: "예문을 반드시 5회 이상 읽어보세요!",
+                    todoStatus: .todo
+                ),
+                Todo(
+                    id: 2,
+                    todoDate: "2025-02-18",
+                    estimatedMinutes: 30,
+                    description: "리스닝 연습하기",
+                    mentorTip: nil,
+                    todoStatus: .todo
+                ),
+                Todo(
+                    id: 3,
+                    todoDate: "2025-02-18",
+                    estimatedMinutes: 30,
+                    description: "??",
+                    mentorTip: "스크립트를 먼저 읽고 들어보세요, 스크립트를 먼저 읽고 들어보세요, 스크립트를 먼저 읽고 들어보세요",
+                    todoStatus: .todo
+                ),
+                Todo(
+                    id: 4,
+                    todoDate: "2025-02-18",
+                    estimatedMinutes: 30,
+                    description: "리스닝 연습하기",
+                    mentorTip: nil,
+                    todoStatus: .todo
+                )
+            ]
+        )
+    )
 }
 
 extension FetchWeeklyProgressResponseDTO {
-   public static let dummy = FetchWeeklyProgressResponseDTO(
-       status: "SUCCESS",
-       code: "200",
-       message: "정상적으로 처리되었습니다.",
-       data: Response(
-           progress: [
-               Response.DailyProgress(
-                   dailyTodoCount: 5,
-                   completedDailyTodoCount: 3,
-                   date: "2025-02-17",
-                   dayOfWeek: .monday,
-                   isValid: true
-               ),
-               Response.DailyProgress(
-                   dailyTodoCount: 4,
-                   completedDailyTodoCount: 4,
-                   date: "2025-02-18",
-                   dayOfWeek: .tuesday,
-                   isValid: true
-               ),
-               Response.DailyProgress(
-                   dailyTodoCount: 6,
-                   completedDailyTodoCount: 2,
-                   date: "2025-02-19",
-                   dayOfWeek: .wednesday,
-                   isValid: true
-               ),
-               Response.DailyProgress(
-                   dailyTodoCount: 5,
-                   completedDailyTodoCount: 0,
-                   date: "2025-02-20",
-                   dayOfWeek: .thursday,
-                   isValid: false
-               )
-           ],
-           hasLastWeek: true,
-           hasNextWeek: true
-       )
-   )
+    public static let dummy = FetchWeeklyProgressResponseDTO(
+        status: "SUCCESS",
+        code: "200",
+        message: "정상적으로 처리되었습니다.",
+        data: Response(
+            progress: [
+                DailyProgress(
+                    dailyTodoCount: 5,
+                    completedDailyTodoCount: 3,
+                    date: "2025-02-17",
+                    dayOfWeek: .monday,
+                    isValid: true
+                ),
+                DailyProgress(
+                    dailyTodoCount: 4,
+                    completedDailyTodoCount: 4,
+                    date: "2025-02-18",
+                    dayOfWeek: .tuesday,
+                    isValid: true
+                ),
+                DailyProgress(
+                    dailyTodoCount: 6,
+                    completedDailyTodoCount: 2,
+                    date: "2025-02-19",
+                    dayOfWeek: .wednesday,
+                    isValid: true
+                ),
+                DailyProgress(
+                    dailyTodoCount: 5,
+                    completedDailyTodoCount: 0,
+                    date: "2025-02-20",
+                    dayOfWeek: .thursday,
+                    isValid: false
+                )
+            ],
+            hasLastWeek: true,
+            hasNextWeek: true
+        )
+    )
+}
+
+extension Todo {
+    static let dummy = Todo(
+        id: 1234,
+        todoDate: "2025-02-21",
+        estimatedMinutes: 50,
+        description: "영어 단어 보카 30개 암기",
+        mentorTip: "예문을 반드시 5회 이상 읽어보세요!",
+        todoStatus: .todo
+    )
+    static let dummies = [
+        Todo(
+            id: 1234,
+            todoDate: "2025-02-21",
+            estimatedMinutes: 50,
+            description: "영어 단어 보카 30개 암기",
+            mentorTip: "예문을 반드시 5회 이상 읽어보세요!",
+            todoStatus: .todo
+        ),
+        Todo(
+            id: 1235,
+            todoDate: "2025-02-21",
+            estimatedMinutes: 30,
+            description: "수학 문제 10개 풀기",
+            mentorTip: "개념을 먼저 복습하세요",
+            todoStatus: .todo
+        ),
+        Todo(
+            id: 1236,
+            todoDate: "2025-02-21",
+            estimatedMinutes: 40,
+            description: "과학 리포트 작성",
+            mentorTip: "참고자료를 꼭 첨부하세요",
+            todoStatus: .todo
+        )
+    ]
+}
+
+extension PatchTodoResponseDTO {
+    static let dummy = PatchTodoResponseDTO(
+        status: "SUCCESS",
+        code: "200",
+        message: "정상적으로 처리되었습니다.",
+        data: Todo.dummy
+    )
 }
