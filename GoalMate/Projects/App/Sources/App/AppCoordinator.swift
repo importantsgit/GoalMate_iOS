@@ -70,43 +70,22 @@ struct AppCoordinator {
             switch action {
             case .appDelegate:
                 return .none
-            case .router(
-                .routeAction(
+            case .router(.routeAction(
                     _,
-                    action: .intro(.coordinatorFinished)
-                )
-            ):
+                    action: .intro(.coordinatorFinished))):
                 state.routes = [
-                    .root(.tab(.init()))
+                    .root(.tab(.init()), embedInNavigationView: true)
                 ]
                 return .none
-            case .router(
-                .routeAction(
-                    _,
-                    action: .tab(.goal(.showLogin))
-                )
-            ):
-                state.routes.presentCover(.signUp(.init()))
+            case .router(.routeAction(
+                _,
+                action: .tab(.coordinator(.showLogin)))):
+                state.routes.push(.signUp(.init()))
                 return .none
-            case .router(
-                .routeAction(
+            case .router(.routeAction(
                     _,
-                    action: .signUp(
-                        .router(.routeAction(
-                            _,
-                            action: .signUp(.auth(.backButtonTapped))))
-                    )
-                )
-            ):
-                state.routes.dismiss()
-                return .none
-            case .router(
-                .routeAction(
-                    _,
-                    action: .signUp(.coordinatorFinished)
-                )
-            ):
-                state.routes.dismiss()
+                    action: .signUp(.coordinatorFinished))):
+                state.routes.pop()
                 return .none
             case .didChangeScenePhase:
                 return .none

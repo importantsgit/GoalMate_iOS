@@ -20,6 +20,7 @@ public struct AppDelegateReducer {
 
     public enum Action {
         case didFinishLaunching
+        case captureLandmark
     }
 
     public var body: some ReducerOf<Self> {
@@ -30,10 +31,11 @@ public struct AppDelegateReducer {
                 return .run { send in
                     await withThrowingTaskGroup(of: Void.self) { group in
                         group.addTask {}
-                        
-                        
                     }
                 }
+            case .captureLandmark:
+                print("capture")
+                return .none
             }
         }
     }

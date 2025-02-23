@@ -1,4 +1,3 @@
-
 import ComposableArchitecture
 import KakaoSDKAuth
 import SwiftUI
@@ -7,7 +6,6 @@ import SwiftUI
 struct GoalMateApp: App {
     @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @Environment(\.scenePhase) private var scenePhase
-
     var body: some Scene {
         WindowGroup {
             AppCoordinatorView(store: self.appDelegate.store)
@@ -19,7 +17,7 @@ struct GoalMateApp: App {
                 }
         }
         .onChange(of: self.scenePhase) { newPhase in
-          self.appDelegate.store.send(.didChangeScenePhase(newPhase))
+            self.appDelegate.store.send(.didChangeScenePhase(newPhase))
         }
     }
 }
@@ -30,29 +28,28 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
     ) {
         AppCoordinator()
             .transformDependency(\.self) { dependency in
-            // 의존성 변환
-        }
+                // 의존성 변환
+            }
     }
-
     func application(
-      _ application: UIApplication,
-      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
     ) -> Bool {
-      self.store.send(.appDelegate(.didFinishLaunching))
-      return true
+        self.store.send(.appDelegate(.didFinishLaunching))
+        return true
     }
-
+    
     func application(
-      _ application: UIApplication,
-      didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+        _ application: UIApplication,
+        didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
-//      self.store.send(.appDelegate(.didRegisterForRemoteNotifications(.success(deviceToken))))
+        //      self.store.send(.appDelegate(.didRegisterForRemoteNotifications(.success(deviceToken))))
     }
-
+    
     func application(
-      _ application: UIApplication,
-      didFailToRegisterForRemoteNotificationsWithError error: Error
+        _ application: UIApplication,
+        didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
-//      self.store.send(.appDelegate(.didRegisterForRemoteNotifications(.failure(error))))
+        //      self.store.send(.appDelegate(.didRegisterForRemoteNotifications(.failure(error))))
     }
 }
