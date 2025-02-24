@@ -23,10 +23,13 @@ public struct CommentDetailFeature {
         var didFailToLoad: Bool
         var input: String = ""
         var isShowPopup: Bool
-
+        var isShowCommentPopup: CommentPopupState
+        var isEditMode: EditCommentState
+        var isEditingComment: Bool
         var totalCount: Int
         var currentPage: Int
         var hasMorePages: Bool
+        var toastState: ToastState
         var comments: IdentifiedArrayOf<CommentContent>
         public init(
             roomId: Int,
@@ -44,6 +47,10 @@ public struct CommentDetailFeature {
             self.currentPage = 1
             self.hasMorePages = true
             self.comments = []
+            self.isShowCommentPopup = .dismiss
+            self.isEditingComment = false
+            self.isEditMode = .idle
+            self.toastState = .hide
             if let startDate {
                 let date = startDate.toDate(
                     format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
@@ -52,7 +59,6 @@ public struct CommentDetailFeature {
             } else {
                 self.startDate = Date()
             }
-
         }
     }
     public enum Action: BindableAction {
@@ -72,15 +78,20 @@ public struct CommentDetailFeature {
         case retryButtonTapped
         case backButtonTapped
         case sendMessageButtonTapped
+        case showCommentPopup(Int, Position)
+        case dismissCommentPopup
+        case editCommentButtonTapped(Int)
+        case editCancelButtonTapped
+        case deleteButtonTapped(Int)
     }
     public enum FeatureAction {
-        case sendMessage(String)
-        case updateMessage(Int, String)
-        case deleteMessage
         case fetchCommentDetail
         case checkFetchCommentDetailResponse(FetchComentDetailResult)
+        case submitMessage(String)
+        case checkSubmitMessageResponse(SubmitMessageResult)
+        case updateMessage(Int, String)
         case checkUpdateMessageResponse(UpdateMessageResult)
-        case checksendMessageResponse(SendMessageResult)
+        case deleteMessage(Int)
         case checkDeleteMessageResponse(DeleteMessageResult)
     }
     public enum DelegateAction {
@@ -100,9 +111,9 @@ public struct CommentDetailFeature {
             case let .delegate(action):
                 return reduce(into: &state, action: action)
             case let .inputText(text):
-                if text.count < 300 {
+                guard text.count < 300
+                else { return .none }
                     state.input = text
-                }
                 return .none
             case let .dismissPopup(isShow):
                 state.isShowPopup = isShow
@@ -117,12 +128,12 @@ public struct CommentDetailFeature {
 extension CommentDetailFeature {
     public enum FetchComentDetailResult {
     case success([CommentContent], Bool)
-    case limitedsending
     case networkError
     case failed
     }
-    public enum SendMessageResult {
+    public enum SubmitMessageResult {
         case success(CommentContent)
+        case limitedsending
         case networkError
         case failed
     }
@@ -135,5 +146,47 @@ extension CommentDetailFeature {
         case success(Int)
         case networkError
         case failed
+    }
+    public enum Position: Equatable {
+        case top(CGFloat)
+        case bottom(CGFloat)
+        public static func == (
+            lhs: Position,
+            rhs: Position) -> Bool {
+                switch (lhs, rhs) {
+                case (.top, .top), (.bottom, .bottom):
+                    return true
+                default:
+                    return false
+                }
+        }
+    }
+    public enum CommentPopupState: Equatable {
+        case display(Int, Position)
+        case dismiss
+        public static func == (
+            lhs: CommentPopupState,
+            rhs: CommentPopupState) -> Bool {
+                switch (lhs, rhs) {
+                case (.display, .display), (.dismiss, .dismiss):
+                    return true
+                default:
+                    return false
+                }
+        }
+    }
+    public enum EditCommentState: Equatable {
+        case edit(Int)
+        case idle
+        public static func == (
+            lhs: EditCommentState,
+            rhs: EditCommentState) -> Bool {
+                switch (lhs, rhs) {
+                case (.edit, .edit), (.idle, .idle):
+                    return true
+                default:
+                    return false
+                }
+        }
     }
 }
