@@ -11,7 +11,7 @@ import SwiftUI
 import Utils
 
 public struct CommentListView: View {
-    @Bindable var store: StoreOf<CommentListFeature>
+    @Perception.Bindable var store: StoreOf<CommentListFeature>
     public var body: some View {
         WithPerceptionTracking {
             VStack {
@@ -86,7 +86,7 @@ public struct CommentListView: View {
                                                     )
                                                 Text(isExpired ?
                                                         "done" :
-                                                        "D+\(calculateDday(fromDate: content.endDate ?? ""))")
+                                                        "D\(calculateDday(fromDate: content.endDate ?? ""))")
                                                     .pretendardStyle(
                                                         .semiBold,
                                                         size: 12,
