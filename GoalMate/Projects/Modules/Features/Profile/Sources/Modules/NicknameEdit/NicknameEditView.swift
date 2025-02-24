@@ -14,7 +14,7 @@ struct NicknameEditView: View {
     enum FocusableField: Hashable {
         case nickname
     }
-    @Bindable var store: StoreOf<NicknameEditFeature>
+    @Perception.Bindable var store: StoreOf<NicknameEditFeature>
     @FocusState private var focusedField: FocusableField?
     @State private var keyboardHeight: CGFloat = 0
     var body: some View {

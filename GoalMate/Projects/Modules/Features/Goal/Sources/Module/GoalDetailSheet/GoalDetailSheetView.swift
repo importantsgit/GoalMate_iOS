@@ -10,7 +10,7 @@ import FeatureCommon
 import SwiftUI
 
 public struct GoalDetailSheetView: View {
-    @Bindable var store: StoreOf<GoalDetailSheetFeature>
+    @Perception.Bindable var store: StoreOf<GoalDetailSheetFeature>
     public init(store: StoreOf<GoalDetailSheetFeature>) {
         self.store = store
     }

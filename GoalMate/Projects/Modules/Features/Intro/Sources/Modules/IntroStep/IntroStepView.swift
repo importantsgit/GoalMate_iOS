@@ -10,7 +10,7 @@ import FeatureCommon
 import SwiftUI
 
 public struct IntroStepView: View {
-    @Bindable var store: StoreOf<IntroStepFeature>
+    @Perception.Bindable var store: StoreOf<IntroStepFeature>
     public init(store: StoreOf<IntroStepFeature>) {
         self.store = store
     }

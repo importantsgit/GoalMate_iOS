@@ -93,7 +93,7 @@ public struct TabCoordinator {
 }
 
 public struct TabCoordinatorView: View {
-    @Bindable var store: StoreOf<TabCoordinator>
+    @Perception.Bindable var store: StoreOf<TabCoordinator>
     public init(store: StoreOf<TabCoordinator>) {
         self.store = store
     }

@@ -10,7 +10,7 @@ import FeatureCommon
 import SwiftUI
 
 public struct MyGoalCompletionView: View {
-    @Bindable var store: StoreOf<MyGoalCompletionFeature>
+    @Perception.Bindable var store: StoreOf<MyGoalCompletionFeature>
     public var body: some View {
         WithPerceptionTracking {
             VStack {

@@ -13,7 +13,7 @@ struct SignUpView: View {
     enum FocusableField: Hashable {
         case nickname
     }
-    @Bindable var store: StoreOf<SignUpFeature>
+    @Perception.Bindable var store: StoreOf<SignUpFeature>
     @FocusState private var focusedField: FocusableField?
     @State private var keyboardHeight: CGFloat = 0
 

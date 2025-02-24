@@ -11,7 +11,7 @@ import SwiftUI
 import Utils
 
 public struct TermsAgreementSheetView: View {
-    @Bindable var store: StoreOf<TermsAgreementFeature>
+    @Perception.Bindable var store: StoreOf<TermsAgreementFeature>
     // obseravable framework 알아야함
     // 선언해줄테니까 써라 16.0 이하 /
     public init(store: StoreOf<TermsAgreementFeature>) {
