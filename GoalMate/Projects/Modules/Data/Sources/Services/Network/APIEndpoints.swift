@@ -79,7 +79,7 @@ struct APIEndpoints {
     ) -> Endpoint<DefaultResponseDTO> {
         Endpoint(
             path: APIPath.logout,
-            method: .put,
+            method: .post,
             headerParameters: [
                 "Authorization": "Bearer \(accessToken)"
             ]
