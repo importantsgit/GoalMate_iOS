@@ -10,7 +10,7 @@ import SwiftUI
 
 public struct GoalDetailView: View {
     @State private var progress: Double
-    @Bindable var store: StoreOf<GoalDetailFeature>
+    @Perception.Bindable var store: StoreOf<GoalDetailFeature>
     public init(
         progress: Double = 0.1,
         store: StoreOf<GoalDetailFeature>
@@ -265,7 +265,7 @@ fileprivate struct GoalDescriptionView: View {
                         LabelView(
                             title: "목표 기간",
                             isLoading: store.isLoading,
-                            content: store.content?.details.period
+                            content: "\(store.content?.details.period ?? "0")일"
                         )
                         HStack(spacing: 0) {
                             Spacer()
