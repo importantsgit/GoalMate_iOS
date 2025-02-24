@@ -38,6 +38,7 @@ public extension Images {
     static let calendar = Asset.Assets.calendar.swiftUIImage
     static let commentSelected = Asset.Assets.commentSelected.swiftUIImage
     static let comment = Asset.Assets.comment.swiftUIImage
+    static let cancel = Asset.Assets.cancel.swiftUIImage
 }
 
 public extension Image {

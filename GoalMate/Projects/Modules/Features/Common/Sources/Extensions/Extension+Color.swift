@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UIKit
 
 public extension Colors {
     static let primary = Asset.Assets.Primary.primary.swiftUIColor
@@ -96,5 +97,36 @@ public extension Color {
             blue: CGFloat(rgbValue & 0x0000FF) / 255.0,
             opacity: min(1, max(opacity, 0))
         )
+    }
+}
+
+extension UIColor {
+    // Hex 문자열로부터 UIColor를 생성하는 이니셜라이저
+    convenience init(hex: String, alpha: CGFloat = 1.0) {
+        var hexSanitized = hex.trimmingCharacters(in: .whitespacesAndNewlines)
+        hexSanitized = hexSanitized.replacingOccurrences(of: "#", with: "")
+        var rgb: UInt64 = 0
+        var alpha: CGFloat = alpha
+        // 유효한 hex 코드인지 확인
+        guard Scanner(string: hexSanitized).scanHexInt64(&rgb)
+        else {
+            self.init(white: 0, alpha: alpha)
+            return
+        }
+        // 알파 채널이 포함된 8자리 hex 코드 (RRGGBBAA)인 경우
+        if hexSanitized.count == 8 {
+            alpha = CGFloat((rgb & 0xFF)) / 255.0
+            rgb = rgb >> 8
+        }
+        // 6자리 hex 코드 (RRGGBB)인 경우
+        let red = CGFloat((rgb & 0xFF0000) >> 16) / 255.0
+        let green = CGFloat((rgb & 0x00FF00) >> 8) / 255.0
+        let blue = CGFloat(rgb & 0x0000FF) / 255.0
+        self.init(red: red, green: green, blue: blue, alpha: alpha)
+    }
+
+    // 특정 Hex 문자열로부터 UIColor를 생성하는 정적 메서드
+    static func fromHex(_ hex: String, alpha: CGFloat = 1.0) -> UIColor {
+        return UIColor(hex: hex, alpha: alpha)
     }
 }
