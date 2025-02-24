@@ -61,7 +61,7 @@ extension CommentListFeature {
         case let .checkFetchCommentRoomsResult(result):
             switch result {
             case let .success(commentRooms, hasNext):
-                state.commentRoomList = commentRooms + state.commentRoomList
+                state.commentRoomList += commentRooms
                 state.totalCount += commentRooms.count
                 state.currentPage += 1
                 state.hasMorePages = hasNext

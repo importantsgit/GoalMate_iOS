@@ -11,7 +11,7 @@ import SwiftUI
 import Utils
 
 public struct ProfileView: View {
-    @Bindable var store: StoreOf<ProfileFeature>
+    @Perception.Bindable var store: StoreOf<ProfileFeature>
     public init(store: StoreOf<ProfileFeature>) {
         self.store = store
     }
@@ -23,12 +23,6 @@ public struct ProfileView: View {
                         leftContent: {
                             Text("마이페이지")
                                 .pretendardStyle(.semiBold, size: 20, color: Colors.grey900)
-                                .overlay {
-                                    if store.isLoading {
-                                        RoundedRectangle(cornerRadius: 8)
-                                            .fill(Colors.grey200)
-                                    }
-                                }
                         }
                     )
                     .frame(height: 64)

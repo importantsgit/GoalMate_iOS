@@ -39,6 +39,7 @@ public struct MyGoalDetailView: View {
                                 .frame(width: 300)
                         }
                     )
+                    .frame(height: 64)
                     let isShowContent = store.content != nil
                     ZStack(alignment: .bottom) {
                         if isShowContent {

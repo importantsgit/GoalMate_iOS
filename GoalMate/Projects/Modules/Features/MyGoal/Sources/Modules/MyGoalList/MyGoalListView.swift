@@ -86,7 +86,7 @@ public struct MyGoalListView: View {
                 value: store.isLoading)
         }
     }
-    
+
     @ViewBuilder
     var skeletonView: some View {
         VStack {

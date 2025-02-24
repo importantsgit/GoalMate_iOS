@@ -18,8 +18,7 @@ public struct CommentListFeature {
         public var isLoading: Bool
         var didFailToLoad: Bool
         var isLogin: Bool
-        var toastState: ToastState
-        
+        var toastState: ToastState  
         var totalCount: Int
         var currentPage: Int
         var hasMorePages: Bool
