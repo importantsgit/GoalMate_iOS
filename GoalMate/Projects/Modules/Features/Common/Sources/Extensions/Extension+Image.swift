@@ -39,6 +39,7 @@ public extension Images {
     static let commentSelected = Asset.Assets.commentSelected.swiftUIImage
     static let comment = Asset.Assets.comment.swiftUIImage
     static let cancel = Asset.Assets.cancel.swiftUIImage
+    static let arrowUp = Asset.Assets.arrowUp.swiftUIImage
 }
 
 public extension Image {
