@@ -32,11 +32,13 @@ public final class NetworkService: NSObject {
             let urlRequest = try endpoint.urlRequest(with: config)
             log(request: urlRequest)
             let (data, response) = try await session.data(for: urlRequest)
-            return try self.manageResponse(
+            let value: T = try self.manageResponse(
                 data: data,
                 response: response,
                 decoder: endpoint.responseDecoder
             )
+            log(response: value)
+            return value
         } catch let error as NetworkError {
             throw error
         } catch {
@@ -82,7 +84,6 @@ public final class NetworkService: NSObject {
 private extension NetworkService {
     func log(request: URLRequest) {
         print("\n - - - - - - - - - - OUTGOING - - - - - - - - - - \n")
-        defer { print("\n - - - - - - - - - -  END - - - - - - - - - - \n") }
         let urlAsString = request.url?.absoluteString ?? ""
         let urlComponents = URLComponents(string: urlAsString)
         let method = request.httpMethod != nil ? "\(request.httpMethod ?? "")" : ""
@@ -101,5 +102,10 @@ private extension NetworkService {
             output += "\n \(String(data: body, encoding: .utf8) ?? "")"
         }
         print(output)
+    }
+
+    func log<T: Decodable>(response: T) {
+        defer { print("\n - - - - - - - - - -  END - - - - - - - - - - \n") }
+        print(response)
     }
 }
