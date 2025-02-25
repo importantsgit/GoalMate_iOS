@@ -16,7 +16,6 @@ public struct CustomPopup<Content: View>: View {
     let rightAction: (() -> Void)?
     @State private var opacity: Double = 0
     @State private var scale: CGFloat = 0.8
-    
     public init(
         isPresented: Binding<Bool>,
         leftButtonTitle: String? = nil,
@@ -32,7 +31,6 @@ public struct CustomPopup<Content: View>: View {
         self.rightAction = rightAction
         self.content = content()
     }
-  
     public var body: some View {
         ZStack {
             if isPresented {
@@ -47,7 +45,6 @@ public struct CustomPopup<Content: View>: View {
                         .padding(.horizontal, 16)
                         .padding(.top, 46)
                         .padding(.bottom, 16)
-                    
                     HStack(spacing: 12) {
                         if let leftButtonTitle = leftButtonTitle {
                             Button(action: {
@@ -72,7 +69,6 @@ public struct CustomPopup<Content: View>: View {
                                     .clipShape(.capsule)
                             }
                         }
-                        
                         if let rightButtonTitle = rightButtonTitle {
                             Button(action: {
                                 rightAction?()
@@ -99,7 +95,7 @@ public struct CustomPopup<Content: View>: View {
                 .opacity(opacity)
                 .scaleEffect(scale)
                 .onAppear {
-                    withAnimation(.spring()) {
+                    withAnimation(.spring(duration: 0.2)) {
                         opacity = 1
                         scale = 1
                     }
@@ -108,10 +104,9 @@ public struct CustomPopup<Content: View>: View {
         }
         .animation(.spring(), value: isPresented)
     }
-    
     private func dismissWithAnimation() {
         Task {
-            withAnimation(.spring()) {
+            withAnimation(.spring(duration: 0.2)) {
                 opacity = 0
                 scale = 0.8
             }
