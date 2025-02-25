@@ -157,6 +157,8 @@ public struct CommentDetailView: View {
                     rightAction: {}
                 ) {
                     VStack {
+                        Spacer()
+                            .frame(height: 50)
                         Images.warning
                             .resized(length: 24)
                         Spacer()
@@ -168,14 +170,7 @@ public struct CommentDetailView: View {
                                 color: Colors.grey800
                             )
                         Spacer()
-                            .frame(height: 10)
-                        Text("하루 1회만 코멘트를 입력할 수 있어요.\n오늘 보낸 코멘트를 수정해주세요.")
-                            .multilineTextAlignment(.center)
-                            .pretendard(
-                                .semiBold,
-                                size: 16,
-                                color: Colors.grey600
-                            )
+                            .frame(height: 40)
                     }
                 }
             }
