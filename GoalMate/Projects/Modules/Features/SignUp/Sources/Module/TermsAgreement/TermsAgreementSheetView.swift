@@ -57,53 +57,74 @@ public struct TermsAgreementSheetView: View {
                 }
                 Spacer()
                     .frame(height: 16)
-                HStack {
-                    Button {
-                        store.send(.view(.termsOfServiceButtonTapped))
-                    } label: {
-                        HStack(spacing: 8) {
-                            Images.check
-                                .resizable()
-                                .renderingMode(.template)
-                                .tint(store.isServiceTermsAgreed ? Colors.grey900 : Colors.grey200)
-                                .frame(width: 16, height: 16)
-                            Text("이용약관에 동의합니다. (필수)")
-                                .pretendardStyle(.regular, size: 16)
+                VStack(spacing: 12) {
+                    HStack {
+                        Button {
+                            store.send(.view(.termsOfServiceButtonTapped))
+                        } label: {
+                            HStack(spacing: 8) {
+                                Images.check
+                                    .resizable()
+                                    .renderingMode(.template)
+                                    .tint(store.isServiceTermsAgreed ?
+                                            Colors.grey900 :
+                                            Colors.grey200)
+                                    .frame(width: 16, height: 16)
+                                Text("이용약관에 동의합니다. (필수)")
+                                    .pretendardStyle(.regular, size: 16)
+                            }
+                        }
+                        Spacer()
+                        Button {
+                            store.send(.view(.openTermsOfServiceView))
+                        } label: {
+                            Image(systemName: "chevron.right")
+                                .resized(length: 10)
+                                .foregroundStyle(Colors.grey600)
                         }
                     }
-                    Spacer()
-                    Button {
-                        store.send(.view(.openTermsOfServiceView))
-                    } label: {
-                        Image(systemName: "chevron.right")
-                            .resized(length: 10)
-                            .foregroundStyle(Colors.grey600)
-                    }
-                }
-
-                Spacer()
-                    .frame(height: 8)
-                HStack {
-                    Button {
-                        store.send(.view(.privacyPolicyAgreeButtonTapped))
-                    } label: {
-                        HStack(spacing: 8) {
-                            Images.check
-                                .resizable()
-                                .renderingMode(.template)
-                                .tint(store.isPrivacyPolicyAgreed ? Colors.grey900 : Colors.grey200)
-                                .frame(width: 16, height: 16)
-                            Text("개인정보 처리 방침에 동의합니다. (필수)")
-                                .pretendardStyle(.regular, size: 16)
+                    HStack {
+                        Button {
+                            store.send(.view(.privacyPolicyAgreeButtonTapped))
+                        } label: {
+                            HStack(spacing: 8) {
+                                Images.check
+                                    .resizable()
+                                    .renderingMode(.template)
+                                    .tint(store.isPrivacyPolicyAgreed ?
+                                            Colors.grey900 :
+                                            Colors.grey200)
+                                    .frame(width: 16, height: 16)
+                                Text("개인정보 처리 방침에 동의합니다. (필수)")
+                                    .pretendardStyle(.regular, size: 16)
+                            }
+                        }
+                        Spacer()
+                        Button {
+                            store.send(.view(.openPrivacyPolicyAgreeView))
+                        } label: {
+                            Image(systemName: "chevron.right")
+                                .resized(length: 10)
+                                .foregroundStyle(Colors.grey600)
                         }
                     }
-                    Spacer()
-                    Button {
-                        store.send(.view(.openPrivacyPolicyAgreeView))
-                    } label: {
-                        Image(systemName: "chevron.right")
-                            .resized(length: 10)
-                            .foregroundStyle(Colors.grey600)
+                    HStack {
+                        Button {
+                            store.send(.view(.ageVerificationButtonTapped))
+                        } label: {
+                            HStack(spacing: 8) {
+                                Images.check
+                                    .resizable()
+                                    .renderingMode(.template)
+                                    .tint(store.isAtLeastFourteenYearsOld ?
+                                            Colors.grey900 :
+                                            Colors.grey200)
+                                    .frame(width: 16, height: 16)
+                                Text("만 14세 이상입니다. (필수)")
+                                    .pretendardStyle(.regular, size: 16)
+                            }
+                        }
+                        Spacer()
                     }
                 }
                 Spacer()

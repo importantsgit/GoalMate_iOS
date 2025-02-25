@@ -19,25 +19,17 @@ extension TermsAgreementFeature {
             state.isAllTermsAgreed.toggle()
             state.isServiceTermsAgreed = state.isAllTermsAgreed
             state.isPrivacyPolicyAgreed = state.isAllTermsAgreed
+            state.isAtLeastFourteenYearsOld = state.isAllTermsAgreed
             return .none
         case .privacyPolicyAgreeButtonTapped:
             state.isPrivacyPolicyAgreed.toggle()
-            if state.isServiceTermsAgreed &&
-                state.isPrivacyPolicyAgreed {
-                state.isAllTermsAgreed = true
-            } else if state.isPrivacyPolicyAgreed == false {
-                state.isAllTermsAgreed = false
-            }
-            return .none
+            return .send(.feature(.updateAllAgreeStatus))
         case .termsOfServiceButtonTapped:
             state.isServiceTermsAgreed.toggle()
-            if state.isServiceTermsAgreed &&
-                state.isPrivacyPolicyAgreed {
-                state.isAllTermsAgreed = true
-            } else if state.isServiceTermsAgreed == false {
-                state.isAllTermsAgreed = false
-            }
-            return .none
+            return .send(.feature(.updateAllAgreeStatus))
+        case .ageVerificationButtonTapped:
+            state.isAtLeastFourteenYearsOld.toggle()
+            return .send(.feature(.updateAllAgreeStatus))
         case .openTermsOfServiceView:
             guard let url = URL(
                 string: Environments.TermsOfServiceURLString
@@ -59,7 +51,16 @@ extension TermsAgreementFeature {
         }
     }
     func reduce(into state: inout State, action: FeatureAction) -> Effect<Action> {
-        return .none
+        switch action {
+        case .updateAllAgreeStatus:
+            let allSelected = [
+                state.isServiceTermsAgreed,
+                state.isPrivacyPolicyAgreed,
+                state.isAtLeastFourteenYearsOld
+            ].allSatisfy { $0 }
+            state.isAllTermsAgreed = allSelected
+            return .none
+        }
     }
     func reduce(into state: inout State, action: DelegateAction) -> Effect<Action> {
         return .none

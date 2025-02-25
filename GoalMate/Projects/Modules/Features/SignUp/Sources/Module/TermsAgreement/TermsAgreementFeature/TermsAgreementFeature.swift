@@ -16,16 +16,20 @@ public struct TermsAgreementFeature {
         var isAllTermsAgreed: Bool
         var isServiceTermsAgreed: Bool        // 이용약관
         var isPrivacyPolicyAgreed: Bool       // 개인정보 처리방침
+        var isAtLeastFourteenYearsOld: Bool   // 만 14세 이상
+        
         public init(
             id: UUID = UUID(),
             isAllTermsAgreed: Bool = false,
             isServiceTermsAgreed: Bool = false,
-            isPrivacyPolicyAgreed: Bool = false
+            isPrivacyPolicyAgreed: Bool = false,
+            isAtLeastFourteenYearsOld: Bool = false
         ) {
             self.id = id
             self.isAllTermsAgreed = isAllTermsAgreed
             self.isServiceTermsAgreed = isServiceTermsAgreed
             self.isPrivacyPolicyAgreed = isPrivacyPolicyAgreed
+            self.isAtLeastFourteenYearsOld = isAtLeastFourteenYearsOld
         }
     }
     public enum Action: BindableAction {
@@ -40,11 +44,14 @@ public struct TermsAgreementFeature {
         case allAgreeButtonTapped
         case termsOfServiceButtonTapped
         case privacyPolicyAgreeButtonTapped
+        case ageVerificationButtonTapped
         case openTermsOfServiceView
         case openPrivacyPolicyAgreeView
         case startButtonTapped
     }
-    public enum FeatureAction {}
+    public enum FeatureAction {
+        case updateAllAgreeStatus
+    }
     public enum DelegateAction {
         case termsAgreementFinished
     }
