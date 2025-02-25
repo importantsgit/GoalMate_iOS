@@ -13,8 +13,9 @@ extension MyGoalListFeature {
     func reduce(into state: inout State, action: ViewCyclingAction) -> Effect<Action> {
         switch action {
         case .onAppear:
-            guard state.hasMorePages else { return .none }
             state.isLoading = true
+            state.myGoalList = []
+            state.pagingationState = .init()
             return .run { send in
                 guard try await authClient.checkLoginStatus()
                 else {
@@ -28,14 +29,17 @@ extension MyGoalListFeature {
     }
     func reduce(into state: inout State, action: ViewAction) -> Effect<Action> {
         switch action {
-        case .retryButtonTapped, .onLoadMore:
-            guard state.hasMorePages else { return .none }
+        case .retryButtonTapped:
             state.isLoading = true
+            return .send(.feature(.fetchMyGoals))
+        case .onLoadMore:
+            guard state.pagingationState.hasMorePages else { return .none }
+            state.isScrollFetching = true
             return .send(.feature(.fetchMyGoals))
         case let .buttonTapped(type):
             switch type {
             case let .showGoalRestart(contentId):
-                return .send(.delegate(.showGoalList))
+                return .send(.delegate(.restartGoal(contentId)))
             case let .showGoalDetail(contentId):
                 return .send(.delegate(.showMyGoalDetail(contentId)))
             case let .showGoalCompletion(contentId):
@@ -48,31 +52,14 @@ extension MyGoalListFeature {
     func reduce(into state: inout State, action: FeatureAction) -> Effect<Action> {
         switch action {
         case .fetchMyGoals:
-            guard state.hasMorePages else {
-                state.isLoading = false
-                return .none
-            }
-            state.isScrollFetching = true
-            return .run { [currentPage = state.currentPage] send in
+            return .run { [currentPage = state.pagingationState.currentPage] send in
                 do {
                     let response = try await menteeClient.fetchMyGoals(currentPage)
-                    let dateFormatter = DateFormatter()
-                    dateFormatter.dateFormat = "yyyy-MM-dd"
-                    let list: [MyGoalContent] = response.menteeGoals.map { goal in
-                            .init(
-                                id: goal.id,
-                                title: goal.title,
-                                progress: CGFloat((goal.totalCompletedCount ?? 0) /
-                                                  (goal.totalTodoCount ?? 1)),
-                                startDate: goal.startDate,
-                                endDate: goal.endDate,
-                                mainImageURL: goal.mainImage,
-                                goalStatus: goal.menteeGoalStatus ?? .inProgress
-                            )
-                    }
+                    let list = response.menteeGoals
                     await send(
                         .feature(
-                            .checkFetchMyGoalResponse(.success(list, response.page?.hasNext ?? false))
+                            .checkFetchMyGoalResponse(
+                                .success(list, response.page?.hasNext ?? false))
                         )
                     )
                 } catch let error as NetworkError {
@@ -97,14 +84,18 @@ extension MyGoalListFeature {
         case let .checkFetchMyGoalResponse(result):
             switch result {
             case let .success(myGoals, hasNext):
-                state.myGoalList += myGoals
-                state.totalCount += myGoals.count
-                state.currentPage += 1
-                state.hasMorePages = hasNext
+                state.myGoalList.append(contentsOf: myGoals)
+                state.pagingationState.totalCount += myGoals.count
+                state.pagingationState.currentPage += 1
+                state.pagingationState.hasMorePages = hasNext
             case .networkError:
-                state.didFailToLoad = true
+                if state.isLoading {
+                    state.didFailToLoad = true
+                }
             case .failed:
-                break
+                if state.isLoading {
+                    state.didFailToLoad = true
+                }
             }
             state.isLoading = false
             state.isScrollFetching = false

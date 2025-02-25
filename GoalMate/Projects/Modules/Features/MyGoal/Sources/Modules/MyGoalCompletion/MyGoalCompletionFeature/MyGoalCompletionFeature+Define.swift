@@ -10,7 +10,7 @@ import Foundation
 
 extension MyGoalCompletionFeature {
     public enum FetchMyGoalCompletionResult {
-        case success(FetchMyGoalDetailResponseDTO.Response.MenteeGoal)
+        case success(MenteeGoal)
         case networkError
         case failed
     }

@@ -21,6 +21,7 @@ struct APIEndpoints {
         case joinGoal               = "goals/{goalId}/mentees"
         case fetchMenteeInfo        = "mentees/my"
 
+        case checkTodos             = "mentees/my/todos"
         case fetchGoals             = "goals"
         case fetchGoalDetail        = "goals/{goalId}"
 
@@ -177,6 +178,18 @@ struct APIEndpoints {
     ) throws -> Endpoint<FetchMenteeInfoResponseDTO> {
         Endpoint(
             path: .fetchMenteeInfo,
+            method: .get,
+            headerParameters: [
+                "Authorization": "Bearer \(accessToken)"
+            ]
+        )
+    }
+
+    static func checkTodosEndpoint(
+        accessToken: String
+    ) -> Endpoint<CheckTodosResponseDTO> {
+        return Endpoint(
+            path: .checkTodos,
             method: .get,
             headerParameters: [
                 "Authorization": "Bearer \(accessToken)"

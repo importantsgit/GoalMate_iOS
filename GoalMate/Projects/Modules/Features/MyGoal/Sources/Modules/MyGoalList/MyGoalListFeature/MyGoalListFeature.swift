@@ -9,13 +9,6 @@ import ComposableArchitecture
 import Data
 import Foundation
 
-
-public struct MyGoalDetailData {
-    let id: Int
-    let startDate: Date
-    let endDate: Date
-}
-
 @Reducer
 public struct MyGoalListFeature {
     public init() {}
@@ -26,13 +19,10 @@ public struct MyGoalListFeature {
         var isLoading: Bool
         var isScrollFetching: Bool
         var didFailToLoad: Bool
-
-        var totalCount: Int
-        var currentPage: Int
-        var hasMorePages: Bool
-        var myGoalList: [MyGoalContent]
+        var pagingationState: PaginationState
+        var myGoalList: IdentifiedArrayOf<MenteeGoal>
         public init(
-            myGoalList: [MyGoalContent] = []
+            myGoalList: IdentifiedArrayOf<MenteeGoal> = []
         ) {
             self.id = UUID()
             self.isLogin = true
@@ -40,9 +30,7 @@ public struct MyGoalListFeature {
             self.isScrollFetching = false
             self.didFailToLoad = false
             self.myGoalList = myGoalList
-            self.totalCount = 0
-            self.currentPage = 1
-            self.hasMorePages = true
+            self.pagingationState = .init()
         }
     }
     public enum Action: BindableAction {
@@ -70,6 +58,7 @@ public struct MyGoalListFeature {
         case showGoalList
         case showMyGoalCompletion(Int)
         case showMyGoalDetail(Int)
+        case restartGoal(Int)
     }
     @Dependency(\.authClient) var authClient
     @Dependency(\.menteeClient) var menteeClient

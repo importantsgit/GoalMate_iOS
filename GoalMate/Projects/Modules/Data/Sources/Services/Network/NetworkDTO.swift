@@ -125,6 +125,16 @@ public struct FetchMenteeInfoResponseDTO: Codable {
     }
 }
 
+public struct CheckTodosResponseDTO: Codable {
+    let status: String
+    let code: String
+    let message: String
+    let data: Response?
+    public struct Response: Codable {
+        let hasRemainingTodosToday: Bool
+    }
+}
+
 public struct FetchGoalsResponseDTO: Codable {
     let status: String
     let code: String
@@ -256,48 +266,6 @@ public struct FetchMyGoalsResponseDTO: Codable {
             case menteeGoals = "mentee_goals"
             case page
         }
-
-        // MARK: - MenteeGoal
-        public struct MenteeGoal: Codable {
-            public let id: Int
-            public let title: String?
-            public let topic: String?
-            public let mentorName: String?
-            public let mainImage: String?
-            public let startDate: String?
-            public let endDate: String?
-            public let finalComment: String?
-            public let todayTodoCount: Int?
-            public let todayCompletedCount: Int?
-            public let todayRemainingCount: Int?
-            public let totalTodoCount: Int?
-            public let totalCompletedCount: Int?
-            public let menteeGoalStatus: MenteeGoalStatus?
-            public let createdAt: String?
-            public let updatedAt: String?
-            public enum MenteeGoalStatus: String, Codable {
-                case inProgress  = "IN_PROGRESS"
-                case completed   = "COMPLETED"
-                case failed      = "FAILED"
-                case canceled    = "CANCELED"
-            }
-            public enum CodingKeys: String, CodingKey {
-                case id, title, topic
-                case mentorName = "mentor_name"
-                case mainImage = "main_image"
-                case startDate = "start_date"
-                case endDate = "end_date"
-                case finalComment = "final_comment"
-                case todayTodoCount = "today_todo_count"
-                case todayCompletedCount = "today_completed_count"
-                case todayRemainingCount = "today_remaining_count"
-                case totalTodoCount = "total_todo_count"
-                case totalCompletedCount = "total_completed_count"
-                case menteeGoalStatus = "mentee_goal_status"
-                case createdAt = "created_at"
-                case updatedAt = "updated_at"
-            }
-        }
     }
 }
 
@@ -318,52 +286,6 @@ public struct FetchMyGoalDetailResponseDTO: Codable {
             case date
             case menteeGoal = "mentee_goal"
             case todos
-        }
-
-        // MARK: - MenteeGoal
-        public struct MenteeGoal: Codable, Identifiable, Equatable {
-            public let id: Int
-            public let title: String?
-            public let topic: String?
-            public let mentorName: String?
-            public let mainImage: String?
-            public let startDate: String?
-            public let endDate: String?
-            public let mentorLetter: String?
-            public let todayTodoCount: Int?
-            public var todayCompletedCount: Int?
-            public var todayRemainingCount: Int?
-            public let totalTodoCount: Int?
-            public let totalCompletedCount: Int?
-            public let menteeGoalStatus: MenteeGoalStatus?
-            public let createdAt: String?
-            public let updatedAt: String?
-            public let commentRoomId: Int
-
-            public enum MenteeGoalStatus: String, Codable {
-                case inProgress = "IN_PROGRESS"
-                case completed = "COMPLETED"
-                case failed = "FAILED"
-                case canceled = "CANCELED"
-            }
-
-            public enum CodingKeys: String, CodingKey {
-                case id, title, topic
-                case mentorName = "mentor_name"
-                case mainImage = "main_image"
-                case startDate = "start_date"
-                case endDate = "end_date"
-                case mentorLetter = "mentor_letter"
-                case todayTodoCount = "today_todo_count"
-                case todayCompletedCount = "today_completed_count"
-                case todayRemainingCount = "today_remaining_count"
-                case totalTodoCount = "total_todo_count"
-                case totalCompletedCount = "total_completed_count"
-                case menteeGoalStatus = "mentee_goal_status"
-                case createdAt = "created_at"
-                case updatedAt = "updated_at"
-                case commentRoomId = "comment_room_id"
-            }
         }
 
         public static func == (
@@ -429,7 +351,7 @@ public struct FetchCommentDetailResponseDTO: Codable {
     let code: String
     let message: String
     let data: Response?
-    
+
     public struct Response: Codable {
         public let comments: [CommentContent]
         public let page: Page
@@ -451,6 +373,52 @@ public struct Page: Codable {
     let totalElements, totalPages, currentPage, pageSize: Int?
     let nextPage, prevPage: Int?
     public let hasNext, hasPrev: Bool?
+}
+
+// MARK: - MenteeGoal
+public struct MenteeGoal: Codable, Identifiable, Equatable {
+    public let id: Int
+    public let title: String?
+    public let topic: String?
+    public let mentorName: String?
+    public let mainImage: String?
+    public let startDate: String?
+    public let endDate: String?
+    public let mentorLetter: String?
+    public let todayTodoCount: Int?
+    public var todayCompletedCount: Int?
+    public var todayRemainingCount: Int?
+    public let totalTodoCount: Int?
+    public let totalCompletedCount: Int?
+    public let menteeGoalStatus: MenteeGoalStatus?
+    public let createdAt: String?
+    public let updatedAt: String?
+    public let commentRoomId: Int
+
+    public enum MenteeGoalStatus: String, Codable {
+        case inProgress = "IN_PROGRESS"
+        case completed = "COMPLETED"
+        case failed = "FAILED"
+        case canceled = "CANCELED"
+    }
+
+    public enum CodingKeys: String, CodingKey {
+        case id, title, topic
+        case mentorName = "mentor_name"
+        case mainImage = "main_image"
+        case startDate = "start_date"
+        case endDate = "end_date"
+        case mentorLetter = "mentor_letter"
+        case todayTodoCount = "today_todo_count"
+        case todayCompletedCount = "today_completed_count"
+        case todayRemainingCount = "today_remaining_count"
+        case totalTodoCount = "total_todo_count"
+        case totalCompletedCount = "total_completed_count"
+        case menteeGoalStatus = "mentee_goal_status"
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+        case commentRoomId = "comment_room_id"
+    }
 }
 
 public struct Todo: Identifiable, Codable, Hashable, Equatable {
@@ -681,25 +649,7 @@ extension FetchMyGoalsResponseDTO {
         message: "정상적으로 처리되었습니다.",
         data: Response(
             menteeGoals: [
-                Response.MenteeGoal(
-                    id: 1,
-                    title: "다온과 함께하는 영어 완전 정복 30일 목표",
-                    topic: "영어",
-                    mentorName: "다온",
-                    mainImage: "https://example.com/images/english-study.jpg",
-                    startDate: "2025-02-01",
-                    endDate: "2025-03-01",
-                    finalComment: "열심히 해봅시다!",
-                    todayTodoCount: 5,
-                    todayCompletedCount: 3,
-                    todayRemainingCount: 2,
-                    totalTodoCount: 100,
-                    totalCompletedCount: 45,
-                    menteeGoalStatus: .inProgress,
-                    createdAt: "2025-02-01T09:00:00.000Z",
-                    updatedAt: "2025-02-19T15:30:00.000Z"
-                ),
-                Response.MenteeGoal(
+                .init(
                     id: 2,
                     title: "하루 30분 코딩 챌린지",
                     topic: "프로그래밍",
@@ -707,7 +657,7 @@ extension FetchMyGoalsResponseDTO {
                     mainImage: "https://example.com/images/coding.jpg",
                     startDate: "2025-02-10",
                     endDate: "2025-03-10",
-                    finalComment: "코딩의 기초를 다져봅시다",
+                    mentorLetter: "코딩의 기초를 다져봅시다",
                     todayTodoCount: 3,
                     todayCompletedCount: 3,
                     todayRemainingCount: 0,
@@ -715,9 +665,10 @@ extension FetchMyGoalsResponseDTO {
                     totalCompletedCount: 20,
                     menteeGoalStatus: .inProgress,
                     createdAt: "2025-02-10T10:00:00.000Z",
-                    updatedAt: "2025-02-19T14:20:00.000Z"
+                    updatedAt: "2025-02-19T14:20:00.000Z",
+                    commentRoomId: 102
                 ),
-                Response.MenteeGoal(
+                .init(
                     id: 3,
                     title: "다온과 함께하는 영어 완전 정복 30일 목표, 다온과 함께하는 영어 완전 정복 30일 목표",
                     topic: "영어",
@@ -725,7 +676,7 @@ extension FetchMyGoalsResponseDTO {
                     mainImage: "https://example.com/images/english-study.jpg",
                     startDate: "2025-02-01",
                     endDate: "2025-03-01",
-                    finalComment: "열심히 해봅시다!",
+                    mentorLetter: "열심히 해봅시다!",
                     todayTodoCount: 5,
                     todayCompletedCount: 3,
                     todayRemainingCount: 2,
@@ -733,9 +684,10 @@ extension FetchMyGoalsResponseDTO {
                     totalCompletedCount: 45,
                     menteeGoalStatus: .inProgress,
                     createdAt: "2025-02-01T09:00:00.000Z",
-                    updatedAt: "2025-02-19T15:30:00.000Z"
+                    updatedAt: "2025-02-19T15:30:00.000Z",
+                    commentRoomId: 103
                 ),
-                Response.MenteeGoal(
+                .init(
                     id: 4,
                     title: "하루 30분 코딩 챌린지",
                     topic: "프로그래밍",
@@ -743,7 +695,7 @@ extension FetchMyGoalsResponseDTO {
                     mainImage: "https://example.com/images/coding.jpg",
                     startDate: "2025-02-10",
                     endDate: "2025-03-10",
-                    finalComment: "코딩의 기초를 다져봅시다",
+                    mentorLetter: "코딩의 기초를 다져봅시다",
                     todayTodoCount: 3,
                     todayCompletedCount: 3,
                     todayRemainingCount: 0,
@@ -751,9 +703,10 @@ extension FetchMyGoalsResponseDTO {
                     totalCompletedCount: 20,
                     menteeGoalStatus: .inProgress,
                     createdAt: "2025-02-10T10:00:00.000Z",
-                    updatedAt: "2025-02-19T14:20:00.000Z"
+                    updatedAt: "2025-02-19T14:20:00.000Z",
+                    commentRoomId: 104
                 ),
-                Response.MenteeGoal(
+                .init(
                     id: 5,
                     title: "다온과 함께하는 영어 완전 정복 30일 목표",
                     topic: "영어",
@@ -761,7 +714,7 @@ extension FetchMyGoalsResponseDTO {
                     mainImage: "https://example.com/images/english-study.jpg",
                     startDate: "2025-02-01",
                     endDate: "2025-03-01",
-                    finalComment: "열심히 해봅시다!",
+                    mentorLetter: "열심히 해봅시다!",
                     todayTodoCount: 5,
                     todayCompletedCount: 3,
                     todayRemainingCount: 2,
@@ -769,9 +722,10 @@ extension FetchMyGoalsResponseDTO {
                     totalCompletedCount: 45,
                     menteeGoalStatus: .inProgress,
                     createdAt: "2025-02-01T09:00:00.000Z",
-                    updatedAt: "2025-02-19T15:30:00.000Z"
+                    updatedAt: "2025-02-19T15:30:00.000Z",
+                    commentRoomId: 105
                 ),
-                Response.MenteeGoal(
+                .init(
                     id: 6,
                     title: "하루 30분 코딩 챌린지",
                     topic: "프로그래밍",
@@ -779,7 +733,7 @@ extension FetchMyGoalsResponseDTO {
                     mainImage: "https://example.com/images/coding.jpg",
                     startDate: "2025-02-10",
                     endDate: "2025-03-10",
-                    finalComment: "코딩의 기초를 다져봅시다",
+                    mentorLetter: "코딩의 기초를 다져봅시다",
                     todayTodoCount: 3,
                     todayCompletedCount: 3,
                     todayRemainingCount: 0,
@@ -787,9 +741,10 @@ extension FetchMyGoalsResponseDTO {
                     totalCompletedCount: 20,
                     menteeGoalStatus: .inProgress,
                     createdAt: "2025-02-10T10:00:00.000Z",
-                    updatedAt: "2025-02-19T14:20:00.000Z"
+                    updatedAt: "2025-02-19T14:20:00.000Z",
+                    commentRoomId: 106
                 ),
-                Response.MenteeGoal(
+                .init(
                     id: 7,
                     title: "다온과 함께하는 영어 완전 정복 30일 목표",
                     topic: "영어",
@@ -797,7 +752,7 @@ extension FetchMyGoalsResponseDTO {
                     mainImage: "https://example.com/images/english-study.jpg",
                     startDate: "2025-02-01",
                     endDate: "2025-03-01",
-                    finalComment: "열심히 해봅시다!",
+                    mentorLetter: "열심히 해봅시다!",
                     todayTodoCount: 5,
                     todayCompletedCount: 3,
                     todayRemainingCount: 2,
@@ -805,9 +760,10 @@ extension FetchMyGoalsResponseDTO {
                     totalCompletedCount: 45,
                     menteeGoalStatus: .inProgress,
                     createdAt: "2025-02-01T09:00:00.000Z",
-                    updatedAt: "2025-02-19T15:30:00.000Z"
+                    updatedAt: "2025-02-19T15:30:00.000Z",
+                    commentRoomId: 107
                 ),
-                Response.MenteeGoal(
+                .init(
                     id: 8,
                     title: "하루 30분 코딩 챌린지",
                     topic: "프로그래밍",
@@ -815,7 +771,7 @@ extension FetchMyGoalsResponseDTO {
                     mainImage: "https://example.com/images/coding.jpg",
                     startDate: "2025-02-10",
                     endDate: "2025-03-10",
-                    finalComment: "코딩의 기초를 다져봅시다",
+                    mentorLetter: "코딩의 기초를 다져봅시다",
                     todayTodoCount: 3,
                     todayCompletedCount: 3,
                     todayRemainingCount: 0,
@@ -823,7 +779,8 @@ extension FetchMyGoalsResponseDTO {
                     totalCompletedCount: 20,
                     menteeGoalStatus: .inProgress,
                     createdAt: "2025-02-10T10:00:00.000Z",
-                    updatedAt: "2025-02-19T14:20:00.000Z"
+                    updatedAt: "2025-02-19T14:20:00.000Z",
+                    commentRoomId: 108
                 )
             ],
             page: Page(
@@ -847,7 +804,7 @@ extension FetchMyGoalDetailResponseDTO {
         message: "정상적으로 처리되었습니다.",
         data: Response(
             date: "2025-02-18",
-            menteeGoal: Response.MenteeGoal(
+            menteeGoal: .init(
                 id: 1,
                 title: "다온과 함께하는 영어 완전 정복 30일 목표",
                 topic: "영어",

@@ -14,6 +14,8 @@ import Utils
 public struct MenteeClient {
     public var fetchMenteeInfo: () async throws -> FetchMenteeInfoResponseDTO.Response
     public var joinGoal: (_ goalId: Int) async throws -> Void
+    public var hasRemainingTodos: () async throws -> Bool
+    public var hideRemainingTodosNotice: () async throws -> Void
     public var fetchMyGoals: (_ page: Int) async throws -> FetchMyGoalsResponseDTO.Response
     public var fetchMyGoalDetail: (
         _ menteeGoalId: Int,
@@ -96,6 +98,21 @@ extension MenteeClient: DependencyKey {
                     }
                     throw NetworkError.statusCodeError(code: code)
                 }
+            },
+            hasRemainingTodos: {
+                guard await dataStorageClient.isShowRemainingTodosNotice
+                else { return false }
+                return try await executeWithTokenValidation { accessToken in
+                    let endpoint = APIEndpoints.checkTodosEndpoint(
+                        accessToken: accessToken)
+                    let response = try await networkClient.asyncRequest(with: endpoint)
+                    guard let data = response.data
+                    else { throw NetworkError.emptyData }
+                    return data.hasRemainingTodosToday
+                }
+            },
+            hideRemainingTodosNotice: {
+                
             },
             fetchMyGoals: { page in
                 try await executeWithTokenValidation { accessToken in
@@ -229,6 +246,11 @@ extension MenteeClient: DependencyKey {
         fetchMenteeInfo: { FetchMenteeInfoResponseDTO.dummy.data!
         },
         joinGoal: { _ in },
+        hasRemainingTodos: {
+            return true
+        },
+        hideRemainingTodosNotice: {
+        },
         fetchMyGoals: { _ in
             FetchMyGoalsResponseDTO.dummy.data!
         },
@@ -271,7 +293,6 @@ extension MenteeClient: DependencyKey {
         },
         fetchCommentDetail: { page, _ in
             let startId = (page - 1) * 20 + 1
-            
             return .init(
                 comments: (0..<20).map { index in
                     let id = startId + index
@@ -321,8 +342,6 @@ extension MenteeClient: DependencyKey {
         func generateRandomRepeatedText(baseText: String) -> String {
             let repeatCount = Int.random(in: 0...3)
             if repeatCount == 0 { return baseText }
-            
-            // 텍스트를 반복하여 연결
             var resultText = ""
             for index in 0..<repeatCount {
                 resultText += baseText
@@ -338,13 +357,18 @@ extension MenteeClient: DependencyKey {
                 return FetchMenteeInfoResponseDTO.dummy.data!
             },
             joinGoal: { _ in },
+            hasRemainingTodos: {
+                return true
+            },
+            hideRemainingTodosNotice: {
+            },
             fetchMyGoals: { page in
                 try await Task.sleep(nanoseconds: 2_000_000_000)
                 let startId = (page - 1) * 20 + 1
                 return FetchMyGoalsResponseDTO.Response.init(
                     menteeGoals: (0..<20).map { index in
                         let id = startId + index
-                        return FetchMyGoalsResponseDTO.Response.MenteeGoal(
+                        return .init(
                             id: id,
                             title: "목표 #\(id)",
                             topic: "주제 #\(id)",
@@ -352,20 +376,21 @@ extension MenteeClient: DependencyKey {
                             mainImage: "https://example.com/image-\(id).jpg",
                             startDate: "2025-01-01",
                             endDate: "2025-12-31",
-                            finalComment: nil,
+                            mentorLetter: "멘토레터 #\(id)", // finalComment 대신 mentorLetter로 변경
                             todayTodoCount: 5,
                             todayCompletedCount: 3,
-                            todayRemainingCount: 2,
+                            todayRemainingCount: (0...5).randomElement()!,
                             totalTodoCount: 100,
                             totalCompletedCount: id * 5, // 진행도를 다르게 보여주기 위해
                             menteeGoalStatus: [.inProgress, .completed].randomElement()!,
                             createdAt: "2025-01-01",
-                            updatedAt: "2025-02-19"
+                            updatedAt: "2025-02-19",
+                            commentRoomId: 1000 + id // 누락된 필드 추가
                         )
                     },
                     page: .init(
                         totalElements: 50, // 전체 데이터 수
-                        totalPages: 100,     // 전체 페이지 수
+                        totalPages: 100,   // 전체 페이지 수
                         currentPage: page,
                         pageSize: 10,
                         nextPage: page < 5 ? page + 1 : nil,
@@ -425,36 +450,24 @@ extension MenteeClient: DependencyKey {
             },
             fetchCommentDetail: { page, _ in
                 let startId = 20 * (page - 1)
-                
-                // 현재 날짜 기준으로 계산
                 let calendar = Calendar.current
                 let today = Date()
-                
                 return .init(
                     comments: (0..<20).map { index in
                         let id = startId + index + 1
                         let isEven = id % 2 == 0
-                        
-                        // 날짜를 계산할 때 id 대신 id/2를 사용하여
-                        // 연속된 두 개의 메시지(멘티/멘토)가 같은 날짜를 가지도록 함
                         let dateId = id / 2
                         let date = calendar.date(byAdding: .day, value: -dateId, to: today)!
-                        
-                        // 텍스트에 표시할 날짜 형식
                         let koreanDateFormatter = DateFormatter()
                         koreanDateFormatter.locale = Locale(identifier: "ko_KR")
                         koreanDateFormatter.dateFormat = "yyyy년 MM월 dd일"
                         let koreanDateString = koreanDateFormatter.string(from: date)
-                        
                         // ISO8601 포맷으로 변환 (API 응답용)
                         let dateFormatter = ISO8601DateFormatter()
                         dateFormatter.formatOptions = [
                             .withInternetDateTime, .withFractionalSeconds]
                         let dateString = dateFormatter.string(from: date)
-                        
-                        // 텍스트에 날짜 포함
                         let commentText = "안녕하세요 #\(id) [\(koreanDateString)] 영어 단어 암기는 이렇게 하시면 될 것 같아요! 좋은 하루 보내세요 :)"
-                        
                         return CommentContent(
                             id: id,
                             comment: generateRandomRepeatedText(baseText: commentText),

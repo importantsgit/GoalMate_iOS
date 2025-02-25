@@ -78,6 +78,7 @@ public struct GoalCoordinator {
         case setTabbarVisibility(Bool)
         case showMyGoal
         case showLogin
+        case showGoalDetail(Int)
     }
 
     public var body: some Reducer<State, Action> {
@@ -91,6 +92,10 @@ public struct GoalCoordinator {
     var core: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
+            case let .delegate(.showGoalDetail(contentId)):
+                state.routes
+                    .push(.goalDetail(.init(contentId: contentId)))
+                return .send(.delegate(.setTabbarVisibility(state.routes.count == 1)))
             case let .router(.routeAction(
                 _,
                 action: .goalList(.delegate(.showGoalDetail(contentId))))):

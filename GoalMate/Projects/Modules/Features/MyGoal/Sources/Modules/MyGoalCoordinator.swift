@@ -73,6 +73,7 @@ public struct MyGoalCoordinator {
     public enum DelegateAction {
         case setTabbarVisibility(Bool)
         case showGoalList
+        case showGoalDetail(Int)
     }
 
     public var body: some Reducer<State, Action> {
@@ -90,6 +91,10 @@ public struct MyGoalCoordinator {
                 _,
                 action: .myGoalList(.delegate(.showGoalList)))):
                 return .send(.delegate(.showGoalList))
+            case let .router(.routeAction(
+                _,
+                action: .myGoalList(.delegate(.restartGoal(contentId))))):
+                return .send(.delegate(.showGoalDetail(contentId)))
             case let .router(.routeAction(
                 _,
                 action: .myGoalList(.delegate(.showMyGoalDetail(contentId))))):

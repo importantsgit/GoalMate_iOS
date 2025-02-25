@@ -21,7 +21,7 @@ public struct MyGoalCompletionFeature {
         var isLoading: Bool
         var didFailToLoad: Bool
         var toastState: ToastState
-        var content: FetchMyGoalDetailResponseDTO.Response.MenteeGoal?
+        var content: MenteeGoal?
         public init(contentId: Int) {
             self.id = UUID()
             self.contentId = contentId

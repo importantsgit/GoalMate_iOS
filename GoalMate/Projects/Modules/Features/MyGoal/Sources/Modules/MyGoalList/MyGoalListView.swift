@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import Data
 import FeatureCommon
 import SwiftUI
 import Utils
@@ -32,7 +33,10 @@ public struct MyGoalListView: View {
                        (store.isLogin == false || store.myGoalList.isEmpty) {
                         emptyMyGoalView
                     }
-                    if store.isLoading {}
+                    if store.isLoading {
+                        skeletonView
+                            .transition(.opacity)
+                    }
                 }
                 .loadingFailure(didFailToLoad: store.didFailToLoad) {
                     store.send(.view(.retryButtonTapped))
@@ -44,48 +48,45 @@ public struct MyGoalListView: View {
         }
     }
     @ViewBuilder
-    var myGoalListView: some View {
-        WithPerceptionTracking {
-            ScrollView {
-                LazyVStack {
-                    ForEach(store.myGoalList, id: \.id) { content in
-                        VStack(spacing: 0) {
-                            MyGoalContentItem(content: content) { type in
-                                store.send(.view(.buttonTapped(type)))
-                            }
-                            .task {
-                                if store.isLoading == false &&
-                                    store.totalCount > 10 &&
-                                    store.myGoalList[store.totalCount-10].id == content.id {
-                                    store.send(.view(.onLoadMore))
+        var myGoalListView: some View {
+            WithPerceptionTracking {
+                ScrollView {
+                    LazyVStack {
+                        ForEach(store.myGoalList, id: \.id) { content in
+                            VStack(spacing: 0) {
+                                MyGoalContentItem(content: content) { type in
+                                    store.send(.view(.buttonTapped(type)))
                                 }
-                            }
-                            if content.id != store.myGoalList.last?.id {
-                                Rectangle()
-                                    .fill(Colors.grey50)
-                                    .frame(height: 16)
+                                .task {
+                                    if store.isLoading == false &&
+                                        store.pagingationState.totalCount > 10 &&
+                                        store.myGoalList[
+                                            store.pagingationState.totalCount-10].id == content.id {
+                                        store.send(.view(.onLoadMore))
+                                    }
+                                }
+                                if content.id != store.myGoalList.last?.id {
+                                    Rectangle()
+                                        .fill(Colors.grey50)
+                                        .frame(height: 16)
+                                }
                             }
                         }
                     }
+                    if store.isScrollFetching {
+                        ProgressView()
+                            .progressViewStyle(.circular)
+                            .scaleEffect(1.7, anchor: .center)
+                    }
+                    Spacer()
+                        .frame(height: 105)
                 }
-                if store.isScrollFetching {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                        .scaleEffect(1.7, anchor: .center)
-                }
+                .scrollIndicators(.hidden)
+                .animation(
+                    .easeInOut(duration: 0.2),
+                    value: store.isLoading)
             }
-            .overlay {
-                if store.isLoading {
-                    skeletonView
-                        .transition(.opacity)
-                }
-            }
-            .scrollIndicators(.hidden)
-            .animation(
-                .easeInOut(duration: 0.2),
-                value: store.isLoading)
         }
-    }
 
     @ViewBuilder
     var skeletonView: some View {
@@ -185,10 +186,10 @@ public struct MyGoalListView: View {
 }
 
 fileprivate struct MyGoalContentItem: View {
-    let content: MyGoalContent
+    let content: MenteeGoal
     let buttonTapped: (MyGoalListFeature.ButtonType) -> Void
     init(
-        content: MyGoalContent,
+        content: MenteeGoal,
         buttonTapped: @escaping (MyGoalListFeature.ButtonType) -> Void
     ) {
         self.content = content
@@ -196,7 +197,7 @@ fileprivate struct MyGoalContentItem: View {
     }
     var body: some View {
         WithPerceptionTracking {
-            let isExpired = content.goalStatus == .completed
+            let isExpired = content.menteeGoalStatus == .completed
             VStack(spacing: 0) {
                 Spacer()
                     .frame(height: 24)
@@ -207,7 +208,9 @@ fileprivate struct MyGoalContentItem: View {
                             size: 13,
                             color: isExpired ? Colors.grey500 : Colors.grey900
                         )
-                    Text(isExpired ? "done" : "D+\(calculateDplus(fromDate: content.startDate))")
+                    Text(isExpired ?
+                            "done" :
+                            "D+\(calculateDplus(fromDate: content.startDate))")
                         .pretendardStyle(
                             .semiBold,
                             size: 12,
@@ -222,7 +225,8 @@ fileprivate struct MyGoalContentItem: View {
                 Spacer()
                     .frame(height: 14)
                 HStack(spacing: 10) {
-                    if let imageUrl = URL(string: content.mainImageURL) {
+                    if  let mainImage = content.mainImage,
+                        let imageUrl = URL(string: mainImage) {
                         AsyncImage(
                             url: imageUrl
                         ) { phase in
@@ -261,7 +265,7 @@ fileprivate struct MyGoalContentItem: View {
                     }
 
                     VStack(alignment: .leading) {
-                        Text(content.title)
+                        Text(content.title ?? "")
                             .pretendard(
                                 .medium,
                                 size: 16,
@@ -279,7 +283,9 @@ fileprivate struct MyGoalContentItem: View {
                                 Images.calendarP
                                     .resized(length: 16)
                             }
-                            Text("\(content.startDate) 부터\n\(content.endDate) 까지")
+                            let startDate = (content.startDate ?? "").convertDateString()
+                            let endDate = (content.startDate ?? "").convertDateString()
+                            Text("\(startDate ?? "") 부터\n\(endDate ?? "") 까지")
                                 .pretendard(
                                     .medium,
                                     size: 11,
@@ -309,7 +315,9 @@ fileprivate struct MyGoalContentItem: View {
                         }
                     }
                     LinearProgressView(
-                        progress: content.progress,
+                        progress:
+                            Double(content.totalCompletedCount ?? 0) /
+                            Double(content.totalTodoCount ?? 1),
                         progressColor: isExpired ? Colors.grey400 : Colors.primary,
                         backgroundColor: isExpired ? Colors.grey100 : Colors.primary50,
                         lineWidth: 14
@@ -332,7 +340,7 @@ fileprivate struct MyGoalContentItem: View {
                                 buttonTapped(.showGoalRestart(content.id))
                             },
                             label: {
-                                Text("다시 시작가기")
+                                Text("다시 시작하기")
                                     .pretendardStyle(.regular, size: 16)
                             }
                         )
@@ -349,6 +357,8 @@ fileprivate struct MyGoalContentItem: View {
                         )
                     }
                 } else {
+                    let remainingCount: Int = content.todayRemainingCount ?? 0
+                    let hasRemainingTodo: Bool = remainingCount > 0
                     RoundedButton(
                         buttonType: FilledStyle(backgroundColor: Colors.primary),
                         height: 44,
@@ -356,7 +366,9 @@ fileprivate struct MyGoalContentItem: View {
                             buttonTapped(.showGoalDetail(content.id))
                         },
                         label: {
-                            Text("진행하기")
+                            Text(hasRemainingTodo ?
+                                 "오늘 해야 할 일 \(remainingCount)개 완료하기" :
+                                 "진행하기")
                                 .pretendardStyle(.regular, size: 16)
                         }
                     )
@@ -368,13 +380,12 @@ fileprivate struct MyGoalContentItem: View {
         }
     }
 
-    func calculateDplus(fromDate: String) -> Int {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy년 MM월 dd일"
-        let date = dateFormatter.date(from: fromDate)
+    func calculateDplus(fromDate: String?) -> Int {
+        guard let fromDate else { return -1 }
+        let date = fromDate.toDate(format: "yyyy-MM-dd")
         let calendar = Calendar.current
         let currentDate = calendar.startOfDay(for: Date())
-        let startDate = calendar.startOfDay(for: date ?? Date())
+        let startDate = calendar.startOfDay(for: date)
         let components = calendar.dateComponents([.day], from: startDate, to: currentDate)
         return components.day ?? 0
     }
@@ -384,9 +395,7 @@ fileprivate struct MyGoalContentItem: View {
 #Preview {
     MyGoalListView(
         store: .init(
-            initialState: .init(
-                myGoalList: MyGoalContent.dummies
-            )
+            initialState: .init()
         ) {
             withDependencies {
                 $0.authClient = .previewValue

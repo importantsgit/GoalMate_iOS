@@ -41,6 +41,8 @@ public actor DataStorageService {
     )
     var tokenInfo: TokenInfo
     var isLogin: Bool = false
+    var isShowRemainingTodosNotice: Bool = false
+    
     public func setUserInfo(_ userInfo: UserInfo) {
         self.userInfo = userInfo
     }
@@ -52,5 +54,8 @@ public actor DataStorageService {
         }
         self.isLogin = true
         self.tokenInfo = tokenInfo
+    }
+    public func setShowRemainingTodosNotice(_ isShow: Bool) {
+        self.isShowRemainingTodosNotice = isShow
     }
 }
