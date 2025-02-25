@@ -20,12 +20,13 @@ public struct CommentDetailFeature {
         let startDate: Date
         var isLoading: Bool
         var isScrollFetching: Bool
+        var isShowPopup: Bool
+        var isUpdatingComment: Bool
+        var isMessageProcessing: Bool
         var didFailToLoad: Bool
         var input: String = ""
-        var isShowPopup: Bool
-        var isShowCommentPopup: CommentPopupState
-        var isEditMode: EditCommentState
-        var isEditingComment: Bool
+        var isShowEditPopup: EditPopupState
+        var isUpdateMode: UpdateCommentState
         var totalCount: Int
         var currentPage: Int
         var hasMorePages: Bool
@@ -47,10 +48,11 @@ public struct CommentDetailFeature {
             self.currentPage = 1
             self.hasMorePages = true
             self.comments = []
-            self.isShowCommentPopup = .dismiss
-            self.isEditingComment = false
-            self.isEditMode = .idle
+            self.isShowEditPopup = .dismiss
+            self.isUpdatingComment = false
+            self.isUpdateMode = .idle
             self.toastState = .hide
+            self.isMessageProcessing = false
             if let startDate {
                 let date = startDate.toDate(
                     format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
@@ -78,8 +80,8 @@ public struct CommentDetailFeature {
         case retryButtonTapped
         case backButtonTapped
         case sendMessageButtonTapped
-        case showCommentPopup(Int, Position)
-        case dismissCommentPopup
+        case showEditPopup(Int, Position)
+        case dismissEditPopup
         case editCommentButtonTapped(Int)
         case editCancelButtonTapped
         case deleteButtonTapped(Int)
@@ -161,12 +163,12 @@ extension CommentDetailFeature {
                 }
         }
     }
-    public enum CommentPopupState: Equatable {
+    public enum EditPopupState: Equatable {
         case display(Int, Position)
         case dismiss
         public static func == (
-            lhs: CommentPopupState,
-            rhs: CommentPopupState) -> Bool {
+            lhs: EditPopupState,
+            rhs: EditPopupState) -> Bool {
                 switch (lhs, rhs) {
                 case (.display, .display), (.dismiss, .dismiss):
                     return true
@@ -175,12 +177,12 @@ extension CommentDetailFeature {
                 }
         }
     }
-    public enum EditCommentState: Equatable {
-        case edit(Int)
+    public enum UpdateCommentState: Equatable {
+        case edit(Int, String)
         case idle
         public static func == (
-            lhs: EditCommentState,
-            rhs: EditCommentState) -> Bool {
+            lhs: UpdateCommentState,
+            rhs: UpdateCommentState) -> Bool {
                 switch (lhs, rhs) {
                 case (.edit, .edit), (.idle, .idle):
                     return true

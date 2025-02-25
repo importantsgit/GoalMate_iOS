@@ -7,6 +7,7 @@
 
 import ComposableArchitecture
 import Data
+import Utils
 
 extension CommentDetailFeature {
     func reduce(into state: inout State, action: ViewCyclingAction) -> Effect<Action> {
@@ -27,30 +28,36 @@ extension CommentDetailFeature {
             return .send(.feature(.fetchCommentDetail))
         case .backButtonTapped:
             return .send(.delegate(.closeView))
-        case let .showCommentPopup(commentId, position):
-            state.input = ""
-            state.isShowCommentPopup = .display(commentId, position)
-            return .none
-        case .dismissCommentPopup:
-            state.isShowCommentPopup = .dismiss
-            return .none
         case .sendMessageButtonTapped:
             guard state.input.isEmpty == false else { return .none }
-            if case let .edit(commentId) = state.isEditMode {
+            if case let .edit(commentId, text) = state.isUpdateMode {
+                guard text != state.input else { return .none }
                 return .send(.feature(.updateMessage(commentId, state.input)))
             } else {
                 return .send(.feature(.submitMessage(state.input)))
             }
+        case let .showEditPopup(commentId, position):
+            HapticManager.impact(style: .selection)
+            state.input = ""
+            state.isShowEditPopup = .display(commentId, position)
+            return .none
+        case .dismissEditPopup:
+            state.isShowEditPopup = .dismiss
+            return .none
         case let .editCommentButtonTapped(commentId):
-            state.isEditMode = .edit(commentId)
-            state.isShowCommentPopup = .dismiss
+            guard let selectComment = state.comments[id: commentId],
+                  let text = selectComment.comment
+            else { return .none }
+            state.input = text
+            state.isUpdateMode = .edit(commentId, text)
+            state.isShowEditPopup = .dismiss
             return .none
         case .editCancelButtonTapped:
             state.input = ""
-            state.isEditMode = .idle
+            state.isUpdateMode = .idle
             return .none
         case let .deleteButtonTapped(commentId):
-            state.isShowCommentPopup = .dismiss
+            state.isShowEditPopup = .dismiss
             return .send(.feature(.deleteMessage(commentId)))
         }
     }
@@ -96,7 +103,7 @@ extension CommentDetailFeature {
             state.isScrollFetching = false
             return .none
         case let .submitMessage(message):
-            state.isLoading = true
+            state.isMessageProcessing = true
             return .run { [roomId = state.roomId, message] send in
                 do {
                     let response = try await menteeClient.postMessage(
@@ -137,9 +144,10 @@ extension CommentDetailFeature {
             case .networkError, .failed:
                 state.toastState = .display("수정하지 못했습니다.")
             }
-            state.isLoading = false
+            state.isMessageProcessing = false
             return .none
         case let .updateMessage(commentId, message):
+            state.isMessageProcessing = true
             return .run { [commentId, message] send in
                 do {
                     let response = try await menteeClient.updateMessage(
@@ -166,14 +174,15 @@ extension CommentDetailFeature {
             switch result {
             case let .success(comment):
                 state.input = ""
-                state.isEditMode = .idle
+                state.isUpdateMode = .idle
                 state.comments[id: comment.id] = comment
             case .networkError, .failed:
                 state.toastState = .display("수정하지 못했습니다.")
             }
-            state.isLoading = false
+            state.isMessageProcessing = false
             return .none
         case let .deleteMessage(commentId):
+            state.isMessageProcessing = true
             return .run { [commentId] send in
                 do {
                     try await menteeClient
@@ -201,7 +210,7 @@ extension CommentDetailFeature {
             case .networkError, .failed:
                 state.toastState = .display("삭제하지 못했습니다.")
             }
-            state.isLoading = false
+            state.isMessageProcessing = false
             return .none
         }
     }

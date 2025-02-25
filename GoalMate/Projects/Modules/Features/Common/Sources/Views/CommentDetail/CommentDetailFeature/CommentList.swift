@@ -62,7 +62,6 @@ struct CommentList: UIViewRepresentable {
         func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
             return parent.comments.count
         }
-        
         func tableView(
             _ tableView: UITableView,
             cellForRowAt indexPath: IndexPath
@@ -71,34 +70,23 @@ struct CommentList: UIViewRepresentable {
                 withIdentifier: "CommentCell",
                 for: indexPath) as? CommentCell
             else { return UITableViewCell() }
-            
             let comment = parent.comments[indexPath.row]
-            
-            // 날짜를 표시할지 여부를 결정
             var shouldShowDate = false
-            
             if let currentCommentDate = comment.commentedAt {
-                // 테이블이 뒤집어져 있으므로 인덱스가 +1인 셀이 화면상 아래에 위치함
                 if indexPath.row + 1 < parent.comments.count {
-                    // 아래에 있는 셀(인덱스가 더 큰)의 날짜와 비교
                     let belowComment = parent.comments[indexPath.row + 1]
                     if let belowCommentDate = belowComment.commentedAt {
-                        // 날짜 형식 변환
                         let currentDate = currentCommentDate.toDate(format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
                         let belowDate = belowCommentDate.toDate(format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
                         
-                        // 일자가 다르면 날짜 표시
                         shouldShowDate = !Calendar.current.isDate(currentDate, inSameDayAs: belowDate)
                     } else {
-                        // 아래 코멘트에 날짜가 없으면 날짜 표시
                         shouldShowDate = true
                     }
                 } else {
-                    // 가장 마지막 코멘트는 항상 날짜 표시
                     shouldShowDate = true
                 }
             }
-            
             cell.configure(with: comment, startDate: parent.startDate, showDateStack: shouldShowDate)
             cell.transform = CGAffineTransform(rotationAngle: .pi)
             cell.onLongPress = { [weak self] (minY, maxY) in
@@ -149,7 +137,7 @@ class CommentCell: UITableViewCell {
         longPressGesture = UILongPressGestureRecognizer(
             target: self,
             action: #selector(handleLongPress(_:)))
-        longPressGesture.minimumPressDuration = 2.0
+        longPressGesture.minimumPressDuration = 0.3
         bubbleView.addGestureRecognizer(longPressGesture)
     }
     
@@ -194,7 +182,7 @@ class CommentCell: UITableViewCell {
         dateLabel.font = IFont.Pretendard.medium.value.font(size: 14)
         dateLabel.textColor = Asset.Assets.Grey.grey700.color
         dateStackView.addArrangedSubview(dateLabel)
-        dplusLabelView.backgroundColor = Asset.Assets.Primary.primary800.color
+        dplusLabelView.backgroundColor = Asset.Assets.Primary.primary700.color
         dplusLabelView.translatesAutoresizingMaskIntoConstraints = false
         dplusLabelView.layer.cornerRadius = 4
         dplusLabelView.clipsToBounds = true
@@ -276,7 +264,6 @@ class CommentCell: UITableViewCell {
             bubbleView.backgroundColor = UIColor(hex: "FBFFF5")
             bubbleTrailingConstraint?.isActive = true
             containerBottomConstraint?.constant = -16
-            
             if let commentedAt = comment.commentedAt, showDateStack {
                 dateStackView.isHidden = false
                 let text = commentedAt.convertDateString(
@@ -301,12 +288,10 @@ class CommentCell: UITableViewCell {
             }
         }
         containerBottomConstraint?.isActive = true
-        
         // 레이아웃 갱신
         setNeedsLayout()
         layoutIfNeeded()
     }
-    
     @objc private func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
         guard self.writerRole == .mentee else { return }
         if gestureRecognizer.state == .began {
@@ -325,7 +310,7 @@ class CommentCell: UITableViewCell {
             }
         }
     }
-    
+
     override func prepareForReuse() {
         super.prepareForReuse()
         messageLabel.text = nil
@@ -333,5 +318,13 @@ class CommentCell: UITableViewCell {
         dplusLabel.text = nil
         dateStackView.isHidden = true
         writerRole = .mentor
+
+        bubbleLeadingConstraint?.isActive = false
+        bubbleTrailingConstraint?.isActive = false
+        bubbleTopConstraint?.isActive = false
+        stackViewTopConstraint?.isActive = false
+        stackToBubbleConstraint?.isActive = false
+        stackViewCenterXConstraint?.isActive = false
+        containerBottomConstraint?.isActive = false
     }
 }

@@ -150,7 +150,7 @@ public struct CommentListView: View {
             }
         }
     }
-    
+
     @ViewBuilder
     var skeletonView: some View {
         VStack {
@@ -193,7 +193,7 @@ public struct CommentListView: View {
         .padding(.horizontal, 20)
         .background(.white)
     }
-    
+
     @ViewBuilder
     var emptyCommentView: some View {
         WithPerceptionTracking {

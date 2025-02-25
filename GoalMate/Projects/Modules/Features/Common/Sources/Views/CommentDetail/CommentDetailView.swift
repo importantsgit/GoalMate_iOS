@@ -53,105 +53,47 @@ public struct CommentDetailView: View {
                     )
                     .frame(height: 64)
                     VStack(spacing: 0) {
-                        // Comments List
-                        CommentList(
-                            comments: store.comments,
-                            startDate: store.startDate
-                        ) {
-                            if store.hasMorePages &&
-                                store.isScrollFetching == false {
-                                store.send(.view(.onLoadMore))
+                        ZStack {
+                            // Comments List
+                            CommentList(
+                                comments: store.comments,
+                                startDate: store.startDate
+                            ) {
+                                if store.hasMorePages &&
+                                    store.isScrollFetching == false {
+                                    store.send(.view(.onLoadMore))
+                                }
+                            } onLongPress: { (comment, points) in
+                                let minY = points.0, maxY = points.1
+                                let commentTop = minY - (safeAreaInsets.top + 64)
+                                let commentBottom = maxY - (safeAreaInsets.top + 64)
+                                store.send(.view(.showEditPopup(
+                                    comment.id,
+                                    (commentTop < 80 ?
+                                            .bottom(commentBottom) :
+                                            .top(commentTop-80)))))
                             }
-                        } onLongPress: { (comment, points) in
-                            let minY = points.0, maxY = points.1
-                            let commentTop = minY - (safeAreaInsets.top + 64)
-                            let commentBottom = maxY - (safeAreaInsets.top + 64)
-                            store.send(.view(.showCommentPopup(
-                                comment.id,
-                                (commentTop < 80 ?
-                                        .bottom(commentBottom) :
-                                        .top(commentTop-80)))))
-                        }
-                        VStack(spacing: 0) {
-                            Divider()
-                            HStack(alignment: .top, spacing: 12) {
-                                TextField(
-                                    "",
-                                    text: $store.input.sending(\.inputText),
-                                    prompt: Text("하루 1회, 300자 이만으로 작성해주세요:)")
-                                        .pretendardStyle(
-                                            .regular,
-                                            size: 16,
-                                            color: Colors.grey500),
-                                    axis: .vertical
-                                )
-                                .pretendard(
-                                    .regular,
-                                    size: 16,
-                                    color: Colors.grey900)
-                                .lineLimit(1...30)
-                                .frame(maxWidth: .infinity, minHeight: 24)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 8)
-                                .background(
-                                    RoundedRectangle(cornerRadius: 30)
-                                        .stroke(Colors.grey300, lineWidth: 2)
-                                        .background(.white)
-                                )
-                                if case .edit(_) = store.isEditMode {
-                                    Button {
-                                        store.send(.view(.editCancelButtonTapped))
-                                    } label: {
-                                        Images.cancel
-                                            .resized(length: 16)
-                                            .frame(width: 44, height: 44)
-                                            .background(
-                                                Circle()
-                                                    .fill(Colors.grey200)
-                                            )
-                                    }
-                                }
-                                Button {
-                                    store.send(.view(.sendMessageButtonTapped))
-                                } label: {
-                                    Image(systemName: "arrow.up")
-                                        .resizable()
-                                        .foregroundStyle(
-                                            store.input.isEmpty ?
-                                                .white :
-                                                .black
-                                        )
-                                        .frame(width: 14, height: 14)
-                                        .frame(width: 44, height: 44)
-                                        .background(
-                                            Circle()
-                                                .fill(
-                                                    store.input.isEmpty ?
-                                                        Colors.grey200 :
-                                                        Colors.primary
-                                                )
-                                        )
-                                }
-                                .disabled(store.input.isEmpty)
+                            if store.isLoading == false &&
+                               store.comments.isEmpty {
+                                Spacer()
+                                Text("오늘 해야 할 일을 진행하며 생긴\n고민과 질문을 남기고 멘토 코멘트를 받아보세요:)")
+                                    .pretendardStyle(
+                                        .regular,
+                                        size: 16,
+                                        color: Colors.grey900
+                                    )
+                                    .multilineTextAlignment(.center)
+                                Spacer()
                             }
-                            .padding(.horizontal, 16)
-                            .padding(.vertical, 8)
-                            .toolbar {
-                                ToolbarItemGroup(placement: .keyboard) {
-                                    Spacer()  // 오른쪽 정렬을 위한 Spacer
-                                    Button {
-                                        hideKeyboard()
-                                    } label: {
-                                        Image(systemName: "chevron.down")
-                                            .foregroundStyle(.gray)
-                                            .font(.system(size: 16, weight: .semibold))
-                                    }
-                                }
+                            if store.isLoading {
+                                skeletonView
+                                    .transition(.opacity)
                             }
                         }
+                        textFieldView
                     }
                     .overlay {
-                        if case let .display(commentId, position) = store.isShowCommentPopup {
+                        if case let .display(commentId, position) = store.isShowEditPopup {
                             VStack {
                                 if case let .top(padding) = position {
                                     Spacer()
@@ -191,18 +133,18 @@ public struct CommentDetailView: View {
                             }
                             .transition(.opacity)
                             .background {
-                                if case .display = store.isShowCommentPopup {
+                                if case .display = store.isShowEditPopup {
                                     Color.clear
                                         .contentShape(Rectangle())
                                         .onTapGesture {
-                                            store.send(.view(.dismissCommentPopup))
+                                            store.send(.view(.dismissEditPopup))
                                         }
                                 }
                             }
                         }
                     }
                     .onTapGesture {
-                        store.send(.view(.dismissCommentPopup))
+                        store.send(.view(.dismissEditPopup))
                     }
                 }
                 .task {
@@ -237,7 +179,153 @@ public struct CommentDetailView: View {
                     }
                 }
             }
-            .animation(.spring(duration: 0.2), value: store.isShowCommentPopup)
+            .animation(.spring(duration: 0.2), value: store.isShowEditPopup)
+            .animation(.easeInOut(duration: 0.1), value: store.isLoading)
+        }
+    }
+
+    @ViewBuilder
+    var skeletonView: some View {
+        ScrollView {
+            VStack {
+                Spacer()
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Colors.grey200)
+                    .frame(width: 160, height: 20)
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Colors.grey200)
+                    .frame(height: 60)
+                    .padding(.leading, 20)
+                    .padding(.trailing, 120)
+                Spacer()
+                    .frame(height: 32)
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Colors.grey200)
+                    .frame(width: 160, height: 20)
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Colors.grey200)
+                    .frame(height: 100)
+                    .padding(.trailing, 20)
+                    .padding(.leading, 120)
+                Spacer()
+                    .frame(height: 32)
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Colors.grey200)
+                    .frame(height: 100)
+                    .padding(.leading, 20)
+                    .padding(.trailing, 120)
+                Spacer()
+                    .frame(height: 32)
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Colors.grey200)
+                    .frame(width: 160, height: 20)
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Colors.grey200)
+                    .frame(height: 100)
+                    .padding(.trailing, 20)
+                    .padding(.leading, 120)
+                Spacer()
+                    .frame(height: 32)
+                RoundedRectangle(cornerRadius: 8)
+                    .fill(Colors.grey200)
+                    .frame(height: 100)
+                    .padding(.leading, 20)
+                    .padding(.trailing, 120)
+            }
+        }
+        .scrollIndicators(.hidden)
+        .background(.white)
+    }
+
+    @ViewBuilder
+    var textFieldView: some View {
+        HStack(alignment: .top, spacing: 12) {
+            TextField(
+                "",
+                text: $store.input.sending(\.inputText),
+                prompt: Text("하루 1회, 300자 이만으로 작성해주세요:)")
+                    .pretendardStyle(
+                        .regular,
+                        size: 16,
+                        color: Colors.grey500),
+                axis: .vertical
+            )
+            .pretendard(
+                .regular,
+                size: 16,
+                color: Colors.grey900)
+            .lineLimit(1...30)
+            .frame(maxWidth: .infinity, minHeight: 24)
+            .padding(.horizontal, 10)
+            .padding(.vertical, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 30)
+                    .stroke(Colors.grey300, lineWidth: 2)
+                    .background(.white)
+            )
+            .disabled(store.isLoading)
+            if case .edit(_, _) = store.isUpdateMode {
+                Button {
+                    store.send(.view(.editCancelButtonTapped))
+                } label: {
+                    Images.cancel
+                        .resized(length: 20)
+                        .frame(width: 44, height: 44)
+                        .background(
+                            Circle()
+                                .fill(Colors.grey200)
+                        )
+                }
+            }
+            Button {
+                store.send(.view(.sendMessageButtonTapped))
+            } label: {
+                Images.arrowUp
+                    .renderingMode(.template)
+                    .resizable()
+                    .frame(width: 20, height: 20)
+                    .frame(width: 44, height: 44)
+                    .foregroundStyle(
+                        getTextFieldForgroundColor()
+                    )
+                    .background(
+                        Circle()
+                            .fill(getTextFieldButtonColor())
+                    )
+            }
+            .disabled(store.input.isEmpty || store.isMessageProcessing)
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()  // 오른쪽 정렬을 위한 Spacer
+                Button {
+                    hideKeyboard()
+                } label: {
+                    Image(systemName: "chevron.down")
+                        .foregroundStyle(.gray)
+                        .font(.system(size: 16, weight: .semibold))
+                }
+            }
+        }
+    }
+
+    func getTextFieldForgroundColor() -> Color {
+        if case let .edit(_, text) = store.isUpdateMode,
+            text == store.input {
+            return .white
+        } else {
+            return store.input.isEmpty ? .white : .black
+        }
+    }
+
+    func getTextFieldButtonColor() -> Color {
+        if case let .edit(_, text) = store.isUpdateMode,
+            text == store.input {
+            return Colors.grey200
+        } else {
+            return store.input.isEmpty ? Colors.grey200 : Colors.primary
         }
     }
 
@@ -260,12 +348,18 @@ fileprivate struct CommentPopupView: View {
                 Button {
                     updateButtonTapped()
                 } label: {
-                    Text("수정")
-                        .pretendard(.regular, size: 14, color: Colors.grey900)
-                        .padding(.leading, 13)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .frame(height: 40)
+                    VStack(spacing: 0) {
+                        Text("수정")
+                            .pretendard(.regular, size: 14, color: Colors.grey900)
+                            .padding(.leading, 13)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .frame(height: 49)
+                        Rectangle()
+                            .fill(Color(hex: "E7E7E7"))
+                            .frame(height: 1)
+                    }
                 }
+
                 Button {
                     deleteButtonTapped()
                 } label: {
