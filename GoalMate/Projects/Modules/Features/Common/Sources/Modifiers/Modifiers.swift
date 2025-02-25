@@ -21,7 +21,7 @@ struct FontModifier: ViewModifier {
 }
 
 struct LoadingModifier: ViewModifier {
-    @Binding var isLoading: Bool
+    var isLoading: Bool
     func body(content: Content) -> some View {
         content
             .overlay {

@@ -49,7 +49,7 @@ struct SignUpView: View {
                 }
             }
             .setMargin()
-            .loading(isLoading: $store.isLoading)
+            .loading(isLoading: store.isLoading)
             .onAppear {
                 store.send(.viewCycling(.onAppear))
             }

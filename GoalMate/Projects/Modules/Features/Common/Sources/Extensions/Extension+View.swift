@@ -20,7 +20,7 @@ public extension View {
         modifier(FontModifier(size: size, font: font, color: color))
     }
 
-    func loading(isLoading: Binding<Bool>) -> some View {
+    func loading(isLoading: Bool) -> some View {
         modifier(LoadingModifier(isLoading: isLoading))
     }
 
