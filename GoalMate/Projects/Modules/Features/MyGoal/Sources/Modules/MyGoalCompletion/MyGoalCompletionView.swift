@@ -19,11 +19,9 @@ public struct MyGoalCompletionView: View {
                         Button {
                             store.send(.view(.backButtonTapped))
                         } label: {
-                            VStack {
-                                Images.back
-                                    .resized(length: 24)
-                            }
-                            .padding(.all, 12)
+                            Images.back
+                                .resized(length: 24)
+                                .padding(.all, 12)
                         }
                     },
                     centerContent: {
@@ -36,8 +34,9 @@ public struct MyGoalCompletionView: View {
                     }
                 )
                 .frame(height: 64)
+                .padding(.leading, 4)
                 Group {
-                    ZStack {
+                    ZStack(alignment: .bottom) {
                         ScrollView {
                             VStack(spacing: 0) {
                                 goalDetailView
@@ -69,41 +68,27 @@ public struct MyGoalCompletionView: View {
                                                 .foregroundStyle(Colors.grey500)
                                         }
                                     }
-                                    .padding(20)
+                                    .padding(.vertical, 24)
+                                    .padding(.horizontal, 28)
                                     .background(Colors.grey100)
                                     .clipShape(.rect(cornerRadius: 20))
                                 }
-                            }
-                        }
-                        .overlay(alignment: .bottom) {
-                            VStack(spacing: 0) {
-                                Button {
-                                    store.send(.view(.nextGoalButtonTapped))
-                                } label: {
-                                    Text("다음 목표 시작하기")
-                                        .pretendard(
-                                            .medium,
-                                            size: 16,
-                                            color: .black
-                                        )
-                                        .frame(maxWidth: .infinity)
-                                        .frame(height: 54)
-                                        .background(Colors.primary)
-                                        .clipShape(.capsule)
-                                }
                                 Spacer()
-                                    .frame(height: 16)
+                                    .frame(height: 150)
                             }
+                            .padding(.horizontal, 16)
                         }
-                        .loadingFailure(didFailToLoad: store.didFailToLoad) {
-                            store.send(.view(.retryButtonTapped))
-                        }
+                        bottomButtomView
+                            .padding(.horizontal, 16)
                         if store.isLoading {
                             skeletonView
+                                .padding(.horizontal, 16)
                         }
                     }
+                    .loadingFailure(didFailToLoad: store.didFailToLoad) {
+                        store.send(.view(.retryButtonTapped))
+                    }
                 }
-                .padding(.horizontal, 16)
             }
             .toast(state: $store.toastState, position: .top)
             .task {
@@ -145,21 +130,17 @@ public struct MyGoalCompletionView: View {
                             isLoading: true,
                             content: "마루"
                         )
-                        LabelView(
-                            title: "진행기간",
-                            isLoading: true,
-                            content: "2024년 11월 17일 부터\n2024년 12월 17일까지"
-                        )
-                        LabelView(
-                            title: "상태",
-                            isLoading: true,
-                            content: "진행 완료"
-                        )
-                        LabelView(
-                            title: "달성율",
-                            isLoading: true,
-                            content: "90%"
-                        )
+                        VStack {
+                            LabelView(
+                                title: "진행기간",
+                                isLoading: true,
+                                content: "20일"
+                            )
+                            RoundedRectangle(cornerRadius: 4)
+                                .fill(.white)
+                                .frame(width: 100, height: 40)
+                                .padding(.leading, 90)
+                        }
                     }
                     Spacer()
                         .frame(height: 30)
@@ -209,10 +190,10 @@ public struct MyGoalCompletionView: View {
                     }
                 }
                 Spacer()
-                    .frame(height: 4)
+                    .frame(height: 30)
                 VStack(spacing: 20) {
                     LabelView(
-                        title: "목표명",
+                        title: "목표",
                         isLoading: store.isLoading,
                         content: store.content?.title
                     )
@@ -221,27 +202,59 @@ public struct MyGoalCompletionView: View {
                         isLoading: store.isLoading,
                         content: store.content?.mentorName
                     )
-                    LabelView(
-                        title: "진행기간",
-                        isLoading: store.isLoading,
-                        content: """
-                        \(store.content?.startDate?.convertDate() ?? "") 부터
-                        \(store.content?.endDate?.convertDate() ?? "") 까지
-                        """
-                    )
-                    LabelView(
-                        title: "상태",
-                        isLoading: store.isLoading,
-                        content: "진행 완료"
-                    )
-                    LabelView(
-                        title: "달성율",
-                        isLoading: store.isLoading,
-                        content: calculatePercentage(
-                            completed: store.content?.totalCompletedCount,
-                            total: store.content?.totalCompletedCount
+                    VStack(alignment: .leading, spacing: 4) {
+                        let startDate = store.content?.startDate ?? ""
+                        let endDate = store.content?.endDate ?? ""
+                        let day = calculatePeriodInDays(
+                            startDate: startDate,
+                            endDate: endDate)
+                        LabelView(
+                            title: "진행기간",
+                            isLoading: store.isLoading,
+                            content: "\(day)일"
                         )
-                    )
+                        HStack(alignment: .top, spacing: 10) {
+                            Images.calendarP
+                                .resized(length: 24)
+                            let startDate = startDate
+                                .convertDateString(toFormat: "yyyy년 MM월 dd일")
+                            let endDate = endDate
+                                .convertDateString(toFormat: "yyyy년 MM월 dd일")
+                            Text("\(startDate ?? "") 부터\n\(endDate ?? "") 까지")
+                                .pretendard(
+                                    .medium,
+                                    size: 14,
+                                    color: Colors.grey600
+                                )
+                                .lineLimit(2)
+                                .multilineTextAlignment(.leading)
+                        }
+                        .padding(12)
+                        .background(Colors.grey50)
+                        .clipShape(.rect(cornerRadius: 12))
+                        .padding(.leading, 90)
+                    }
+                    HStack(alignment: .top, spacing: 30) {
+                        Text("달성율")
+                            .pretendard(
+                                .semiBold,
+                                size: 16,
+                                color: Colors.grey600)
+                            .frame(
+                                minWidth: 60,
+                                alignment: .leading)
+                            .padding(.top, 12)
+                        LinearProgressView(
+                            isShowFlag: true,
+                            progress:
+                                Double(store.content?.totalCompletedCount ?? 0) /
+                                Double(store.content?.totalTodoCount ?? 1),
+                            progressColor: Colors.primary,
+                            backgroundColor: Colors.primary50,
+                            lineWidth: 14
+                        )
+                        .padding(.top, 14)
+                    }
                 }
             }
         }
@@ -252,15 +265,13 @@ public struct MyGoalCompletionView: View {
         VStack(spacing: 16) {
             Text("to. 김골메이트")
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .font(.system(size: 16, weight: .regular)) // TODO: 고치기
-                .foregroundStyle(Colors.primary900)
+                .pretendard(.regular, size: 16, color: Colors.primary900)
             Text("김골메이트님!\n30일동안 고생 많았어요~! 어떠셨어요? 조금 힘들었죠? 앞으로도 응원할게요!김골메이트님!".splitCharacters())
                 .pretendardStyle(.regular, size: 15)
                 .lineSpacing(4)
             Text("from. ANNA")
                 .frame(maxWidth: .infinity, alignment: .trailing)
-                .font(.system(size: 16, weight: .regular)) // TODO: 고치기
-                .foregroundStyle(Colors.primary900)
+                .pretendard(.regular, size: 16, color: Colors.primary900)
         }
         .padding(24)
         .background(Color(hex: "FBFFF5"))
@@ -269,6 +280,37 @@ public struct MyGoalCompletionView: View {
             RoundedRectangle(cornerRadius: 30)
                 .stroke(Colors.grey100, lineWidth: 3)
         }
+    }
+
+    @ViewBuilder
+    var bottomButtomView: some View {
+        VStack(spacing: 0) {
+            Spacer()
+            Button {
+                store.send(.view(.nextGoalButtonTapped))
+            } label: {
+                Text("다음 목표 시작하기")
+                    .pretendard(
+                        .medium,
+                        size: 16,
+                        color: .black
+                    )
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 54)
+                    .background(Colors.primary)
+                    .clipShape(.capsule)
+            }
+            Spacer()
+                .frame(height: 16)
+        }
+        .frame(height: 112)
+        .background(
+            LinearGradient(
+                gradient: Gradient(colors: [.white.opacity(0), .white, .white]),
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        )
     }
 
     func calculatePercentage(
@@ -281,16 +323,17 @@ public struct MyGoalCompletionView: View {
         else { return "-" }
         return String(Int(round(Double(completed) / Double(total) * 100)))
     }
-}
 
-fileprivate extension String {
-    func convertDate() -> String {
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        let date = dateFormatter.date(from: self)
-        dateFormatter.dateFormat = "yyyy년 MM월 dd일"
-        let dateString = dateFormatter.string(from: date ?? Date())
-        return dateString
+    func calculatePeriodInDays(startDate: String?, endDate: String?) -> Int {
+        guard let startDate, let endDate else { return -1 }
+        let startDateObj = startDate.toDate(format: "yyyy-MM-dd")
+        let endDateObj = endDate.toDate(format: "yyyy-MM-dd")
+        let calendar = Calendar.current
+        let startDay = calendar.startOfDay(for: startDateObj)
+        let endDay = calendar.startOfDay(for: endDateObj)
+        let components = calendar.dateComponents(
+            [.day], from: startDay, to: endDay)
+        return (components.day ?? 0) + 1
     }
 }
 
@@ -325,7 +368,7 @@ fileprivate struct LabelView: View {
                     .multilineTextAlignment(.leading)
                     .lineSpacing(4)
                     .pretendard(
-                        .semiBold,
+                        .medium,
                         size: 16,
                         color: isLoading ?
                             .clear :

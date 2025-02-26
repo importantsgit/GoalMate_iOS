@@ -57,6 +57,7 @@ public struct MyGoalListView: View {
                                 MyGoalContentItem(content: content) { type in
                                     store.send(.view(.buttonTapped(type)))
                                 }
+                                .id(content.id)
                                 .task {
                                     if store.isLoading == false &&
                                         store.pagingationState.totalCount > 10 &&
@@ -283,8 +284,10 @@ fileprivate struct MyGoalContentItem: View {
                                 Images.calendarP
                                     .resized(length: 16)
                             }
-                            let startDate = (content.startDate ?? "").convertDateString()
-                            let endDate = (content.endDate ?? "").convertDateString()
+                            let startDate = (content.startDate ?? "")
+                                .convertDateString(toFormat: "yyyy년 MM월 dd일")
+                            let endDate = (content.endDate ?? "")
+                                .convertDateString(toFormat: "yyyy년 MM월 dd일")
                             Text("\(startDate ?? "") 부터\n\(endDate ?? "") 까지")
                                 .pretendard(
                                     .medium,
@@ -316,8 +319,8 @@ fileprivate struct MyGoalContentItem: View {
                     }
                     LinearProgressView(
                         progress:
-                            Double(content.totalCompletedCount ?? 0) /
-                            Double(content.totalTodoCount ?? 1),
+                            Double(content.totalCompletedCount) /
+                        Double(content.totalTodoCount),
                         progressColor: isExpired ? Colors.grey400 : Colors.primary,
                         backgroundColor: isExpired ? Colors.grey100 : Colors.primary50,
                         lineWidth: 14

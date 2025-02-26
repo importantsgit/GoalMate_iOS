@@ -10,18 +10,21 @@ import SwiftUI
 public struct LinearProgressView: View {
     var progress: Double
     let title: String?
+    let isShowFlag: Bool
     let progressColor: Color
     let backgroundColor: Color
     let lineWidth: CGFloat
 
     public init(
         title: String? = nil,
+        isShowFlag: Bool = false,
         progress: Double,
         progressColor: Color,
         backgroundColor: Color,
         lineWidth: CGFloat
     ) {
         self.title = title
+        self.isShowFlag = isShowFlag
         self.progress = progress
         self.progressColor = progressColor
         self.backgroundColor = backgroundColor
@@ -39,25 +42,30 @@ public struct LinearProgressView: View {
             }
             VStack(spacing: 4) {
                 GeometryReader { geometry in
+                    let width = min(max(calculateProgress(progress), 0), 1)
+                    * geometry.size.width
                     ZStack(alignment: .leading) {
                         backgroundColor
                         Rectangle()
                             .fill(progressColor)
-                            .frame(
-                                width:
-                                    min(
-                                        max(
-                                            calculateProgress(progress),
-                                            0
-                                        ),
-                                        1
-                                    ) * geometry.size.width
-                            )
+                            .frame(width: width)
+                    }
+                    .clipShape(
+                        RoundedRectangle(cornerRadius: lineWidth/2)
+                    )
+                    .overlay {
+                        if isShowFlag {
+                            HStack {
+                                Images.flagGreen
+                                    .resized(length: 14)
+                                Spacer()
+                            }
+                            .offset(
+                                x: width-3,
+                                y: -((lineWidth/2)+7))
+                        }
                     }
                 }
-                .clipShape(
-                    RoundedRectangle(cornerRadius: lineWidth/2)
-                )
                 .frame(height: lineWidth)
                 .animation(.easeInOut, value: progress)
                 HStack {

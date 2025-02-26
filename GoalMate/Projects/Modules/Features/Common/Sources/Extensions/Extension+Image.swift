@@ -40,6 +40,7 @@ public extension Images {
     static let comment = Asset.Assets.comment.swiftUIImage
     static let cancel = Asset.Assets.cancel.swiftUIImage
     static let arrowUp = Asset.Assets.arrowUp.swiftUIImage
+    static let flagGreen = Asset.Assets.flagGreen.swiftUIImage
 }
 
 public extension Image {
