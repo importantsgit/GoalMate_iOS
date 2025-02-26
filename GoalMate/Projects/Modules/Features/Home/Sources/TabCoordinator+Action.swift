@@ -16,11 +16,9 @@ extension TabCoordinator {
     func reduce(into state: inout State, action: ViewCyclingAction) -> Effect<Action> {
         switch action {
         case .onAppear:
-            // TODO: 새 체크 리스트
-            // TODO: 새 알림 카운트
             return .merge(
-                .none,
-                .none
+                .send(.feature(.checkRemainingTodo)),
+                .none // TODO: 새 알림 카운트
             )
         }
     }
@@ -34,16 +32,17 @@ extension TabCoordinator {
         switch action {
         case .checkRemainingTodo:
             return .run { send in
-                // TODO: 오늘 해야 할 일이 남았어요
-                let hasRemainingTodos = try await menteeClient.hasRemainingTodos()
-                await send(.feature(
-                    .checkRemainingTodoResponse(hasRemainingTodos)))
+                do {
+                    let hasRemainingTodos = try await menteeClient.hasRemainingTodos()
+                    await send(.feature(
+                        .checkRemainingTodoResponse(hasRemainingTodos)))
+                } catch {
+                    await send(.feature(
+                        .checkRemainingTodoResponse(false)))
+                }
             }
         case let .checkRemainingTodoResponse(result):
             state.hasRemainingTodos = result
-            return .none
-        case .hideRemainingTodoNotice:
-            // TODO: 오늘 해야 할 일이 남았어요
             return .none
         }
     }

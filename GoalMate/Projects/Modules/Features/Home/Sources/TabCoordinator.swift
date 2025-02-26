@@ -59,7 +59,7 @@ public struct TabCoordinator {
         case profile(ProfileCoordinator.Action)
         case comment(CommentCoordinator.Action)
         case binding(BindingAction<State>)
-        case remainingTodosNoticeTapped(Bool)
+        case tabbarButtonTapped(Tab)
     }
     public enum ViewCyclingAction {
         case onAppear
@@ -68,7 +68,6 @@ public struct TabCoordinator {
         case showLogin
     }
     public enum FeatureAction {
-        case hideRemainingTodoNotice
         case checkRemainingTodo
         case checkRemainingTodoResponse(Bool)
     }
@@ -103,9 +102,9 @@ public struct TabCoordinator {
                 return reduce(into: &state, action: action)
             case let .profile(action):
                 return reduce(into: &state, action: action)
-            case .remainingTodosNoticeTapped:
-                state.hasRemainingTodos = false
-                return .send(.feature(.hideRemainingTodoNotice))
+            case let .tabbarButtonTapped(tab):
+                state.selectedTab = tab
+                return .none
             case .binding:
                 return .none
             }

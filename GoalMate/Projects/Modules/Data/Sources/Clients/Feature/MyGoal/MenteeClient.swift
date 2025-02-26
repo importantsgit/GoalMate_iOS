@@ -100,8 +100,6 @@ extension MenteeClient: DependencyKey {
                 }
             },
             hasRemainingTodos: {
-                guard await dataStorageClient.isShowRemainingTodosNotice
-                else { return false }
                 return try await executeWithTokenValidation { accessToken in
                     let endpoint = APIEndpoints.checkTodosEndpoint(
                         accessToken: accessToken)

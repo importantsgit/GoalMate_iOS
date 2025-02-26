@@ -58,7 +58,10 @@ public struct TabCoordinatorView: View {
                 if store.isTabVisible {
                     VStack {
                         Spacer()
-                        CustomTabBar(selectedTab: $store.selectedTab)
+                        CustomTabBar(
+                            selectedTab: $store.selectedTab.sending(\.tabbarButtonTapped),
+                            hasRemainingTodos: store.hasRemainingTodos
+                        )
                             .onAppear {
                                 store.send(.viewCycling(.onAppear))
                             }
@@ -72,25 +75,51 @@ public struct TabCoordinatorView: View {
 
 struct CustomTabBar: View {
     @Binding var selectedTab: TabCoordinator.Tab
+    var hasRemainingTodos: Bool
+    init(
+        selectedTab: Binding<TabCoordinator.Tab>,
+        hasRemainingTodos: Bool) {
+        self._selectedTab = selectedTab
+        self.hasRemainingTodos = hasRemainingTodos
+    }
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
                 ForEach(TabCoordinator.Tab.allCases, id: \.self) { tab in
-                    tabButton(tab)
+                    ZStack {
+                        tabButton(tab)
+                    }
+                }
+            }
+            .overlay {
+                if selectedTab != .myGoal && hasRemainingTodos {
+                    GeometryReader { geometry in
+                        let tabWidth = geometry.size.width / 4
+                        VStack(spacing: 0) {
+                            Text("오늘 해야 할 일 남았어요")
+                                .pretendardStyle(
+                                    .semiBold,
+                                    size: 12,
+                                    color: .white)
+                                .frame(height: 12)
+                                .padding(10)
+                                .background(Colors.error)
+                                .clipShape(.capsule)
+                            createTrianglePath()
+                                .fill(Colors.error)
+                                .frame(width: 12, height: 6)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .offset(x: -(tabWidth/2), y: -44)
+                    }
+                    .frame(height: 38)
                 }
             }
             .padding(.top, 10)
             .padding(.bottom, 32)
             .padding(.horizontal, 20)
+            .background(Color.white)
         }
-        .background(Color.white)
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-//        .overlay {
-//            Rectangle()
-//                .stroke(Colors.grey200, lineWidth: 1)
-//                .cornerRadius(24, corners: [.topLeft, .bottomRight])
-//        }
-//        .shadow(color: .black.opacity(0.05), radius: 8, y: -4)
     }
     @ViewBuilder
     private func tabButton(_ tab: TabCoordinator.Tab) -> some View {
@@ -131,9 +160,16 @@ struct CustomTabBar: View {
         }
         .buttonStyle(.plain)
     }
+    func createTrianglePath() -> Path {
+        var path = Path()
+        path.move(to: .init(x: 0, y: 0))
+        path.addLine(to: .init(x: 6, y: 6))
+        path.addLine(to: .init(x: 12, y: 0))
+        path.closeSubpath()
+        return path
+    }
 }
 
-// Tab에 title 추가
 extension TabCoordinator.Tab {
     static var allCases: [TabCoordinator.Tab] {
         [.goal, .myGoal, .comment, .profile]
