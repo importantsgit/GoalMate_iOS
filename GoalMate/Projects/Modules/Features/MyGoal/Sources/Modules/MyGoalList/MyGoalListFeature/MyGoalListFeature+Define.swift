@@ -19,18 +19,4 @@ extension MyGoalListFeature {
         case networkError
         case failed
     }
-    public struct PaginationState: Equatable {
-        var totalCount: Int
-        var currentPage: Int
-        var hasMorePages: Bool
-        init(
-            totalCount: Int = 0,
-            currentPage: Int = 1,
-            hasMorePages: Bool = true
-        ) {
-            self.totalCount = totalCount
-            self.currentPage = currentPage
-            self.hasMorePages = hasMorePages
-        }
-    }
 }

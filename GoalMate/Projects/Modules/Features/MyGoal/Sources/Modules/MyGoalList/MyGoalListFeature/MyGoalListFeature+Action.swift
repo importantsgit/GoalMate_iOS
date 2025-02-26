@@ -30,6 +30,7 @@ extension MyGoalListFeature {
     func reduce(into state: inout State, action: ViewAction) -> Effect<Action> {
         switch action {
         case .retryButtonTapped:
+            state.didFailToLoad = false
             state.isLoading = true
             return .send(.feature(.fetchMyGoals))
         case .onLoadMore:
