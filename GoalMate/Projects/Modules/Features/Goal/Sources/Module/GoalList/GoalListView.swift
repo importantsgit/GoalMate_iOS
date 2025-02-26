@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import Data
 import FeatureCommon
 import SwiftUI
 import Utils
@@ -28,51 +29,65 @@ struct GoalListView: View {
                 )
                 .frame(height: 64)
                 .padding(.horizontal, 20)
-                ScrollView {
-                    LazyVGrid(
-                        columns: [
-                            GridItem(.flexible(), spacing: .grid(2)),
-                            GridItem(.flexible())
-                        ],
-                        alignment: .center,
-                        spacing: 30
-                    ) {
-                        ForEach(store.goalContents) { content in
-                            Button {
-                                store.send(.view(.contentTapped(content.id)))
-                            } label: {
-                                getGoalContentCell(content: content)
-                            }
-                            .task {
-                                if store.isScrollFetching == false &&
-                                    store.totalCount > 10 &&
-                                    store.goalContents[store.totalCount-10].id == content.id {
-                                    store.send(.view(.onLoadMore))
-                                }
-                            }
-                        }
-                    }
-                    if store.isScrollFetching {
-                        ProgressView()
-                            .progressViewStyle(.circular)
-                            .scaleEffect(1.7, anchor: .center)
-                    }
-                }
-                .overlay {
+                ZStack {
+                    goalListView
                     if store.isLoading {
                         skeletonView
                             .transition(.opacity)
                     }
                 }
+                .loadingFailure(didFailToLoad: store.didFailToLoad) {
+                    store.send(.view(.retryButtonTapped))
+                }
                 .padding(.horizontal, 20)
                 .onAppear {
                     store.send(.viewCycling(.onAppear))
                 }
-                .scrollIndicators(.hidden)
                 .animation(
                     .easeInOut(duration: 0.2),
                     value: store.isLoading)
             }
+        }
+    }
+
+    @ViewBuilder
+    var goalListView: some View {
+        WithPerceptionTracking {
+            ScrollView {
+                LazyVGrid(
+                    columns: [
+                        GridItem(.flexible(), spacing: .grid(2)),
+                        GridItem(.flexible())
+                    ],
+                    alignment: .center,
+                    spacing: 30
+                ) {
+                    ForEach(store.goalContents) { content in
+                        Button {
+                            store.send(.view(.contentTapped(content.id)))
+                        } label: {
+                            getGoalContentCell(content: content)
+                        }
+                        .task {
+                            if store.isLoading == false &&
+                                store.isScrollFetching &&
+                                store.pagingationState.totalCount > 10 &&
+                                store.goalContents[
+                                    store.pagingationState.totalCount-10].id == content.id {
+                                store.send(.view(.onLoadMore))
+                            }
+                        }
+                    }
+                }
+                if store.isScrollFetching {
+                    ProgressView()
+                        .progressViewStyle(.circular)
+                        .scaleEffect(1.7, anchor: .center)
+                }
+                Spacer()
+                    .frame(height: 105)
+            }
+            .scrollIndicators(.hidden)
         }
     }
 
@@ -110,10 +125,10 @@ struct GoalListView: View {
     }
 
     @ViewBuilder
-    func getGoalContentCell(content: GoalContent) -> some View {
+    func getGoalContentCell(content: Goal) -> some View {
         WithPerceptionTracking {
             VStack(spacing: 10) {
-                if let imageUrl = URL(string: content.imageURL) {
+                if let imageUrl = URL(string: content.mainImage ?? "") {
                      AsyncImage(
                          url: imageUrl
                      ) { phase in
@@ -136,16 +151,14 @@ struct GoalListView: View {
                                  .fill(.black)
                          }
                      }
+                     .opacity(content.goalStatus == .closed ? 0.5 : 1)
                      .aspectRatio(158/118, contentMode: .fit)  // 컨테이너 비율 설정
                      .clipShape(.rect(cornerRadius: 4))
                      .overlay {
-                         if content.remainingCapacity == 0 {
-                             Colors.grey300
-                                 .overlay {
-                                     Images.comingSoon
-                                         .resizable()
-                                         .aspectRatio(158/64, contentMode: .fit)
-                                 }
+                         if content.goalStatus == .closed {
+                             Images.comingSoon
+                                 .resizable()
+                                 .aspectRatio(156/55, contentMode: .fit)
                          }
                      }
                  } else {
@@ -157,18 +170,20 @@ struct GoalListView: View {
                  }
 
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(content.title.splitCharacters())
+                    Text((content.title ?? "").splitCharacters())
                         .lineLimit(2)
                         .truncationMode(.tail)
                         .multilineTextAlignment(.leading)
                         .pretendard(.semiBold, size: 18, color: Colors.grey900)
                         .frame(maxWidth: .infinity, alignment: .leading)
                     AvailableTagView(
-                        remainingCapacity: content.remainingCapacity,
-                        currentParticipants: content.currentParticipants,
+                        remainingCapacity:
+                            (content.participantsLimit ?? 0) -
+                            (content.currentParticipants ?? 0),
+                        currentParticipants: content.currentParticipants ?? 0,
                         size: .small
                     )
-                    if 1...10 ~= content.remainingCapacity {
+                    if content.isClosingSoon ?? false {
                         TagView(
                             title: "마감임박",
                             backgroundColor: Colors.secondaryY700
@@ -221,9 +236,7 @@ struct GoalListView: View {
 #Preview {
     GoalListView(
         store: Store(
-            initialState: GoalListFeature.State.init(
-                goalContents: GoalContent.dummies
-            ),
+            initialState: .init(),
             reducer: {
                 GoalListFeature()
             }

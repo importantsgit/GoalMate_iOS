@@ -13,7 +13,7 @@ extension GoalListFeature {
     func reduce(into state: inout State, action: ViewCyclingAction) -> Effect<Action> {
         switch action {
         case .onAppear:
-            guard state.hasMorePages else { return .none }
+            guard state.pagingationState.hasMorePages else { return .none }
             state.isLoading = true
             return .send(.feature(.fetchGoals))
         }
@@ -22,8 +22,12 @@ extension GoalListFeature {
     func reduce(into state: inout State, action: ViewAction) -> Effect<Action> {
         switch action {
         case .retryButtonTapped:
+            guard state.pagingationState.hasMorePages else { return .none }
+            state.didFailToLoad = false
+            state.isLoading = true
             return .send(.feature(.fetchGoals))
         case .onLoadMore:
+            guard state.pagingationState.hasMorePages else { return .none }
             return .send(.feature(.fetchGoals))
         case let .contentTapped(contentId):
             return .send(.delegate(.showGoalDetail(contentId)))
@@ -33,43 +37,14 @@ extension GoalListFeature {
     func reduce(into state: inout State, action: FeatureAction) -> Effect<Action> {
         switch action {
         case .fetchGoals:
-            guard state.hasMorePages
-            else {
-                state.isLoading = false
-                return .none
-            }
             state.isScrollFetching = true
-            return .run { [currentPage = state.currentPage] send in
+            return .run { [currentPage = state.pagingationState.currentPage] send in
                 do {
                     let response = try await goalClient.fetchGoals(page: currentPage)
-                    let mappedContents = await withTaskGroup(of: GoalContent.self) { group in
-                        for goal in response.goals {
-                            group.addTask {
-                                // 각 Goal을 GoalContent로 변환
-                                return GoalContent(
-                                    id: goal.id,
-                                    title: goal.title ?? "",
-                                    discountPercentage: 30, // 임시 값
-                                    originalPrice: 30000,   // 임시 값
-                                    discountedPrice: 21000, // 임시 값
-                                    maxOccupancy: goal.participantsLimit ?? 0,
-                                    remainingCapacity: (goal.participantsLimit ?? 0) -
-                                    (goal.currentParticipants ?? 0),
-                                    currentParticipants: goal.currentParticipants ?? 0,
-                                    imageURL: goal.mainImage ?? ""
-                                )
-                            }
-                        }
-                        var contents: [GoalContent] = []
-                        for await content in group {
-                            contents.append(content)
-                        }
-                        return contents
-                    }
                     await send(.feature(
                             .checkFetchGoalListResponse(
                                 .success(
-                                    mappedContents,
+                                    response.goals,
                                     response.page?.hasNext ?? false
                                 )
                             )))
@@ -86,14 +61,14 @@ extension GoalListFeature {
         case let .checkFetchGoalListResponse(result):
             switch result {
             case let .success(contents, hasNext):
-                state.goalContents += contents
-                state.totalCount += contents.count
-                state.currentPage += 1
-                state.hasMorePages = hasNext
+                state.goalContents.append(contentsOf: contents)
+                state.pagingationState.totalCount += contents.count
+                state.pagingationState.currentPage += 1
+                state.pagingationState.hasMorePages = hasNext
             case .networkError:
                 state.didFailToLoad = true
             case .failed:
-                break
+                state.didFailToLoad = true
             }
             state.isLoading = false
             state.isScrollFetching = false

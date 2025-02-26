@@ -41,7 +41,11 @@ public struct MyGoalListView: View {
                 .loadingFailure(didFailToLoad: store.didFailToLoad) {
                     store.send(.view(.retryButtonTapped))
                 }
+                .padding(.horizontal, 20)
             }
+            .animation(
+                .easeInOut(duration: 0.2),
+                value: store.isLoading)
             .task {
                 store.send(.viewCycling(.onAppear))
             }
@@ -52,14 +56,15 @@ public struct MyGoalListView: View {
             WithPerceptionTracking {
                 ScrollView {
                     LazyVStack {
-                        ForEach(store.myGoalList, id: \.id) { content in
-                            VStack(spacing: 0) {
+                        ForEach(store.myGoalList) { content in
+                            VStack(spacing: 30) {
                                 MyGoalContentItem(content: content) { type in
                                     store.send(.view(.buttonTapped(type)))
                                 }
                                 .id(content.id)
                                 .task {
                                     if store.isLoading == false &&
+                                        store.isScrollFetching &&
                                         store.pagingationState.totalCount > 10 &&
                                         store.myGoalList[
                                             store.pagingationState.totalCount-10].id == content.id {
@@ -83,9 +88,6 @@ public struct MyGoalListView: View {
                         .frame(height: 105)
                 }
                 .scrollIndicators(.hidden)
-                .animation(
-                    .easeInOut(duration: 0.2),
-                    value: store.isLoading)
             }
         }
 
@@ -360,7 +362,7 @@ fileprivate struct MyGoalContentItem: View {
                         )
                     }
                 } else {
-                    let remainingCount: Int = content.todayRemainingCount ?? 0
+                    let remainingCount: Int = content.todayRemainingCount
                     let hasRemainingTodo: Bool = remainingCount > 0
                     RoundedButton(
                         buttonType: FilledStyle(backgroundColor: Colors.primary),
@@ -379,7 +381,6 @@ fileprivate struct MyGoalContentItem: View {
                 Spacer()
                     .frame(height: 30)
             }
-            .padding(20)
         }
     }
 

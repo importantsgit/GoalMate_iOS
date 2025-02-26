@@ -146,39 +146,6 @@ public struct FetchGoalsResponseDTO: Codable {
         public enum CodingKeys: String, CodingKey {
             case goals, page
         }
-        // MARK: - Goal
-        public struct Goal: Codable {
-            public let id: Int
-            public let title: String?
-            public let topic: String?
-            public let description: String?
-            public let period: Int?
-            public let dailyDuration: Int?
-            public let participantsLimit: Int?
-            public let currentParticipants: Int?
-            public let isClosingSoon: Bool?
-            public let goalStatus: GoalStatus?
-            public let mentorName: String?
-            public let createdAt: String?
-            public let updatedAt: String?
-            public let mainImage: String?
-            public enum GoalStatus: String, Codable {
-                case open       = "OPEN"
-                case closed     = "CLOSED"
-            }
-            public enum CodingKeys: String, CodingKey {
-                case id, title, topic, description, period
-                case dailyDuration = "daily_duration"
-                case participantsLimit = "participants_limit"
-                case currentParticipants = "current_participants"
-                case isClosingSoon = "is_closing_soon"
-                case goalStatus = "goal_status"
-                case mentorName = "mentor_name"
-                case createdAt = "created_at"
-                case updatedAt = "updated_at"
-                case mainImage = "main_image"
-            }
-        }
     }
 }
 
@@ -373,6 +340,41 @@ public struct Page: Codable {
     let totalElements, totalPages, currentPage, pageSize: Int?
     let nextPage, prevPage: Int?
     public let hasNext, hasPrev: Bool?
+}
+
+// MARK: - Goal
+public struct Goal: Codable, Identifiable, Equatable {
+    public let id: Int
+    public let title: String?
+    public let topic: String?
+    public let description: String?
+    public let period: Int?
+    public let dailyDuration: Int?
+    public let participantsLimit: Int?
+    public let currentParticipants: Int?
+    public let isClosingSoon: Bool?
+    public let goalStatus: GoalStatus?
+    public let mentorName: String?
+    public let createdAt: String?
+    public let updatedAt: String?
+    public let mainImage: String?
+    public enum GoalStatus: String, Codable, Equatable {
+        case open       = "OPEN"
+        case closed     = "CLOSED"
+        case upcoming   = "UPCOMING"
+    }
+    public enum CodingKeys: String, CodingKey {
+        case id, title, topic, description, period
+        case dailyDuration = "daily_duration"
+        case participantsLimit = "participants_limit"
+        case currentParticipants = "current_participants"
+        case isClosingSoon = "is_closing_soon"
+        case goalStatus = "goal_status"
+        case mentorName = "mentor_name"
+        case createdAt = "created_at"
+        case updatedAt = "updated_at"
+        case mainImage = "main_image"
+    }
 }
 
 // MARK: - MenteeGoal

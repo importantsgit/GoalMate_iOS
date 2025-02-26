@@ -8,6 +8,7 @@
 import ComposableArchitecture
 import Data
 import Dependencies
+import FeatureCommon
 import Foundation
 
 @Reducer
@@ -23,23 +24,17 @@ public struct GoalListFeature {
         var isLoading: Bool
         var isScrollFetching: Bool
         var didFailToLoad: Bool
-        var goalContents: [GoalContent]
-        
-        var totalCount: Int
-        var currentPage: Int
-        var hasMorePages: Bool
+        var goalContents: IdentifiedArrayOf<Goal>
+        var pagingationState: PaginationState
         public init(
-            isLoading: Bool = false,
-            goalContents: [GoalContent] = []
+            isLoading: Bool = false
         ) {
             self.id = UUID()
             self.isLoading = true
             self.isScrollFetching = false
             self.didFailToLoad = false
-            self.goalContents = goalContents
-            self.hasMorePages = true
-            self.currentPage = 1
-            self.totalCount = 0
+            self.goalContents = []
+            self.pagingationState = .init()
         }
     }
     public enum Action: BindableAction {
