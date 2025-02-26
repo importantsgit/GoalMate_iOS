@@ -304,7 +304,8 @@ public struct MyGoalDetailView: View {
                                                 size: 14,
                                                 color: Colors.grey500
                                             )
-                                        if todo.mentorTip != nil {
+                                        if let mentorTip = todo.mentorTip,
+                                           mentorTip.isEmpty == false {
                                             Rectangle()
                                                 .fill(Colors.grey300)
                                                 .frame(width: 1, height: 12)
@@ -500,7 +501,7 @@ public struct MyGoalDetailView: View {
         .frame(height: 112)
         .background(
             LinearGradient(
-                gradient: Gradient(colors: [.clear, .white, .white]),
+                gradient: Gradient(colors: [.white.opacity(0), .white, .white]),
                 startPoint: .top,
                 endPoint: .bottom
             )
