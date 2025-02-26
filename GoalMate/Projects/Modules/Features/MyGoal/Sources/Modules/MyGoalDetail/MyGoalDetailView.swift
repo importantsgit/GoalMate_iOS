@@ -107,6 +107,10 @@ public struct MyGoalDetailView: View {
                         .easeInOut(duration: 0.2),
                         value: store.isLoadingWhenDayTapped)
                 }
+            }
+            .toast(state: $store.toastState, position: .bottom)
+            .hideWithScreenshot()
+            .overlay {
                 CustomPopup(
                     isPresented: $store.isShowPopup.sending(\.dismissCapturePopup),
                     leftButtonTitle: nil,
@@ -147,8 +151,6 @@ public struct MyGoalDetailView: View {
                 }
                 .ignoresSafeArea()
             }
-            .toast(state: $store.toastState, position: .bottom)
-            .hideWithScreenshot()
             .task {
                 store.send(.viewCycling(.onAppear))
             }
