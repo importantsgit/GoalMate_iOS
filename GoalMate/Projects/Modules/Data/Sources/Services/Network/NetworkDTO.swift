@@ -385,12 +385,12 @@ public struct MenteeGoal: Codable, Identifiable, Equatable {
     public let startDate: String?
     public let endDate: String?
     public let mentorLetter: String?
-    public let todayTodoCount: Int?
-    public var todayCompletedCount: Int?
-    public var todayRemainingCount: Int?
-    public let totalTodoCount: Int?
-    public let totalCompletedCount: Int?
-    public let menteeGoalStatus: MenteeGoalStatus?
+    public let todayTodoCount: Int
+    public var todayCompletedCount: Int
+    public var todayRemainingCount: Int
+    public let totalTodoCount: Int
+    public var totalCompletedCount: Int
+    public let menteeGoalStatus: MenteeGoalStatus
     public let createdAt: String?
     public let updatedAt: String?
     public let commentRoomId: Int
@@ -445,10 +445,10 @@ public enum TodoStatus: String, Codable {
 }
 
 public struct DailyProgress: Codable, Hashable, Equatable, Identifiable {
-    public var id: String { date ?? "" }  // date를 id로 사용
-    public let dailyTodoCount: Int?
-    public let completedDailyTodoCount: Int?
-    public let date: String?
+    public var id: String { date }  // date를 id로 사용
+    public let dailyTodoCount: Int
+    public var completedDailyTodoCount: Int
+    public let date: String
     public let dayOfWeek: DayOfWeek?
     public let isValid: Bool?
     public enum DayOfWeek: String, Codable {

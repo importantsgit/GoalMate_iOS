@@ -25,18 +25,15 @@ public struct CircularProgressView: View {
     public var body: some View {
         GeometryReader { geometry in
             ZStack {
-                // Background Circle
                 Circle()
                     .fill(backgroundColor)
-                // Progress Arc
                 if progress < 1.0 {
                     makeCirclePath(
                         in: geometry,
-                        progress: progress
+                        progress: calculateSteppedProgress(progress)
                     )
                     .fill(progressColor)
                 } else {
-                    // When complete, show check mark
                     Circle()
                         .fill(progressColor)
                         .overlay {
@@ -51,7 +48,7 @@ public struct CircularProgressView: View {
         .aspectRatio(1, contentMode: .fit)
         .animation(.easeInOut, value: progress)
     }
- 
+
     private func makeCirclePath(in geometry: GeometryProxy, progress: Double) -> Path {
         let width = geometry.size.width
         let height = geometry.size.height
@@ -64,7 +61,7 @@ public struct CircularProgressView: View {
             center: center,
             radius: radius,
             startAngle: .degrees(270),
-            endAngle: .degrees(270 + (180 * progress)),
+            endAngle: .degrees(270 + (360 * progress)),
             clockwise: false
         )
         path.addLine(to: center)
@@ -72,10 +69,33 @@ public struct CircularProgressView: View {
         return path
     }
 
-    private func calculateProgress(_ value: Double) -> Double {
+    private func calculateSteppedProgress(_ value: Double) -> Double {
+        if value >= 1.0 { return 1.0 }
         if value <= 0 { return 0 }
-        let result = ceil(value * 10) / 10
-        return min(result, 1.0)
+        let percentage = value * 100
+        if percentage < 10 {
+            return 0.05 // 5% of 360°
+        } else if percentage < 20 {
+            return 0.10 // 10% of 360°
+        } else if percentage < 30 {
+            return 0.20 // 20% of 360°
+        } else if percentage < 40 {
+            return 0.30 // 30% of 360°
+        } else if percentage < 50 {
+            return 0.40 // 40% of 360°
+        } else if percentage < 60 {
+            return 0.50 // 50% of 360°
+        } else if percentage < 70 {
+            return 0.60 // 60% of 360°
+        } else if percentage < 80 {
+            return 0.70 // 70% of 360°
+        } else if percentage < 90 {
+            return 0.80 // 80% of 360°
+        } else if percentage < 100 {
+            return 0.90 // 90% of 360°
+        } else {
+            return 1.0 // 100% of 360°
+        }
     }
 }
 
@@ -83,19 +103,31 @@ public struct CircularProgressView: View {
 #Preview {
     VStack(spacing: 20) {
         CircularProgressView(
-            progress: 0.3,
+            progress: 0.05, // 5%
             progressColor: .green,
             backgroundColor: .green.opacity(0.2)
         )
         .frame(width: 40, height: 40)
         CircularProgressView(
-            progress: 0.7,
-            progressColor: .green,
-            backgroundColor: .green.opacity(0.2)
+            progress: 0.15, // 15%
+            progressColor: .blue,
+            backgroundColor: .blue.opacity(0.2)
         )
         .frame(width: 40, height: 40)
         CircularProgressView(
-            progress: 1.0,
+            progress: 0.25, // 25%
+            progressColor: .orange,
+            backgroundColor: .orange.opacity(0.2)
+        )
+        .frame(width: 40, height: 40)
+        CircularProgressView(
+            progress: 0.75, // 75%
+            progressColor: .purple,
+            backgroundColor: .purple.opacity(0.2)
+        )
+        .frame(width: 40, height: 40)
+        CircularProgressView(
+            progress: 1.0, // 100%
             progressColor: .green,
             backgroundColor: .green.opacity(0.2)
         )

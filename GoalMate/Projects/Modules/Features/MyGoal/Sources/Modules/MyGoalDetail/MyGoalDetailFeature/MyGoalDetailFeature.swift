@@ -17,11 +17,10 @@ public struct MyGoalDetailFeature {
     public struct State: Equatable {
         public let id: UUID
         let menteeGoalId: Int
-        var content: FetchMyGoalDetailResponseDTO.Response?
+        var content: MenteeGoal?
         var todos: IdentifiedArrayOf<Todo>
         var weeklyProgress: IdentifiedArrayOf<DailyProgress>
         var remainingTime: TimeInterval
-        var todayCompletedCount: Int
         var isLoadingWhenDayTapped: Bool
         var isContentLoading: Bool
         var isTodoLoading: Bool
@@ -34,7 +33,8 @@ public struct MyGoalDetailFeature {
         var isShowCapturePopup: Bool
         var toastState: ToastState
         public init(
-            menteeGoalId: Int
+            menteeGoalId: Int,
+            selectedDate: Date = Date.now
         ) {
             self.id = UUID()
             self.menteeGoalId = menteeGoalId
@@ -44,8 +44,7 @@ public struct MyGoalDetailFeature {
             self.didFailToLoad = false
             self.todos = []
             self.weeklyProgress = []
-            self.selectedDate = Date.now
-            self.todayCompletedCount = 0
+            self.selectedDate = selectedDate
             self.remainingTime = 0
             self.isShowCapturePopup = false
             self.isShowOutdatePopup = false
@@ -129,7 +128,7 @@ public struct MyGoalDetailFeature {
     }
     func calculateRemainingTime() -> TimeInterval {
         let calendar = Calendar.current
-        let now = Date()
+        let now = now
         let tomorrow = calendar.startOfDay(
             for: calendar.date(byAdding: .day, value: 1, to: now) ?? now
         )

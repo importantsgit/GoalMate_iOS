@@ -32,7 +32,7 @@ public struct MyGoalDetailView: View {
                             }
                         },
                         centerContent: {
-                            Text(store.content?.menteeGoal?.title ?? "목표")
+                            Text(store.content?.title ?? "목표")
                                 .pretendard(.semiBold, size: 20, color: Colors.grey900)
                                 .lineLimit(1)
                                 .truncationMode(.tail)
@@ -75,14 +75,14 @@ public struct MyGoalDetailView: View {
                                             // 오늘 진척율 / 전체 진척율
                                             goalProgressView
                                             Spacer()
-                                                .frame(height: 30)
-                                            SeparatorView(height: 1)
+                                                .frame(height: 44)
+                                            SeparatorView(height: 16)
                                             Spacer()
                                                 .frame(height: 30)
                                             // 목표 상세보기
                                             goalDetailInfoView
                                             Spacer()
-                                                .frame(height: 130)
+                                                .frame(height: 150)
                                         }
                                         .padding(.horizontal, 20)
                                     }
@@ -204,8 +204,7 @@ public struct MyGoalDetailView: View {
 
     @ViewBuilder
     var calendarView: some View {
-        if let content = store.content,
-           let menteeGoal = content.menteeGoal,
+        if let menteeGoal = store.content,
            let startDate = menteeGoal.startDate?.toDate(),
            let endDate = menteeGoal.endDate?.toDate() {
             VStack(alignment: .leading, spacing: 20) {
@@ -249,19 +248,47 @@ public struct MyGoalDetailView: View {
                             .padding(.vertical, 6)
                         Spacer()
                         if Calendar.current.isDateInToday(store.selectedDate) {
+                            let isTimeOver = store.remainingTime <= 0
                             HStack(spacing: 4) {
-                                Text(store.remainingTime.formattedRemainingTime())
-                                    .pretendard(.semiBold, size: 14, color: Colors.grey700)
+                                Text(isTimeOver ?
+                                        "time over" :
+                                        store.remainingTime.formattedRemainingTime())
+                                    .pretendard(
+                                        .semiBold,
+                                        size: 14,
+                                        color:
+                                            store.remainingTime <= 30 * 60 &&
+                                            isTimeOver == false ?
+                                            Colors.error :
+                                            Colors.grey700
+                                    )
                                 Text("남았어요")
-                                    .pretendard(.regular, size: 12, color: Colors.grey700)
+                                    .pretendard(
+                                        .regular,
+                                        size: 12,
+                                        color:
+                                            store.remainingTime <= 30 * 60 &&
+                                            isTimeOver == false ?
+                                            Colors.error :
+                                            Colors.grey700
+                                    )
                             }
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
-                            .background(.white)
+                            .background(
+                                store.remainingTime <= 30 * 60 &&
+                                isTimeOver == false ?
+                                    Color(hex: "FFEAE9") :
+                                    Color.white)
                             .clipShape(.rect(cornerRadius: 12))
                             .overlay {
                                 RoundedRectangle(cornerRadius: 12)
-                                    .stroke(Colors.grey200, lineWidth: 1)
+                                    .stroke(
+                                        store.remainingTime <= 30 * 60 &&
+                                        isTimeOver == false ?
+                                            Colors.error :
+                                            Colors.grey200,
+                                        lineWidth: 1)
                             }
                         }
                     }
@@ -269,12 +296,12 @@ public struct MyGoalDetailView: View {
                 VStack(spacing: 29) {
                     VStack(spacing: 16) {
                         ForEach(store.todos, id: \.id) { todo in
-                            VStack(alignment: .leading) {
+                            VStack(alignment: .leading, spacing: 4) {
                                 Button {
                                     store.send(.view(
                                         .todoButtonTapped(todo.id, todo.todoStatus)))
                                 } label: {
-                                    HStack(spacing: 10) {
+                                    HStack(alignment: .top, spacing: 10) {
                                         let isDone = todo.todoStatus == .completed
                                         Rectangle()
                                             .fill(isDone ? Colors.primary : Colors.grey200)
@@ -286,13 +313,16 @@ public struct MyGoalDetailView: View {
                                                         .resized(length: 12)
                                                 }
                                             }
-                                        Text(todo.description ?? "")
-                                            .pretendardStyle(
+                                        Text((todo.description ?? "").splitCharacters())
+                                            .multilineTextAlignment(.leading)
+                                            .lineSpacing(4)
+                                            .pretendard(
                                                 .regular,
                                                 size: 17,
                                                 color: Colors.grey900
                                             )
-                                            .frame(maxWidth: .infinity, alignment: .leading)
+                                            .fixedSize(horizontal: false, vertical: true)
+                                        Spacer()
                                     }
                                     .frame(height: 32)
                                 }
@@ -378,8 +408,7 @@ public struct MyGoalDetailView: View {
     @ViewBuilder
     var goalProgressView: some View {
         WithPerceptionTracking {
-            if let content = store.content,
-               let menteeGoal = content.menteeGoal {
+            if let menteeGoal = store.content {
                 VStack(spacing: 29) {
                     VStack(spacing: 44) {
                         VStack(spacing: 24) {
@@ -393,8 +422,8 @@ public struct MyGoalDetailView: View {
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                 SemiCircleProgressView(
                                     progress:
-                                        Double(store.todayCompletedCount) /
-                                        Double(menteeGoal.todayTodoCount ?? 1),
+                                        Double(menteeGoal.todayCompletedCount) /
+                                        Double(menteeGoal.todayTodoCount),
                                     progressColor: Colors.secondaryY,
                                     backgroundColor: Colors.secondaryY50,
                                     lineWidth: 20
@@ -404,8 +433,8 @@ public struct MyGoalDetailView: View {
                         LinearProgressView(
                             title: "전체 진척율",
                             progress:
-                                Double(menteeGoal.totalCompletedCount ?? 0) /
-                                Double(menteeGoal.totalTodoCount ?? 1),
+                                Double(menteeGoal.totalCompletedCount) /
+                                Double(menteeGoal.totalTodoCount),
                             progressColor: Colors.primary,
                             backgroundColor: Colors.primary50,
                             lineWidth: 20
@@ -441,7 +470,7 @@ public struct MyGoalDetailView: View {
                             .fill(Colors.grey200)
                             .frame(width: 1)
                         Text(
-                            (store.content?.menteeGoal?.title ?? "")
+                            (store.content?.title ?? "")
                                 .splitCharacters())
                             .pretendardStyle(.medium, size: 14, color: Colors.grey600)
                             .frame(maxWidth: .infinity, alignment: .leading)
@@ -461,7 +490,7 @@ public struct MyGoalDetailView: View {
                         Rectangle()
                             .fill(Colors.grey200)
                             .frame(width: 1)
-                        Text(store.content?.menteeGoal?.mentorName ?? "")
+                        Text(store.content?.mentorName ?? "")
                             .pretendardStyle(.medium, size: 14, color: Colors.grey600)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.vertical, 8)
@@ -686,14 +715,14 @@ struct DateCell: View {
                 .pretendardStyle(.medium, size: 15, color: textColor)
             if isSelected == false,
                let progress = progress,
-               let total = progress.dailyTodoCount,
-               let completed = progress.completedDailyTodoCount,
-               total > 0,
+               progress.dailyTodoCount > 0,
                Calendar.current.compare(
                 date, to: Date(), toGranularity: .day
                ) != .orderedDescending {
                 CircularProgressView(
-                    progress: (Double(completed) / Double(total)),
+                    progress:
+                        (Double(progress.completedDailyTodoCount) /
+                         Double(progress.dailyTodoCount)),
                     progressColor: Colors.primary,
                     backgroundColor: Colors.primary100
                 )
@@ -757,6 +786,19 @@ extension TimeInterval {
             withDependencies {
                 $0.authClient = .previewValue
                 $0.menteeClient = .previewValue
+                $0.date.now = {
+                    let calendar = Calendar.current
+                    let currentDate = "2025-02-27".toDate()
+                    let targetComponents = DateComponents(
+                        year: calendar.component(.year, from: currentDate),
+                        month: calendar.component(.month, from: currentDate),
+                        day: calendar.component(.day, from: currentDate),
+                        hour: 23,
+                        minute: 58,
+                        second: 01
+                    )
+                    return calendar.date(from: targetComponents)!
+                }()
             } operation: {
                 MyGoalDetailFeature()
             }

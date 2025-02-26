@@ -75,11 +75,10 @@ extension MyGoalDetailFeature {
             state.todos[id: todoId]?.isShowTip.toggle()
             return .none
         case .showCommentButtonTapped:
-            guard let content = state.content,
-                  let menteeGoal = content.menteeGoal
+            guard let content = state.content
             else { return .none }
             return .send(.delegate(
-                .showComment(menteeGoal.commentRoomId, menteeGoal.title, menteeGoal.startDate)))
+                .showComment(content.commentRoomId, content.title, content.startDate)))
         }
     }
     func reduce(into state: inout State, action: CalendarAction) -> Effect<Action> {
@@ -123,10 +122,8 @@ extension MyGoalDetailFeature {
         case let .checkFetchMyGoalDetailResponse(result):
             switch result {
             case let .success(content):
-                state.content = content
+                state.content = content.menteeGoal
                 state.todos = IdentifiedArray(uniqueElements: content.todos, id: \.id)
-                state.todayCompletedCount = content.menteeGoal?.todayCompletedCount ?? 0
-                print(content)
                 state.isContentLoading = false
             case .networkError:
                 state.didFailToLoad = true
@@ -161,8 +158,10 @@ extension MyGoalDetailFeature {
             }
         case let .checkFetchWeeklyProgressResponse(result):
             switch result {
-            case let .success(content):
-                state.weeklyProgress.append(contentsOf: content)
+            case let .success(list):
+                list.forEach { day in
+                    state.weeklyProgress.updateOrAppend(day)
+                }
             case .networkError:
                 break
             case .failed:
@@ -172,11 +171,16 @@ extension MyGoalDetailFeature {
         case let .checkUpdateTodoResponse(result):
             switch result {
             case let .success(todo, todoId):
+                let today = Date.now.getString(format: "yyyy-MM-dd")
                 state.todos[id: todoId]?.todoStatus = todo.todoStatus
                 if todo.todoStatus == .completed {
-                    state.todayCompletedCount += 1
+                    state.content?.todayCompletedCount += 1
+                    state.content?.totalCompletedCount += 1
+                    state.weeklyProgress[id: today]?.completedDailyTodoCount += 1
                 } else {
-                    state.todayCompletedCount -= 1
+                    state.content?.todayCompletedCount -= 1
+                    state.content?.totalCompletedCount -= 1
+                    state.weeklyProgress[id: today]?.completedDailyTodoCount -= 1
                 }
             case .networkError:
                 state.toastState = .display("네트워크에 오류가 발생했습니다.")
