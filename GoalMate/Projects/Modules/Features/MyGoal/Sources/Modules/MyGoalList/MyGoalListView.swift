@@ -210,7 +210,7 @@ fileprivate struct MyGoalContentItem: View {
                         )
                     Text(isExpired ?
                             "done" :
-                            "D+\(calculateDplus(fromDate: content.startDate))")
+                            "D-\(calculateDDay(endDate: content.endDate))")
                         .pretendardStyle(
                             .semiBold,
                             size: 12,
@@ -284,7 +284,7 @@ fileprivate struct MyGoalContentItem: View {
                                     .resized(length: 16)
                             }
                             let startDate = (content.startDate ?? "").convertDateString()
-                            let endDate = (content.startDate ?? "").convertDateString()
+                            let endDate = (content.endDate ?? "").convertDateString()
                             Text("\(startDate ?? "") 부터\n\(endDate ?? "") 까지")
                                 .pretendard(
                                     .medium,
@@ -380,13 +380,14 @@ fileprivate struct MyGoalContentItem: View {
         }
     }
 
-    func calculateDplus(fromDate: String?) -> Int {
-        guard let fromDate else { return -1 }
-        let date = fromDate.toDate(format: "yyyy-MM-dd")
+    func calculateDDay(endDate: String?) -> Int {
+        guard let endDate else { return -1 }
+        let date = endDate.toDate(format: "yyyy-MM-dd")
         let calendar = Calendar.current
         let currentDate = calendar.startOfDay(for: Date())
-        let startDate = calendar.startOfDay(for: date)
-        let components = calendar.dateComponents([.day], from: startDate, to: currentDate)
+        let targetDate = calendar.startOfDay(for: date)
+        // 현재 날짜부터 목표 날짜까지의 차이를 계산
+        let components = calendar.dateComponents([.day], from: currentDate, to: targetDate)
         return components.day ?? 0
     }
 }
