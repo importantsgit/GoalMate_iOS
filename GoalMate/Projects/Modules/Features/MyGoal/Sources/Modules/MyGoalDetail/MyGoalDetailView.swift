@@ -296,7 +296,7 @@ public struct MyGoalDetailView: View {
                 VStack(spacing: 29) {
                     VStack(spacing: 16) {
                         ForEach(store.todos, id: \.id) { todo in
-                            VStack(alignment: .leading, spacing: 4) {
+                            VStack(alignment: .leading, spacing: 6) {
                                 Button {
                                     store.send(.view(
                                         .todoButtonTapped(todo.id, todo.todoStatus)))
@@ -313,6 +313,7 @@ public struct MyGoalDetailView: View {
                                                         .resized(length: 12)
                                                 }
                                             }
+                                            .padding(.top, 2)
                                         Text((todo.description ?? "").splitCharacters())
                                             .multilineTextAlignment(.leading)
                                             .lineSpacing(4)
@@ -321,10 +322,12 @@ public struct MyGoalDetailView: View {
                                                 size: 17,
                                                 color: Colors.grey900
                                             )
-                                            .fixedSize(horizontal: false, vertical: true)
+                                            .fixedSize(
+                                                horizontal: false,
+                                                vertical: true
+                                            )
                                         Spacer()
                                     }
-                                    .frame(height: 32)
                                 }
                                 VStack(alignment: .leading) {
                                     HStack {

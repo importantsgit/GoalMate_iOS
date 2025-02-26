@@ -38,6 +38,7 @@ public struct CircularProgressView: View {
                         .fill(progressColor)
                         .overlay {
                             Image(systemName: "checkmark")
+                                .foregroundStyle(.black)
                                 .font(.system(size: geometry.size.width * 0.4))
                                 .fontWeight(.bold)
                                 .foregroundStyle(.white)
