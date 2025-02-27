@@ -9,18 +9,15 @@ import ComposableArchitecture
 import SwiftUI
 
 public struct GoalDetailView: View {
-    @State private var progress: Double
     @Perception.Bindable var store: StoreOf<GoalDetailFeature>
     public init(
-        progress: Double = 0.1,
         store: StoreOf<GoalDetailFeature>
     ) {
-        self.progress = progress
         self.store = store
     }
     public var body: some View {
         WithPerceptionTracking {
-            ZStack {
+            ZStack(alignment: .bottom) {
                 VStack {
                     NavigationBar(
                         leftContent: {
@@ -36,12 +33,15 @@ public struct GoalDetailView: View {
                         },
                         centerContent: {
                             Text("목표")
-                                .pretendardStyle(.semiBold, size: 20, color: Color(hex: "212121"))
+                                .pretendardStyle(
+                                    .semiBold,
+                                    size: 20,
+                                    color: Color(hex: "212121")
+                                )
                         }
                     )
-                    .padding(.horizontal, 16)
+                    .padding(.leading, 4)
                     .frame(height: 64)
-                    .background(Color.white)
                     ScrollView(.vertical) {
                         VStack(spacing: 0) {
                             pageView
@@ -61,25 +61,32 @@ public struct GoalDetailView: View {
                         store.send(.view(.retryButtonTapped))
                     }
                 }
-                if store.didFailToLoad == false,
-                    store.isShowButton {
+                if let content = store.content,
+                   content.isParticipated == false {
+                    BottomButtonView(store: store)
+                }
+                CustomPopup(
+                    isPresented: $store
+                        .isShowUnavailablePopup.sending(\.showUnavailablePopup),
+                    leftButtonTitle: nil,
+                    rightButtonTitle: "확인했습니다.",
+                    leftAction: nil,
+                    rightAction: {}
+                ) {
                     VStack {
                         Spacer()
-                        BottomButtonView(store: store)
-                    }
-                }
-                if store.isShowUnavailablePopup {
-                    PopupView(isPresented: $store.isShowUnavailablePopup) {
-                        VStack(spacing: 16) {
-                            Images.warning
-                                .resized(length: 24)
-                            Text("무료 참여 기회를 이미 사용했어요.\n곧 결제 기능이 추가될 예정이에요")
-                                .pretendard(.medium, size: 16, color: Colors.grey800)
-                        }
-                    } action: {
-                    } label: {
-                        Text("다른 목표 보러가기")
-                            .pretendard(.medium, size: 16, color: .black)
+                            .frame(height: 50)
+                        Images.warning
+                            .resized(length: 24)
+                        Spacer()
+                            .frame(height: 10)
+                        Text("무료 참여 기회를 이미 사용했어요.\n곧 결제 기능이 추가될 예정이에요")
+                            .pretendard(
+                                .medium,
+                                size: 16,
+                                color: Colors.grey800)
+                        Spacer()
+                            .frame(height: 40)
                     }
                 }
             }
@@ -95,65 +102,72 @@ private extension GoalDetailView {
     @ViewBuilder
     var pageView: some View {
         WithPerceptionTracking {
-            TabView(selection: $store.currentPage) {
+            Group {
                 if let content = store.content {
-                    ForEach(
-                        Array(content.thumbnailImages.enumerated()),
-                        id: \.offset
-                    ) { index, imageURL in
-                        AsyncImage(
-                            url: URL(string: imageURL)
-                        ) { phase in
-                            switch phase {
-                            case .empty:
-                                ProgressView()
-                                    .progressViewStyle(.circular)
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fill)
-                                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            case .failure:
-                                Images.placeholder
-                                    .resizable()
-                                    .aspectRatio(contentMode: .fit)
-                            @unknown default:
-                                Rectangle()
-                                    .fill(.black)
+                    let thumbnailImages = content.thumbnailImages.sorted { $0.id < $1.id }
+                    TabView(selection: $store.currentPage) {
+                        ForEach(thumbnailImages) { thumbnail in
+                            Group {
+                                if let imageURL = thumbnail.imageUrl {
+                                    AsyncImage(
+                                        url: URL(string: imageURL)
+                                    ) { phase in
+                                        switch phase {
+                                        case .empty:
+                                            ZStack {
+                                                Rectangle()
+                                                    .fill(Colors.grey200)
+                                                ProgressView()
+                                                    .progressViewStyle(.circular)
+                                            }
+                                        case .success(let image):
+                                            image
+                                                .resizable()
+                                        case .failure:
+                                            Images.placeholder
+                                                .resizable()
+                                        @unknown default:
+                                            Rectangle()
+                                                .fill(.black)
+                                        }
+                                    }
+                                } else {
+                                    Images.placeholder
+                                        .resizable()
+                                }
                             }
+                            .tag(thumbnail.id)
+                            .background(Colors.grey200)
                         }
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                        .tag(index)
-                        .background(Colors.grey200)
+                    }
+                    .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+                    .overlay(alignment: .bottom) {
+                        // 커스텀 인디케이터
+                        let count = thumbnailImages.count
+                        if count > 1 {
+                            HStack(spacing: 8) {
+                                ForEach(0..<count) { index in
+                                    Circle()
+                                        .stroke(Colors.grey300, lineWidth: 1)
+                                        .frame(width: 8, height: 8)
+                                        .background(
+                                            Circle()
+                                                .fill(
+                                                    store.currentPage == index ?
+                                                    Colors.grey900 :
+                                                            .white
+                                                )
+                                        )
+                                }
+                            }
+                            .padding(.bottom, 20)
+                        }
                     }
                 } else {
                     Colors.grey200
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
                 }
             }
-            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-            .overlay(alignment: .bottom) {
-                // 커스텀 인디케이터
-                let count = store.content?.thumbnailImages.count ?? 0
-                if count > 1 {
-                    HStack(spacing: 8) {
-                        ForEach(0..<count) { index in
-                            Circle()
-                                .stroke(Colors.grey300, lineWidth: 1)
-                                .frame(width: 8, height: 8)
-                                .background(
-                                    Circle()
-                                        .fill(
-                                            store.currentPage == index ?
-                                            Colors.grey900 :
-                                                    .white
-                                        )
-                                )
-                        }
-                    }
-                    .padding(.bottom, 20)
-                }
-            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
             .aspectRatio(36/27, contentMode: .fit)
             .animation(
                 .easeInOut(duration: 0.3),
@@ -168,7 +182,8 @@ fileprivate struct TitleView: View {
     var body: some View {
         WithPerceptionTracking {
             VStack(alignment: .leading, spacing: 8) {
-                Text(store.content?.details.title.splitCharacters() ?? " ")
+                let title = store.content?.title ?? ""
+                Text(title.splitCharacters() ?? " ")
                     .pretendardStyle(
                         .semiBold,
                         size: 22,
@@ -218,10 +233,15 @@ fileprivate struct TitleView: View {
                         )
                 }
                  */
+                let currentParticipants = store.content?.currentParticipants ?? 0
+                let remainingCapacity = ((store.content?.participantsLimit ?? 0) -
+                                         currentParticipants)
+                let isExpired = store.content?.goalStatus ?? .open
                 AvailableTagView(
-                    remainingCapacity: store.content?.remainingCapacity ?? 0,
-                    currentParticipants: store.content?.currentParticipants ?? 0,
-                    size: .large
+                    remainingCapacity: remainingCapacity,
+                    currentParticipants: currentParticipants,
+                    size: .large,
+                    isExpired: isExpired == .closed
                 )
                 .overlay {
                     if store.isLoading {
@@ -229,7 +249,7 @@ fileprivate struct TitleView: View {
                             .fill(Colors.grey200)
                     }
                 }
-                if 1...10 ~= (store.content?.remainingCapacity ?? 0) {
+                if store.content?.isClosingSoon ?? false {
                     TagView(
                         title: "마감임박",
                         backgroundColor: Colors.secondaryY700
@@ -250,22 +270,23 @@ fileprivate struct GoalDescriptionView: View {
         WithPerceptionTracking {
             VStack(spacing: 20) {
                 Group {
+                    let period = store.content?.period ?? 0
                     SeparatorView()
-                    VStack(spacing: 8) {
+                    VStack(spacing: 12) {
                         LabelView(
                             title: "목표 주제",
                             isLoading: store.isLoading,
-                            content: store.content?.details.goalSubject
+                            content: store.content?.topic ?? ""
                         )
                         LabelView(
                             title: "멘토명",
                             isLoading: store.isLoading,
-                            content: store.content?.details.mentor
+                            content: store.content?.mentorName ?? ""
                         )
                         LabelView(
                             title: "목표 기간",
                             isLoading: store.isLoading,
-                            content: "\(store.content?.details.period ?? "0")일"
+                            content: "\(period)일"
                         )
                         HStack(spacing: 0) {
                             Spacer()
@@ -274,8 +295,15 @@ fileprivate struct GoalDescriptionView: View {
                                 Images.calendar
                                     .resized(length: 24)
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text("\(store.content?.details.startDate ?? "")에 시작해서")
-                                    Text("\(store.content?.details.endDate ?? "")에 끝나요")
+                                    let currentDate = Date()
+                                    let startDateString = currentDate.getString()
+                                    let endDate = Calendar.current.date(
+                                        byAdding: .day,
+                                        value: period,
+                                        to: currentDate) ?? currentDate
+                                    let endDateString = endDate.getString()
+                                    Text("\(startDateString)에 시작해서")
+                                    Text("\(endDateString)에 끝나요")
                                 }
                                 .pretendard(.medium, size: 14, color: Colors.grey600)
                             }
@@ -290,6 +318,12 @@ fileprivate struct GoalDescriptionView: View {
                             }
                             Spacer()
                         }
+                        let duration = store.content?.dailyDuration ?? 0
+                        LabelView(
+                            title: "소요 기간",
+                            isLoading: store.isLoading,
+                            content: "하루 평균 \(duration)시간"
+                        )
                     }
                     SeparatorView()
                 }
@@ -297,7 +331,10 @@ fileprivate struct GoalDescriptionView: View {
                 VStack(spacing: 16) {
                     HStack {
                         Text("목표 설명")
-                            .pretendard(.semiBold, size: 16, color: Colors.grey500)
+                            .pretendard(
+                                .semiBold,
+                                size: 16,
+                                color: Colors.grey500)
                             .overlay {
                                 if store.isLoading {
                                     RoundedRectangle(cornerRadius: 4)
@@ -306,18 +343,17 @@ fileprivate struct GoalDescriptionView: View {
                             }
                         Spacer()
                     }
-                    Text(store.content?.details.goalDescription.splitCharacters() ?? "")
-                        .pretendard(.medium, size: 16, color: Colors.grey900)
+                    let description = store.content?.description ?? ""
+                    Text(description.splitCharacters())
+                        .pretendard(
+                            .medium,
+                            size: 16,
+                            color: Colors.grey900)
+                        .frame(maxWidth: .infinity)
                         .padding(20)
                         .background(Colors.grey50)
                         .clipShape(.rect(cornerRadius: 24))
                         .lineSpacing(3)
-                        .overlay {
-                            if store.isLoading {
-                                RoundedRectangle(cornerRadius: 4)
-                                    .fill(Colors.grey200)
-                            }
-                        }
                 }
                 .padding(.horizontal, 20)
                 SeparatorView(height: 16)
@@ -335,18 +371,19 @@ fileprivate struct GoalDescriptionView: View {
                             Spacer()
                         }
                         VStack(spacing: 10) {
-                            ForEach(
-                                Array(content.details.weeklyGoal.enumerated()),
-                                id: \.offset
-                            ) { goal in
+                            let weeklyObjectives = content.weeklyObjectives.sorted {
+                                $0.id < $1.id
+                            }
+                            ForEach(weeklyObjectives) { goal in
                                 HStack(alignment: .top, spacing: 12) {
-                                    Text("\(goal.offset+1)주")
+                                    Text("\(goal.weekNumber)주")
                                         .pretendard(.semiBold, size: 13, color: Colors.primary900)
                                         .padding(.vertical, 2)
                                         .frame(minWidth: 34)
                                         .background(Colors.primary50)
                                         .clipShape(.rect(cornerRadius: 6))
-                                    Text(goal.element.splitCharacters())
+                                    let description = goal.description ?? ""
+                                    Text(description.splitCharacters())
                                         .lineLimit(2)
                                         .truncationMode(.tail)
                                         .multilineTextAlignment(.leading)
@@ -371,12 +408,12 @@ fileprivate struct GoalDescriptionView: View {
                             Spacer()
                         }
                         VStack(spacing: 10) {
-                            ForEach(
-                                Array(content.details.milestoneGoal.enumerated()),
-                                id: \.offset
-                            ) { goal in
+                            let midObjectives = content.midObjectives.sorted {
+                                $0.id < $1.id
+                            }
+                            ForEach(midObjectives) { goal in
                                 HStack(alignment: .top, spacing: 12) {
-                                    Text("\(goal.offset+1)")
+                                    Text("\(goal.sequence)")
                                         .pretendard(
                                             .semiBold,
                                             size: 13,
@@ -386,7 +423,8 @@ fileprivate struct GoalDescriptionView: View {
                                         .frame(minWidth: 34)
                                         .background(Colors.secondaryY50)
                                         .clipShape(.rect(cornerRadius: 6))
-                                    Text(goal.element.splitCharacters())
+                                    let description = goal.description ?? ""
+                                    Text(description.splitCharacters())
                                         .lineLimit(2)
                                         .truncationMode(.tail)
                                         .multilineTextAlignment(.leading)
@@ -400,10 +438,8 @@ fileprivate struct GoalDescriptionView: View {
                     Spacer()
                         .frame(height: 30)
                     LazyVStack(spacing: 0) {
-                        ForEach(
-                            Array(content.contentImages),
-                            id: \.self
-                        ) { imageURL in
+                        ForEach(content.contentImages) { image in
+                            let imageURL = image.imageUrl ?? ""
                             AsyncImage(
                                 url: URL(string: imageURL)
                             ) { phase in
@@ -448,7 +484,10 @@ fileprivate struct BottomButtonView: View {
                         .renderingMode(.template)
                         .resized(length: 16)
                         .foregroundStyle(Colors.grey800)
-                    Text("무료참여 \(store.content?.remainingCapacity ?? 0)자리 남았어요")
+                    let remainingCapacity =
+                        (store.content?.participantsLimit ?? 0) -
+                        (store.content?.currentParticipants ?? 0)
+                    Text("참여 가능한 자리가 \(remainingCapacity)자리 남았어요")
                         .pretendardStyle(
                             .regular,
                             size: 12,
@@ -463,6 +502,8 @@ fileprivate struct BottomButtonView: View {
                     RoundedRectangle(cornerRadius: 20)
                         .stroke(Colors.grey500, lineWidth: 1)
                 )
+                let goalStatus = store.content?.goalStatus ?? .open
+                let iaClosed = goalStatus == .closed
                 Button {
                     if store.isLogin {
                         store.send(.view(.startButtonTapped))
@@ -477,26 +518,26 @@ fileprivate struct BottomButtonView: View {
                         .pretendardStyle(
                             .medium,
                             size: 16,
-                            color: store.content?.remainingCapacity == 0 ?
+                            color: iaClosed ?
                                 .white : .black
                         )
                         .frame(maxWidth: .infinity)
                         .frame(height: 54)
                         .background(
-                            store.content?.remainingCapacity == 0 ?
-                            Colors.grey300 :
+                            iaClosed ?
+                                Colors.grey300 :
                                 Colors.primary
                         )
                         .clipShape(.capsule)
                 }
                 .padding(.horizontal, 20)
-                .disabled(store.content?.remainingCapacity == 0)
+                .disabled(iaClosed)
                 Spacer()
                     .frame(height: 16)
             }
             .background(
                 LinearGradient(
-                    gradient: Gradient(colors: [.clear, .white, .white]),
+                    gradient: Gradient(colors: [.white.opacity(0), .white, .white]),
                     startPoint: .top,
                     endPoint: .bottom
                 )

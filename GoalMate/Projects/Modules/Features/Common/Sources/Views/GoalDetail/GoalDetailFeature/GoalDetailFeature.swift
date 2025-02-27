@@ -16,8 +16,7 @@ public struct GoalDetailFeature {
     public struct State: Equatable {
         public let id: UUID
         let contentId: Int
-        var content: GoalContentDetail?
-        var isShowButton: Bool
+        var content: GoalDetail?
         var isShowUnavailablePopup: Bool
         var currentPage: Int
         var isLoading: Bool
@@ -26,7 +25,6 @@ public struct GoalDetailFeature {
         var toastState: ToastState
         public init(
             contentId: Int,
-            isShowButton: Bool = true,
             isShowUnavailablePopup: Bool = false,
             currentPage: Int = 0,
             isLoading: Bool = true,
@@ -34,7 +32,6 @@ public struct GoalDetailFeature {
         ) {
             self.id = UUID()
             self.contentId = contentId
-            self.isShowButton = isShowButton
             self.isShowUnavailablePopup = isShowUnavailablePopup
             self.currentPage = currentPage
             self.isLoading = true
@@ -50,6 +47,7 @@ public struct GoalDetailFeature {
         case feature(FeatureAction)
         case delegate(DelegateAction)
         case binding(BindingAction<State>)
+        case showUnavailablePopup(Bool)
     }
     public enum ViewCyclingAction {
         case onAppear
@@ -64,11 +62,11 @@ public struct GoalDetailFeature {
     public enum FeatureAction {
         case checkLogin(Bool)
         case fetchDetail
-        case checkFetchDetailResponse(Result<GoalContentDetail, Error>)
+        case checkFetchDetailResponse(FetchGoalDetailResult)
         case showToast(String)
     }
     public enum DelegateAction {
-        case showPurchaseSheet(GoalContentDetail)
+        case showPurchaseSheet(GoalDetail)
         case showLogin
         case closeView
     }
@@ -86,6 +84,9 @@ public struct GoalDetailFeature {
                 return reduce(into: &state, action: action)
             case let .delegate(action):
                 return reduce(into: &state, action: action)
+            case let .showUnavailablePopup(isShow):
+                state.isShowUnavailablePopup = isShow
+                return .none
             case .binding:
                 return .none
             }
@@ -97,5 +98,10 @@ extension GoalDetailFeature {
     public enum FetchError: Error {
         case networkError
         case emptyData
+    }
+    public enum FetchGoalDetailResult {
+        case success(GoalDetail)
+        case networkError
+        case failed
     }
 }
