@@ -71,6 +71,8 @@ public struct Goal: Codable, Identifiable, Equatable {
 // MARK: - MenteeGoal
 public struct MenteeGoal: Codable, Identifiable, Equatable {
     public let id: Int
+    public let goalId: Int
+    public let commentRoomId: Int
     public let title: String?
     public let topic: String?
     public let mentorName: String?
@@ -86,7 +88,6 @@ public struct MenteeGoal: Codable, Identifiable, Equatable {
     public let menteeGoalStatus: MenteeGoalStatus
     public let createdAt: String?
     public let updatedAt: String?
-    public let commentRoomId: Int
 
     public enum MenteeGoalStatus: String, Codable {
         case inProgress = "IN_PROGRESS"
@@ -97,6 +98,7 @@ public struct MenteeGoal: Codable, Identifiable, Equatable {
 
     public enum CodingKeys: String, CodingKey {
         case id, title, topic
+        case goalId = "goal_id"
         case mentorName = "mentor_name"
         case mainImage = "main_image"
         case startDate = "start_date"
@@ -303,7 +305,8 @@ extension FetchMyGoalsResponseDTO {
             menteeGoals: [
                 .init(
                     id: 2,
-                    title: "하루 30분 코딩 챌린지",
+                    goalId: 2,
+                    commentRoomId: 102, title: "하루 30분 코딩 챌린지",
                     topic: "프로그래밍",
                     mentorName: "지훈",
                     mainImage: "https://example.com/images/coding.jpg",
@@ -317,12 +320,12 @@ extension FetchMyGoalsResponseDTO {
                     totalCompletedCount: 20,
                     menteeGoalStatus: .inProgress,
                     createdAt: "2025-02-10T10:00:00.000Z",
-                    updatedAt: "2025-02-19T14:20:00.000Z",
-                    commentRoomId: 102
+                    updatedAt: "2025-02-19T14:20:00.000Z"
                 ),
                 .init(
                     id: 3,
-                    title: "다온과 함께하는 영어 완전 정복 30일 목표, 다온과 함께하는 영어 완전 정복 30일 목표",
+                    goalId: 3,
+                    commentRoomId: 103, title: "다온과 함께하는 영어 완전 정복 30일 목표, 다온과 함께하는 영어 완전 정복 30일 목표",
                     topic: "영어",
                     mentorName: "다온",
                     mainImage: "https://example.com/images/english-study.jpg",
@@ -336,12 +339,12 @@ extension FetchMyGoalsResponseDTO {
                     totalCompletedCount: 45,
                     menteeGoalStatus: .inProgress,
                     createdAt: "2025-02-01T09:00:00.000Z",
-                    updatedAt: "2025-02-19T15:30:00.000Z",
-                    commentRoomId: 103
+                    updatedAt: "2025-02-19T15:30:00.000Z"
                 ),
                 .init(
                     id: 4,
-                    title: "하루 30분 코딩 챌린지",
+                    goalId: 4,
+                    commentRoomId: 104, title: "하루 30분 코딩 챌린지",
                     topic: "프로그래밍",
                     mentorName: "지훈",
                     mainImage: "https://example.com/images/coding.jpg",
@@ -355,12 +358,12 @@ extension FetchMyGoalsResponseDTO {
                     totalCompletedCount: 20,
                     menteeGoalStatus: .inProgress,
                     createdAt: "2025-02-10T10:00:00.000Z",
-                    updatedAt: "2025-02-19T14:20:00.000Z",
-                    commentRoomId: 104
+                    updatedAt: "2025-02-19T14:20:00.000Z"
                 ),
                 .init(
                     id: 5,
-                    title: "다온과 함께하는 영어 완전 정복 30일 목표",
+                    goalId: 5,
+                    commentRoomId: 105, title: "다온과 함께하는 영어 완전 정복 30일 목표",
                     topic: "영어",
                     mentorName: "다온",
                     mainImage: "https://example.com/images/english-study.jpg",
@@ -374,12 +377,12 @@ extension FetchMyGoalsResponseDTO {
                     totalCompletedCount: 45,
                     menteeGoalStatus: .inProgress,
                     createdAt: "2025-02-01T09:00:00.000Z",
-                    updatedAt: "2025-02-19T15:30:00.000Z",
-                    commentRoomId: 105
+                    updatedAt: "2025-02-19T15:30:00.000Z"
                 ),
                 .init(
                     id: 6,
-                    title: "하루 30분 코딩 챌린지",
+                    goalId: 6,
+                    commentRoomId: 106, title: "하루 30분 코딩 챌린지",
                     topic: "프로그래밍",
                     mentorName: "지훈",
                     mainImage: "https://example.com/images/coding.jpg",
@@ -393,12 +396,12 @@ extension FetchMyGoalsResponseDTO {
                     totalCompletedCount: 20,
                     menteeGoalStatus: .inProgress,
                     createdAt: "2025-02-10T10:00:00.000Z",
-                    updatedAt: "2025-02-19T14:20:00.000Z",
-                    commentRoomId: 106
+                    updatedAt: "2025-02-19T14:20:00.000Z"
                 ),
                 .init(
                     id: 7,
-                    title: "다온과 함께하는 영어 완전 정복 30일 목표",
+                    goalId: 7,
+                    commentRoomId: 107, title: "다온과 함께하는 영어 완전 정복 30일 목표",
                     topic: "영어",
                     mentorName: "다온",
                     mainImage: "https://example.com/images/english-study.jpg",
@@ -412,12 +415,12 @@ extension FetchMyGoalsResponseDTO {
                     totalCompletedCount: 45,
                     menteeGoalStatus: .inProgress,
                     createdAt: "2025-02-01T09:00:00.000Z",
-                    updatedAt: "2025-02-19T15:30:00.000Z",
-                    commentRoomId: 107
+                    updatedAt: "2025-02-19T15:30:00.000Z"
                 ),
                 .init(
                     id: 8,
-                    title: "하루 30분 코딩 챌린지",
+                    goalId: 8,
+                    commentRoomId: 108, title: "하루 30분 코딩 챌린지",
                     topic: "프로그래밍",
                     mentorName: "지훈",
                     mainImage: "https://example.com/images/coding.jpg",
@@ -431,8 +434,7 @@ extension FetchMyGoalsResponseDTO {
                     totalCompletedCount: 20,
                     menteeGoalStatus: .inProgress,
                     createdAt: "2025-02-10T10:00:00.000Z",
-                    updatedAt: "2025-02-19T14:20:00.000Z",
-                    commentRoomId: 108
+                    updatedAt: "2025-02-19T14:20:00.000Z"
                 )
             ],
             page: Page(
@@ -458,7 +460,8 @@ extension FetchMyGoalDetailResponseDTO {
             date: "2025-02-18",
             menteeGoal: .init(
                 id: 1,
-                title: "다온과 함께하는 영어 완전 정복 30일 목표",
+                goalId: 9,
+                commentRoomId: 1, title: "다온과 함께하는 영어 완전 정복 30일 목표",
                 topic: "영어",
                 mentorName: "다온",
                 mainImage: "https://main-image.url",
@@ -472,8 +475,7 @@ extension FetchMyGoalDetailResponseDTO {
                 totalCompletedCount: 50,
                 menteeGoalStatus: .inProgress,
                 createdAt: "2025-02-18T17:56:07.894Z",
-                updatedAt: "2025-02-18T17:56:07.894Z",
-                commentRoomId: 1
+                updatedAt: "2025-02-18T17:56:07.894Z"
             ),
             todos: [
                 Todo(

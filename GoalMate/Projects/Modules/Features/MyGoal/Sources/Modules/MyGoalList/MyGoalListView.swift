@@ -342,7 +342,7 @@ fileprivate struct MyGoalContentItem: View {
                             ),
                             height: 44,
                             buttonTapped: {
-                                buttonTapped(.showGoalRestart(content.id))
+                                buttonTapped(.showGoalRestart(content.goalId))
                             },
                             label: {
                                 Text("다시 시작하기")

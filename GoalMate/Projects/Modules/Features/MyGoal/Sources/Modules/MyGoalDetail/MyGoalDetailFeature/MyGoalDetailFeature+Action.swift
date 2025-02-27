@@ -39,7 +39,8 @@ extension MyGoalDetailFeature {
     func reduce(into state: inout State, action: ViewAction) -> Effect<Action> {
         switch action {
         case .showGoalDetail:
-            return .send(.delegate(.showGoalDetail(state.menteeGoalId)))
+            guard let content = state.content else { return .none }
+            return .send(.delegate(.showGoalDetail(content.goalId)))
         case .backButtonTapped:
             return .send(.delegate(.closeView))
         case .retryButtonTapped:

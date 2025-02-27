@@ -25,7 +25,8 @@ extension MyGoalCompletionFeature {
             return .send(.delegate(
                 .showComment(content.commentRoomId, content.title, content.startDate)))
         case .moreDetailButtonTapped:
-            return .send(.delegate(.showGoalDetail(state.contentId)))
+            guard let content = state.content else { return .none }
+            return .send(.delegate(.showGoalDetail(content.goalId)))
         case .nextGoalButtonTapped:
             return .send(.delegate(.showGoalList))
         case .retryButtonTapped:
