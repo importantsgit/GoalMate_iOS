@@ -15,7 +15,7 @@ public struct MenteeClient {
     public var fetchMenteeInfo: () async throws -> FetchMenteeInfoResponseDTO.Response
     public var joinGoal: (_ goalId: Int) async throws -> Void
     public var hasRemainingTodos: () async throws -> Bool
-    public var hideRemainingTodosNotice: () async throws -> Void
+    public var getNewCommentsCount: () async throws -> Int
     public var fetchMyGoals: (_ page: Int) async throws -> FetchMyGoalsResponseDTO.Response
     public var fetchMyGoalDetail: (
         _ menteeGoalId: Int,
@@ -109,8 +109,16 @@ extension MenteeClient: DependencyKey {
                     return data.hasRemainingTodosToday
                 }
             },
-            hideRemainingTodosNotice: {
-                
+            getNewCommentsCount: {
+                try await executeWithTokenValidation { accessToken in
+                    let endpoint = APIEndpoints.getNewCommentsCount(
+                        accessToken: accessToken
+                    )
+                    let response = try await networkClient.asyncRequest(with: endpoint)
+                    guard let data = response.data
+                    else { throw NetworkError.emptyData }
+                    return data.newCommentsCount
+                }
             },
             fetchMyGoals: { page in
                 try await executeWithTokenValidation { accessToken in
@@ -247,7 +255,8 @@ extension MenteeClient: DependencyKey {
         hasRemainingTodos: {
             return true
         },
-        hideRemainingTodosNotice: {
+        getNewCommentsCount: {
+            return 4
         },
         fetchMyGoals: { _ in
             FetchMyGoalsResponseDTO.dummy.data!
@@ -358,7 +367,8 @@ extension MenteeClient: DependencyKey {
             hasRemainingTodos: {
                 return true
             },
-            hideRemainingTodosNotice: {
+            getNewCommentsCount: {
+                return 4
             },
             fetchMyGoals: { page in
                 try await Task.sleep(nanoseconds: 2_000_000_000)

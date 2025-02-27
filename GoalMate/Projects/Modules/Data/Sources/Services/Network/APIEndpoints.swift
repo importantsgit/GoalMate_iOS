@@ -31,9 +31,10 @@ struct APIEndpoints {
 
         case updateTodo             = "mentees/my/goals/{menteeGoalId}/todos/{todoId}"
 
+        case getNewCommentsCount    = "comments/new"
         case fetchCommentRooms      = "comment-rooms/my"
-        case getPostMessage          = "comment-rooms/{roomId}/comments"
-        case updateDeleteMessage    = "comments/{commentId}"
+        case getPostMessage         = "comment-rooms/{roomId}/comments"
+        case editMessage            = "comments/{commentId}"
         func path(with parameters: [String: String]) -> String {
             var result = self.rawValue
             parameters.forEach { key, value in
@@ -329,7 +330,7 @@ struct APIEndpoints {
         accessToken: String
     ) throws -> Endpoint<PostSendCommentResponseDTO> {
         try Endpoint(
-            path: .updateDeleteMessage,
+            path: .editMessage,
             pathParameters: [
                 "commentId": "\(commentId)"
             ],
@@ -348,11 +349,23 @@ struct APIEndpoints {
         accessToken: String
     ) throws -> Endpoint<DefaultResponseDTO> {
         try Endpoint(
-            path: .updateDeleteMessage,
+            path: .editMessage,
             pathParameters: [
                 "commentId": "\(commentId)"
             ],
             method: .delete,
+            headerParameters: [
+                "Authorization": "Bearer \(accessToken)"
+            ]
+        )
+    }
+
+    static func getNewCommentsCount(
+        accessToken: String
+    ) -> Endpoint<Response<GetNewCommentsCountsResponseDTO>> {
+        Endpoint(
+            path: .getNewCommentsCount,
+            method: .get,
             headerParameters: [
                 "Authorization": "Bearer \(accessToken)"
             ]
