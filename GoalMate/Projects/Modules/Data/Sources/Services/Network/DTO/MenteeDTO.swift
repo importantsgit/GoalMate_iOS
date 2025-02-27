@@ -7,6 +7,15 @@
 
 import Foundation
 
+public struct JoinGoalInfo: Codable {
+    public let menteeGoalId: Int
+    public let commentRoomId: Int
+    public enum CodingKeys: String, CodingKey {
+        case menteeGoalId = "mentee_goal_id"
+        case commentRoomId = "comment_room_id"
+    }
+}
+
 public struct SetNicknameRequestDTO: Codable {
     let name: String
 }

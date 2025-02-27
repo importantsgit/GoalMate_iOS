@@ -130,7 +130,7 @@ struct APIEndpoints {
 
     static func fetchGoalEndpoint(
         with request: PaginationRequestDTO
-    ) -> Endpoint<FetchGoalsResponseDTO> {
+    ) -> Endpoint<Response<FetchGoalsResponseDTO>> {
         Endpoint(
             path: .fetchGoals,
             method: .get,
@@ -141,7 +141,7 @@ struct APIEndpoints {
     static func fetchGoalDetailEndpoint(
         goalId: Int,
         accessToken: String? = nil
-    ) throws -> Endpoint<FetchGoalDetailResponseDTO> {
+    ) throws -> Endpoint<Response<GoalDetail>> {
         var headerParameters: [String: String] = [:]
         if let accessToken {
             headerParameters = [
@@ -161,7 +161,7 @@ struct APIEndpoints {
     static func joinGoalEndpoint(
         goalId: Int,
         accessToken: String
-    ) throws -> Endpoint<JoinGoalResponseDTO> {
+    ) throws -> Endpoint<Response<JoinGoalInfo>> {
         try Endpoint(
             path: .joinGoal,
             pathParameters: [
@@ -285,7 +285,7 @@ struct APIEndpoints {
             queryParametersEncodable: request
         )
     }
-    
+
     static func fetchComentDetil(
         with request: PaginationRequestDTO,
         roomId: Int,

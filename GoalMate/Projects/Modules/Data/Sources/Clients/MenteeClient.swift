@@ -13,7 +13,7 @@ import Utils
 @DependencyClient
 public struct MenteeClient {
     public var fetchMenteeInfo: () async throws -> FetchMenteeInfoResponseDTO.Response
-    public var joinGoal: (_ goalId: Int) async throws -> Void
+    public var joinGoal: (_ goalId: Int) async throws -> JoinGoalInfo
     public var hasRemainingTodos: () async throws -> Bool
     public var getNewCommentsCount: () async throws -> Int
     public var fetchMyGoals: (_ page: Int) async throws -> FetchMyGoalsResponseDTO.Response
@@ -89,14 +89,15 @@ extension MenteeClient: DependencyKey {
                         accessToken: accessToken
                     )
                     let response = try await networkClient.asyncRequest(with: endpoint)
-                    if response.code == "200" {
-                        return
+                    let code = response.code
+                    guard code == "200"
+                    else {
+                        let code = Int(code.dropFirst()) ?? 0
+                        throw NetworkError.statusCodeError(code: code)
                     }
-                    print(response)
-                    guard let code = Int(response.code) else {
-                        throw NetworkError.invaildResponse
-                    }
-                    throw NetworkError.statusCodeError(code: code)
+                    guard let info = response.data
+                    else { throw NetworkError.invaildResponse }
+                    return info
                 }
             },
             hasRemainingTodos: {
@@ -251,7 +252,9 @@ extension MenteeClient: DependencyKey {
     public static var testValue = MenteeClient(
         fetchMenteeInfo: { FetchMenteeInfoResponseDTO.dummy.data!
         },
-        joinGoal: { _ in },
+        joinGoal: { _ in
+            return .init(menteeGoalId: 0, commentRoomId: 0)
+        },
         hasRemainingTodos: {
             return true
         },
@@ -363,7 +366,9 @@ extension MenteeClient: DependencyKey {
                 try await Task.sleep(nanoseconds: 2_000_000_000)
                 return FetchMenteeInfoResponseDTO.dummy.data!
             },
-            joinGoal: { _ in },
+            joinGoal: { _ in
+                return .init(menteeGoalId: 0, commentRoomId: 0)
+            },
             hasRemainingTodos: {
                 return true
             },

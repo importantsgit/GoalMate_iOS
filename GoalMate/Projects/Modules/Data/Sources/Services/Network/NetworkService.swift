@@ -53,28 +53,37 @@ public final class NetworkService: NSObject {
     ) throws -> T {
         guard let response = response as? HTTPURLResponse
         else { throw NetworkError.invaildResponse }
+        
         switch response.statusCode {
         case 200...299:
             do {
                 let decodingData: T = try decoder.decode(data)
                 return decodingData
             } catch let error {
+                print("Failed to decode type: \(T.self)")
                 switch error as? DecodingError {
                 case .dataCorrupted(let context):
                     print("Data corrupted: \(context)")
+                    print("Coding path: \(context.codingPath)")
                 case .keyNotFound(let key, let context):
                     print("Key '\(key)' not found: \(context.debugDescription)")
+                    print("Coding path: \(context.codingPath)")
                 case .valueNotFound(let value, let context):
                     print("Value '\(value)' not found: \(context.debugDescription)")
+                    print("Coding path: \(context.codingPath)")
                 case .typeMismatch(let type, let context):
                     print("Type '\(type)' mismatch: \(context.debugDescription)")
+                    print("Coding path: \(context.codingPath)")
                 case .none:
                     print("Error: \(error)")
                 case .some(let error):
                     print("Error: \(error)")
                 }
+                if let jsonString = String(data: data, encoding: .utf8) {
+                    print("Raw JSON data: \(jsonString)")
+                }
                 throw NetworkError.invalidFormat
-             }
+            }
         default:
             throw NetworkError.statusCodeError(code: response.statusCode)
         }
