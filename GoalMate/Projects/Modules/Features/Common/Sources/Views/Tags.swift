@@ -39,7 +39,7 @@ public struct AvailableTagView: View {
                         size: isLarge ? 17 : 14,
                         color: .white
                     )
-                Text("잔여")
+                Text("남음")
                     .pretendardStyle(
                         .medium,
                         size: isLarge ? 13 : 11,
