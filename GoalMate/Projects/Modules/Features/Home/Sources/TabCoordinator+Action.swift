@@ -18,7 +18,7 @@ extension TabCoordinator {
         case .onAppear:
             return .merge(
                 .send(.feature(.checkRemainingTodo)),
-                .none // TODO: 새 알림 카운트
+                .send(.feature(.getNewCommentsCount))
             )
         }
     }
@@ -43,6 +43,20 @@ extension TabCoordinator {
             }
         case let .checkRemainingTodoResponse(result):
             state.hasRemainingTodos = result
+            return .none
+        case .getNewCommentsCount:
+            return .run { send in
+                do {
+                    let count = try await menteeClient.getNewCommentsCount()
+                    await send(.feature(
+                        .chekcNewCommentsCountResponse(count)))
+                } catch {
+                    await send(.feature(
+                        .chekcNewCommentsCountResponse(0)))
+                }
+            }
+        case let .chekcNewCommentsCountResponse(count):
+            state.newCommentsCount = count
             return .none
         }
     }

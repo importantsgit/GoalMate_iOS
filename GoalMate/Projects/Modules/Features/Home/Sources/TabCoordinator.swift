@@ -29,6 +29,7 @@ public struct TabCoordinator {
         public var selectedTab: Tab
         public var isTabVisible: Bool
         public var hasRemainingTodos: Bool
+        public var newCommentsCount: Int = 0
         public var goal: GoalCoordinator.State
         public var myGoal: MyGoalCoordinator.State
         public var comment: CommentCoordinator.State
@@ -70,6 +71,8 @@ public struct TabCoordinator {
     public enum FeatureAction {
         case checkRemainingTodo
         case checkRemainingTodoResponse(Bool)
+        case getNewCommentsCount
+        case chekcNewCommentsCountResponse(Int)
     }
     @Dependency(\.menteeClient) var menteeClient
     public var body: some Reducer<State, Action> {

@@ -59,8 +59,10 @@ public struct TabCoordinatorView: View {
                     VStack {
                         Spacer()
                         CustomTabBar(
-                            selectedTab: $store.selectedTab.sending(\.tabbarButtonTapped),
-                            hasRemainingTodos: store.hasRemainingTodos
+                            selectedTab: $store
+                                .selectedTab.sending(\.tabbarButtonTapped),
+                            hasRemainingTodos: store.hasRemainingTodos,
+                            newCommentsCount: store.newCommentsCount
                         )
                             .onAppear {
                                 store.send(.viewCycling(.onAppear))
@@ -76,18 +78,22 @@ public struct TabCoordinatorView: View {
 struct CustomTabBar: View {
     @Binding var selectedTab: TabCoordinator.Tab
     var hasRemainingTodos: Bool
+    var newCommentsCount: Int
     init(
         selectedTab: Binding<TabCoordinator.Tab>,
-        hasRemainingTodos: Bool) {
+        hasRemainingTodos: Bool,
+        newCommentsCount: Int
+    ) {
         self._selectedTab = selectedTab
         self.hasRemainingTodos = hasRemainingTodos
+        self.newCommentsCount = newCommentsCount
     }
     var body: some View {
         VStack(spacing: 0) {
             HStack(spacing: 0) {
                 ForEach(TabCoordinator.Tab.allCases, id: \.self) { tab in
                     ZStack {
-                        tabButton(tab)
+                        tabButton(tab, newCommentsCount)
                     }
                 }
             }
@@ -122,9 +128,12 @@ struct CustomTabBar: View {
         }
     }
     @ViewBuilder
-    private func tabButton(_ tab: TabCoordinator.Tab) -> some View {
+    private func tabButton(
+        _ tab: TabCoordinator.Tab,
+        _ newCommentsCount: Int
+    ) -> some View {
         Button {
-            withAnimation(.spring(response: 0.3)) {
+            withAnimation(.spring(response: 0.2)) {
                 selectedTab = tab
             }
         } label: {
@@ -140,9 +149,29 @@ struct CustomTabBar: View {
                             Images.goalSeleceted.resized(length: 24) :
                             Images.goal.resized(length: 24)
                     case .comment:
-                        selectedTab == tab ?
-                            Images.commentSelected.resized(length: 24) :
-                            Images.comment.resized(length: 24)
+                        Group {
+                            selectedTab == tab ?
+                                Images.commentSelected.resized(length: 24) :
+                                Images.comment.resized(length: 24)
+                        }
+                        .overlay {
+                            if newCommentsCount > 0 {
+                                Text("\(newCommentsCount)")
+                                    .pretendardStyle(
+                                        .regular,
+                                        size: 12,
+                                        color: .white
+                                    )
+                                    .frame(
+                                        width: 14,
+                                        height: 14)
+                                    .background {
+                                        Circle()
+                                            .fill(Colors.error)
+                                    }
+                                    .offset(x: 10, y: -7)
+                            }
+                        }
                     case .profile:
                         selectedTab == tab ?
                             Images.profileSelected.resized(length: 24) :
