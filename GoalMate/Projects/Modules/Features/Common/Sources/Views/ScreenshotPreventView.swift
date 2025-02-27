@@ -8,31 +8,41 @@
 import SwiftUI
 import UIKit
 
+import SwiftUI
+
 struct ScreenshotPreventView<Content: View>: View {
     var content: Content
-
     init(@ViewBuilder content: @escaping () -> Content) {
         self.content = content()
     }
-
+    
+    /// View Properties
     @State private var hostingController: UIHostingController<Content>?
-
+    
     var body: some View {
         _ScreenshotPreventHelper(hostingController: $hostingController)
-            .overlay(
-                GeometryReader { geometry in
-                    let size = geometry.size
+            .overlay {
+                GeometryReader {
+                    let size = $0.size
+                    
                     Color.clear
                         .preference(key: SizeKey.self, value: size)
-                        .onPreferenceChange(SizeKey.self) { newValue in
-                            if hostingController == nil {
-                                hostingController = UIHostingController(rootView: content)
-                                hostingController?.view.backgroundColor = .clear
-                                hostingController?.view.frame = CGRect(origin: .zero, size: size)
+                        .onPreferenceChange(SizeKey.self, perform: { value in
+                            if value != .zero {
+                                /// Creating Hosting Controller with the Size
+                                if hostingController == nil {
+                                    hostingController = UIHostingController(rootView: content)
+                                    hostingController?.view.backgroundColor = .clear
+                                    hostingController?.view.tag = 1009
+                                    hostingController?.view.frame = .init(origin: .zero, size: value)
+                                } else {
+                                    /// Sometimes the View size may updated, In that case updating the UIView Size
+                                    hostingController?.view.frame = .init(origin: .zero, size: value)
+                                }
                             }
-                        }
+                        })
                 }
-            )
+            }
     }
 }
 
@@ -45,7 +55,6 @@ fileprivate struct SizeKey: PreferenceKey {
 
 fileprivate struct _ScreenshotPreventHelper<Content: View>: UIViewRepresentable {
     @Binding var hostingController: UIHostingController<Content>?
-
     func makeUIView(context: Context) -> UIView {
         let secureField = UITextField()
         secureField.isSecureTextEntry = true
@@ -54,11 +63,9 @@ fileprivate struct _ScreenshotPreventHelper<Content: View>: UIViewRepresentable 
         }
         return UIView()
     }
-
+    
     func updateUIView(_ uiView: UIView, context: Context) {
-        // Adding hosting view as a Subview to the TextLayout View
-        if let hostingController,
-            uiView.subviews.contains(where: { $0.tag == 100 }) == false {
+        if let hostingController, !uiView.subviews.contains(where: { $0.tag == 1009 }) {
             uiView.addSubview(hostingController.view)
         }
     }

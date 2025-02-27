@@ -250,14 +250,11 @@ struct LoadingFailureModifier: ViewModifier {
 
 struct HideWithScreenshot: ViewModifier {
     @State private var size: CGSize?
-    @Environment(\.safeAreaInsets) private var safeAreaInsets
 
     func body(content: Content) -> some View {
         ScreenshotPreventView {
             ZStack {
                 content
-                    .padding(.top, safeAreaInsets.top)
-                    .padding(.bottom, safeAreaInsets.bottom)
                     .background(
                         GeometryReader { proxy in
                             Color.clear
