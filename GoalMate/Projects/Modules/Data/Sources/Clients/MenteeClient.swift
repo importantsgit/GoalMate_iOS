@@ -378,7 +378,8 @@ extension MenteeClient: DependencyKey {
                         let id = startId + index
                         return .init(
                             id: id,
-                            title: "목표 #\(id)",
+                            goalId: id,
+                            commentRoomId: 1000 + id, title: "목표 #\(id)",
                             topic: "주제 #\(id)",
                             mentorName: "멘토 #\(id)",
                             mainImage: "https://example.com/image-\(id).jpg",
@@ -392,8 +393,7 @@ extension MenteeClient: DependencyKey {
                             totalCompletedCount: id * 5, // 진행도를 다르게 보여주기 위해
                             menteeGoalStatus: [.inProgress, .completed].randomElement()!,
                             createdAt: "2025-01-01",
-                            updatedAt: "2025-02-19",
-                            commentRoomId: 1000 + id // 누락된 필드 추가
+                            updatedAt: "2025-02-19" // 누락된 필드 추가
                         )
                     },
                     page: .init(
