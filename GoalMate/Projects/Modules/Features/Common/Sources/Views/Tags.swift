@@ -15,19 +15,21 @@ public struct AvailableTagView: View {
     let remainingCapacity: Int
     let currentParticipants: Int
     let size: Size
+    let isExpired: Bool
 
     public init(
         remainingCapacity: Int,
         currentParticipants: Int,
-        size: Size = .small
+        size: Size = .small,
+        isExpired: Bool = false
     ) {
         self.remainingCapacity = remainingCapacity
         self.currentParticipants = currentParticipants
         self.size = size
+        self.isExpired = isExpired
     }
 
     public var body: some View {
-        let hasNoCapacity: Bool = remainingCapacity == 0
         let isLarge = size == .large
         HStack(spacing: isLarge ? 4 : 2) {
             HStack(spacing: 2) {
@@ -51,7 +53,7 @@ public struct AvailableTagView: View {
                 GeometryReader { geometry in
                     makeBackgroundPath(in: geometry)
                         .fill(
-                            hasNoCapacity ?
+                            isExpired ?
                                 Colors.grey500 :
                                 Colors.secondaryP400
                         )
@@ -62,7 +64,7 @@ public struct AvailableTagView: View {
                     .pretendardStyle(
                         .medium,
                         size: isLarge ? 17 : 14,
-                        color: hasNoCapacity ?
+                        color: isExpired ?
                             Colors.grey600 :
                             Colors.secondaryP
                     )
@@ -70,7 +72,7 @@ public struct AvailableTagView: View {
                     .pretendardStyle(
                         .medium,
                         size: isLarge ? 13 : 11,
-                        color: hasNoCapacity ?
+                        color: isExpired ?
                             Colors.grey600 :
                             Colors.secondaryP
                     )
@@ -78,7 +80,7 @@ public struct AvailableTagView: View {
         }
         .padding(.trailing, 8)
         .background(
-            hasNoCapacity ?
+            isExpired ?
                 Colors.grey200 :
                 Colors.secondaryP50
         )

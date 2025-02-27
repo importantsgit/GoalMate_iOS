@@ -181,7 +181,8 @@ struct GoalListView: View {
                             (content.participantsLimit ?? 0) -
                             (content.currentParticipants ?? 0),
                         currentParticipants: content.currentParticipants ?? 0,
-                        size: .small
+                        size: .small,
+                        isExpired: content.goalStatus == .closed
                     )
                     if content.isClosingSoon ?? false {
                         TagView(
