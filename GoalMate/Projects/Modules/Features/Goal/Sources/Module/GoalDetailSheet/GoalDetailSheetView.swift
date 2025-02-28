@@ -95,7 +95,7 @@ public struct GoalDetailSheetView: View {
             }
             .padding(.horizontal, 20)
             .padding(.bottom, safeAreaInsets.bottom)
-            .toast(state: $store.toastState, position: .top)
+            .toast(state: $store.toastState, position: .bottom)
         }
     }
 }
