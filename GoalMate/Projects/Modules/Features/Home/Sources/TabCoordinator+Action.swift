@@ -96,6 +96,10 @@ extension TabCoordinator {
         case let .delegate(.setTabbarVisibility(isShow)):
             state.isTabVisible = isShow
             return .none
+        case .delegate(.showGoalList):
+            state.isTabVisible = true
+            state.selectedTab = .goal
+            return .none
         default: return .none
         }
     }
