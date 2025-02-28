@@ -717,7 +717,8 @@ struct DateCell: View {
         ZStack {
             Text(date.getString(format: "d"))
                 .pretendardStyle(.medium, size: 15, color: textColor)
-            if isSelected == false,
+            if isInRange,
+               isSelected == false,
                let progress = progress,
                progress.dailyTodoCount > 0,
                Calendar.current.compare(
