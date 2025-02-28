@@ -70,7 +70,7 @@ public struct ProfileView: View {
                                                 .foregroundStyle(Colors.grey600)
                                         }
                                     }
-                                    Text("회원가입하고 무료 목표 참여권 받으세요.")
+                                    Text("회원가입하고 지금 바로 목표를 달성해보아요!")
                                         .pretendardStyle(.regular, size: 14, color: Colors.grey900)
                                         .padding(.bottom, 20)
                                 }
