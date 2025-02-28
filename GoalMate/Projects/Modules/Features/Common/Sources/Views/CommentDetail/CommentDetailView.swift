@@ -170,6 +170,14 @@ public struct CommentDetailView: View {
                                 color: Colors.grey800
                             )
                         Spacer()
+                            .frame(height: 10)
+                        Text("하루 1회만 코멘트를 입력 할 수 있어요.\n오늘 보낸 코멘트를 수정해주세요.")
+                            .pretendardStyle(
+                                .medium,
+                                size: 14,
+                                color: Colors.grey800
+                            )
+                        Spacer()
                             .frame(height: 40)
                     }
                 }
