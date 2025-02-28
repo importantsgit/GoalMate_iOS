@@ -51,22 +51,38 @@ public struct MyGoalDetailView: View {
                                     .frame(height: 56)
                                 if store.isContentLoading == false {
                                     VStack(spacing: 0) {
-                                        todoView
-                                            .padding(.vertical, 30)
-                                            .padding(.horizontal, 20)
-                                            .background(Colors.grey50)
-                                            .overlay {
-                                                if store.isTodoLoading {
-                                                    ZStack {
-                                                        Colors.grey100
-                                                            .opacity(0.3)
-                                                        ProgressView()
-                                                            .progressViewStyle(.circular)
-                                                    }
+                                        Group {
+                                            if store.todos.isEmpty == false {
+                                                todoView
+                                                    .padding(.vertical, 30)
+                                                    .padding(.horizontal, 20)
+                                            } else {
+                                                Text("오늘은 쉬는 날이에요!")
+                                                    .pretendard(
+                                                        .semiBold,
+                                                        size: 16,
+                                                        color: Colors.grey900)
+                                                    .frame(maxWidth: .infinity)
+                                                    .padding(.vertical, 51)
+                                            }
+                                        }
+                                        .background(Colors.grey50)
+                                        .overlay {
+                                            if store.isTodoLoading {
+                                                ZStack {
+                                                    Colors.grey100
+                                                        .opacity(0.3)
+                                                    ProgressView()
+                                                        .progressViewStyle(.circular)
                                                 }
                                             }
-                                            .animation(.easeInOut(
-                                                duration: 0.2), value: store.isTodoLoading)
+                                        }
+                                        .animation(
+                                            .easeInOut(duration: 0.2),
+                                            value: store.isTodoLoading)
+                                        .animation(
+                                            .easeInOut(duration: 0.2),
+                                            value: store.todos)
                                         VStack(spacing: 0) {
                                             // 오늘 해야 할 일
                                             Spacer()
@@ -122,7 +138,7 @@ public struct MyGoalDetailView: View {
                     let isCapture = store.isShowCapturePopup
                     let text = isCapture ?
                     "멘토의 정성이 담긴 계획은\n공유할 수 없어요." :
-                    "이미 지나간 날짜는\n완료 표시할 수 없어요 :("
+                    "오늘이 아닌 날짜는\n완료 표시할 수 없어요 :("
                     VStack {
                         if isCapture {
                             Images.warning
@@ -415,23 +431,25 @@ public struct MyGoalDetailView: View {
             if let menteeGoal = store.content {
                 VStack(spacing: 29) {
                     VStack(spacing: 44) {
-                        VStack(spacing: 24) {
-                            VStack(spacing: 8) {
-                                Text("오늘 진척율")
-                                    .pretendardStyle(
-                                        .semiBold,
-                                        size: 16,
-                                        color: Colors.grey800
+                        if store.todos.isEmpty == false {
+                            VStack(spacing: 24) {
+                                VStack(spacing: 8) {
+                                    Text("오늘 진척율")
+                                        .pretendardStyle(
+                                            .semiBold,
+                                            size: 16,
+                                            color: Colors.grey800
+                                        )
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                    let progress = (Double(menteeGoal.todayCompletedCount) /
+                                                    Double(menteeGoal.todayTodoCount))
+                                    SemiCircleProgressView(
+                                        progress: progress,
+                                        progressColor: Colors.secondaryY,
+                                        backgroundColor: Colors.secondaryY50,
+                                        lineWidth: 20
                                     )
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                SemiCircleProgressView(
-                                    progress:
-                                        Double(menteeGoal.todayCompletedCount) /
-                                        Double(menteeGoal.todayTodoCount),
-                                    progressColor: Colors.secondaryY,
-                                    backgroundColor: Colors.secondaryY50,
-                                    lineWidth: 20
-                                )
+                                }
                             }
                         }
                         LinearProgressView(
