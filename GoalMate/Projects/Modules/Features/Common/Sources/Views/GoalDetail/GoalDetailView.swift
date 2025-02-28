@@ -190,7 +190,7 @@ fileprivate struct TitleView: View {
         WithPerceptionTracking {
             VStack(alignment: .leading, spacing: 8) {
                 let title = store.content?.title ?? ""
-                Text(title.splitCharacters() ?? " ")
+                Text(title.splitCharacters())
                     .pretendardStyle(
                         .semiBold,
                         size: 22,
