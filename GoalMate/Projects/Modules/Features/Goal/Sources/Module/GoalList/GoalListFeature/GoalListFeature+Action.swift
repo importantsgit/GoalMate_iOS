@@ -7,14 +7,16 @@
 
 import ComposableArchitecture
 import Data
+import Foundation
 
 extension GoalListFeature {
     // MARK: ViewCycling
     func reduce(into state: inout State, action: ViewCyclingAction) -> Effect<Action> {
         switch action {
         case .onAppear:
-            guard state.pagingationState.hasMorePages else { return .none }
+            guard state.goalContents.isEmpty else { return .none }
             state.isLoading = true
+            state.didFailToLoad = false
             return .send(.feature(.fetchGoals))
         }
     }
@@ -22,13 +24,17 @@ extension GoalListFeature {
     func reduce(into state: inout State, action: ViewAction) -> Effect<Action> {
         switch action {
         case .retryButtonTapped:
-            guard state.pagingationState.hasMorePages else { return .none }
-            state.didFailToLoad = false
             state.isLoading = true
+            state.didFailToLoad = false
             return .send(.feature(.fetchGoals))
         case .onLoadMore:
             guard state.pagingationState.hasMorePages else { return .none }
             return .send(.feature(.fetchGoals))
+                .throttle(
+                         id: PublisherID.throttle,
+                         for: .milliseconds(500),
+                         scheduler: DispatchQueue.main,
+                         latest: true)
         case let .contentTapped(contentId):
             return .send(.delegate(.showGoalDetail(contentId)))
         }
@@ -65,10 +71,10 @@ extension GoalListFeature {
                 state.pagingationState.totalCount += contents.count
                 state.pagingationState.currentPage += 1
                 state.pagingationState.hasMorePages = hasNext
-            case .networkError:
-                state.didFailToLoad = true
-            case .failed:
-                state.didFailToLoad = true
+            case .networkError, .failed:
+                if state.isLoading {
+                    state.didFailToLoad = true
+                }
             }
             state.isLoading = false
             state.isScrollFetching = false

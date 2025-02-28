@@ -25,9 +25,9 @@ struct GoalListView: View {
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                             .frame(width: 88, height: 24)
+                            .padding(.vertical, 14)
                     }
                 )
-                .frame(height: 64)
                 .padding(.horizontal, 20)
                 ZStack {
                     goalListView
@@ -69,13 +69,13 @@ struct GoalListView: View {
                             getGoalContentCell(content: content)
                         }
                         .task {
-                            if store.isLoading == false &&
-                                store.isScrollFetching &&
-                                store.pagingationState.totalCount > 10 &&
-                                store.goalContents[
-                                    store.pagingationState.totalCount-10].id == content.id {
-                                store.send(.view(.onLoadMore))
-                            }
+                            let isNearEnd = store.goalContents.count >= 3 &&
+                                 content.id == store.goalContents[
+                                     store.goalContents.count-3].id
+                             if store.isScrollFetching == false &&
+                                isNearEnd {
+                                 store.send(.view(.onLoadMore))
+                             }
                         }
                     }
                 }
