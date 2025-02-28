@@ -57,11 +57,12 @@ public struct LinearProgressView: View {
                         if isShowFlag {
                             HStack {
                                 Images.flagGreen
-                                    .resized(length: 14)
+                                    .resized(size: .init(width: 16, height: 14))
                                 Spacer()
                             }
                             .offset(
-                                x: width-3,
+                                x: max(lineWidth/2,
+                                       min(width-5, geometry.size.width-(lineWidth/2))),
                                 y: -((lineWidth/2)+7))
                         }
                     }
@@ -88,6 +89,7 @@ public struct LinearProgressView: View {
 #Preview {
     LinearProgressView(
         title: "전체 진척율",
+        isShowFlag: true,
         progress: 0.0,
         progressColor: .blue,
         backgroundColor: .gray.opacity(0.2),
@@ -95,6 +97,7 @@ public struct LinearProgressView: View {
     )
     .padding(30)
     LinearProgressView(
+        isShowFlag: true,
         progress: 0.3,
         progressColor: .blue,
         backgroundColor: .gray.opacity(0.2),
@@ -102,6 +105,7 @@ public struct LinearProgressView: View {
     )
     .padding(30)
     LinearProgressView(
+        isShowFlag: true,
         progress: 0.8,
         progressColor: .blue,
         backgroundColor: .gray.opacity(0.2),
@@ -109,6 +113,7 @@ public struct LinearProgressView: View {
     )
     .padding(30)
     LinearProgressView(
+        isShowFlag: true,
         progress: 1,
         progressColor: .blue,
         backgroundColor: .gray.opacity(0.2),
