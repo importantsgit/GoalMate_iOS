@@ -64,9 +64,9 @@ public struct TabCoordinatorView: View {
                             hasRemainingTodos: store.hasRemainingTodos,
                             newCommentsCount: store.newCommentsCount
                         )
-                            .onAppear {
-                                store.send(.viewCycling(.onAppear))
-                            }
+                        .onAppear {
+                            store.send(.viewCycling(.onAppear))
+                        }
                     }
                     .ignoresSafeArea(.all, edges: .bottom)
                 }

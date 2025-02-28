@@ -237,7 +237,6 @@ public struct ProfileView: View {
                 }
                 .ignoresSafeArea()
             }
-
         }
         .task {
             store.send(.viewCycling(.onAppear))
