@@ -275,7 +275,7 @@ struct APIEndpoints {
     static func fetchCommentRooms(
         with request: PaginationRequestDTO,
         accessToken: String
-    ) -> Endpoint<FecthCommentRoomsResponseDTO> {
+    ) -> Endpoint<Response<FecthCommentRoomsResponseDTO>> {
         Endpoint(
             path: .fetchCommentRooms,
             method: .get,
@@ -290,7 +290,7 @@ struct APIEndpoints {
         with request: PaginationRequestDTO,
         roomId: Int,
         accessToken: String
-    ) throws -> Endpoint<FetchCommentDetailResponseDTO> {
+    ) throws -> Endpoint<Response<FetchCommentDetailResponseDTO>> {
         try Endpoint(
             path: .getPostMessage,
             pathParameters: [

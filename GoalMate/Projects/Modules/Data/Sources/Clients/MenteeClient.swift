@@ -32,11 +32,11 @@ public struct MenteeClient {
     ) async throws -> Todo
     public var fetchCommentRooms: (
         _ page: Int
-    ) async throws -> FecthCommentRoomsResponseDTO.Response
+    ) async throws -> FecthCommentRoomsResponseDTO
     public var fetchCommentDetail: (
         _ page: Int,
         _ roomId: Int
-    ) async throws -> FetchCommentDetailResponseDTO.Response
+    ) async throws -> FetchCommentDetailResponseDTO
     public var postMessage: (
         _ roomId: Int,
         _ comment: String
@@ -270,7 +270,9 @@ extension MenteeClient: DependencyKey {
         fetchWeeklyProgress: { _, _ in FetchWeeklyProgressResponseDTO.dummy.data!
         },
         updateTodo: { _, _, status in
-            return Todo.dummy
+            var dummy = Todo.dummy
+            dummy.todoStatus = status == .completed ? .todo : .completed
+            return dummy
         },
         fetchCommentRooms: { page in
             let startId = (page - 1) * 20 + 1
@@ -433,16 +435,16 @@ extension MenteeClient: DependencyKey {
                 )
             },
             fetchCommentRooms: { page in
-                let startId = (page - 1) * 10 + 1
+                let startId = (page - 1) * 20 + 1
                 return .init(
-                    commentRooms: (0..<10).map { index in
+                    commentRooms: (0..<20).map { index in
                         let id = startId + index
                         return CommentRoom(
                             id: id,
                             menteeGoalId: id + 100,
                             menteeGoalTitle: "목표 제목 #\(id)",
                             startDate: "2025-01-\(String(format: "%02d", id % 28 + 1))",
-                            endDate: "2025-02-\(String(format: "%02d", id % 28 + 1))",
+                            endDate: "2025-03-\(String(format: "%02d", id % 28 + 1))",
                             menteeName: "멘티 #\(id)",
                             mentorName: "멘토 #\(id)",
                             mentorProfileImage: "https://example.com/profile-\(id).jpg",

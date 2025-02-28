@@ -12,32 +12,18 @@ public struct GetNewCommentsCountsResponseDTO: Codable {
 }
 
 public struct FecthCommentRoomsResponseDTO: Codable {
-    let status: String
-    let code: String
-    let message: String
-    let data: Response?
+    public let commentRooms: [CommentRoom]
+    public let page: Page
 
-    public struct Response: Codable {
-        public let commentRooms: [CommentRoom]
-        public let page: Page
-
-        enum CodingKeys: String, CodingKey {
-            case commentRooms = "comment_rooms"
-            case page
-        }
+    enum CodingKeys: String, CodingKey {
+        case commentRooms = "comment_rooms"
+        case page
     }
 }
 
 public struct FetchCommentDetailResponseDTO: Codable {
-    let status: String
-    let code: String
-    let message: String
-    let data: Response?
-
-    public struct Response: Codable {
-        public let comments: [CommentContent]
-        public let page: Page
-    }
+    public let comments: [CommentContent]
+    public let page: Page
 }
 
 public struct PostSendCommentResponseDTO: Codable {
@@ -86,5 +72,6 @@ public struct CommentContent: Codable, Identifiable, Equatable {
     public enum WriterRole: String, Codable {
         case mentor = "MENTOR"
         case mentee = "MENTEE"
+        case admin  = "ADMIN"
     }
 }
