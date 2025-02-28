@@ -43,6 +43,7 @@ public struct MyGoalListFeature {
     }
     public enum ViewCyclingAction {
         case onAppear
+        case onDisappear
     }
     public enum ViewAction {
         case onLoadMore

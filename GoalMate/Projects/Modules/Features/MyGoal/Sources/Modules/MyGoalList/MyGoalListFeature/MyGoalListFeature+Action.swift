@@ -13,9 +13,6 @@ extension MyGoalListFeature {
     func reduce(into state: inout State, action: ViewCyclingAction) -> Effect<Action> {
         switch action {
         case .onAppear:
-            state.isLoading = true
-            state.myGoalList = []
-            state.pagingationState = .init()
             return .run { send in
                 guard try await authClient.checkLoginStatus()
                 else {
@@ -25,6 +22,13 @@ extension MyGoalListFeature {
                 }
                 await send(.feature(.fetchMyGoals))
             }
+        case .onDisappear:
+            state.isLoading = true
+            state.isLogin = true
+            state.didFailToLoad = false
+            state.myGoalList = []
+            state.pagingationState = .init()
+            return .none
         }
     }
     func reduce(into state: inout State, action: ViewAction) -> Effect<Action> {
@@ -34,9 +38,16 @@ extension MyGoalListFeature {
             state.isLoading = true
             return .send(.feature(.fetchMyGoals))
         case .onLoadMore:
-            guard state.pagingationState.hasMorePages else { return .none }
+            guard state.pagingationState.hasMorePages,
+                  state.isScrollFetching == false
+            else { return .none }
             state.isScrollFetching = true
             return .send(.feature(.fetchMyGoals))
+                .throttle(
+                    id: PublisherID.throttle,
+                    for: .milliseconds(500),
+                    scheduler: DispatchQueue.main,
+                    latest: true)
         case let .buttonTapped(type):
             switch type {
             case let .showGoalRestart(contentId):

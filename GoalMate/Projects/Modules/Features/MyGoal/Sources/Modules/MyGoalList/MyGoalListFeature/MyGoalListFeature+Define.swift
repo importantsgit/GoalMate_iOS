@@ -9,6 +9,10 @@ import Data
 import Foundation
 
 extension MyGoalListFeature {
+    public enum PublisherID {
+        case throttle
+    }
+
     public enum ButtonType {
         case showGoalCompletion(Int)
         case showGoalDetail(Int)

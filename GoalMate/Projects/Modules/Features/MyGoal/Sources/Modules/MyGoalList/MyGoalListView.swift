@@ -26,7 +26,6 @@ public struct MyGoalListView: View {
                     }
                 )
                 .frame(height: 64)
-                .padding(.horizontal, 20)
                 ZStack {
                     myGoalListView
                     if store.isLoading == false &&
@@ -41,13 +40,16 @@ public struct MyGoalListView: View {
                 .loadingFailure(didFailToLoad: store.didFailToLoad) {
                     store.send(.view(.retryButtonTapped))
                 }
-                .padding(.horizontal, 20)
             }
+            .padding(.horizontal, 20)
             .animation(
                 .easeInOut(duration: 0.2),
                 value: store.isLoading)
             .task {
                 store.send(.viewCycling(.onAppear))
+            }
+            .onDisappear {
+                store.send(.viewCycling(.onDisappear))
             }
         }
     }
@@ -63,11 +65,11 @@ public struct MyGoalListView: View {
                                 }
                                 .id(content.id)
                                 .task {
-                                    if store.isLoading == false &&
-                                        store.isScrollFetching &&
-                                        store.pagingationState.totalCount > 10 &&
-                                        store.myGoalList[
-                                            store.pagingationState.totalCount-10].id == content.id {
+                                    let isNearEnd = store.myGoalList.count >= 3 &&
+                                        content.id == store.myGoalList[
+                                            store.myGoalList.count - 3].id
+                                    if store.isScrollFetching == false &&
+                                        isNearEnd {
                                         store.send(.view(.onLoadMore))
                                     }
                                 }
@@ -211,9 +213,10 @@ fileprivate struct MyGoalContentItem: View {
                             size: 13,
                             color: isExpired ? Colors.grey500 : Colors.grey900
                         )
+                    let dDay = Date().toString().calculateDday(endDate: content.endDate ?? "")
                     Text(isExpired ?
                             "done" :
-                            "D-\(calculateDDay(endDate: content.endDate))")
+                            dDay)
                         .pretendardStyle(
                             .semiBold,
                             size: 12,
@@ -382,17 +385,6 @@ fileprivate struct MyGoalContentItem: View {
                     .frame(height: 30)
             }
         }
-    }
-
-    func calculateDDay(endDate: String?) -> Int {
-        guard let endDate else { return -1 }
-        let date = endDate.toDate(format: "yyyy-MM-dd")
-        let calendar = Calendar.current
-        let currentDate = calendar.startOfDay(for: Date())
-        let targetDate = calendar.startOfDay(for: date)
-        // 현재 날짜부터 목표 날짜까지의 차이를 계산
-        let components = calendar.dateComponents([.day], from: currentDate, to: targetDate)
-        return components.day ?? 0
     }
 }
 
