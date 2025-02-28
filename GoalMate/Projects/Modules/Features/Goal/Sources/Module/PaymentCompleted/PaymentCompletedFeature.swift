@@ -27,22 +27,47 @@ public struct PaymentCompletedFeature {
     }
 
     public enum Action: BindableAction {
+        case view(ViewAction)
+        case delegate(DelegateAction)
+        case binding(BindingAction<State>)
+    }
+    public enum ViewAction {
         case backButtonTapped
         case startButtonTapped
-        case binding(BindingAction<State>)
+    }
+    public enum DelegateAction {
+        case closeView
+        case showMyGoalDetail(Int)
     }
 
     public var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-            case .backButtonTapped:
-                return .none
-            case .startButtonTapped:
-                return .none
+            case let .view(action):
+                return reduce(into: &state, action: action)
+            case let .delegate(action):
+                return reduce(into: &state, action: action)
             case .binding:
                 return .none
             }
         }
         BindingReducer()
+    }
+}
+
+extension PaymentCompletedFeature {
+    // MARK: View
+    func reduce(into state: inout State, action: ViewAction) -> Effect<Action> {
+        switch action {
+        case .backButtonTapped:
+            return .send(.delegate(.closeView))
+        case.startButtonTapped:
+            guard let contentId = state.content.menteeGoalId
+            else { return .none }
+            return .send(.delegate(.showMyGoalDetail(contentId)))
+        }
+    }
+    func reduce(into state: inout State, action: DelegateAction) -> Effect<Action> {
+        return .none
     }
 }

@@ -17,7 +17,7 @@ struct PaymentCompletedView: View {
                 NavigationBar(
                     leftContent: {
                         Button {
-                            store.send(.backButtonTapped)
+                            store.send(.view(.backButtonTapped))
                         } label: {
                             VStack {
                                 Images.back
@@ -27,21 +27,28 @@ struct PaymentCompletedView: View {
                         }
                     }
                 )
-                .background(Color.white)
+                .frame(height: 64)
+                Spacer()
+                    .frame(height: 32)
                 Images.paymentCompleted
                     .resizable()
                     .aspectRatio(contentMode: .fit)
                     .overlay {
                         VStack {
                             Spacer()
-                                .frame(height: 50)
+                                .frame(height: 60)
                             Text("반가워요,\n함께 목표까지 완주해요!")
-                                .pretendardStyle(.semiBold, size: 18, color: Colors.grey900)
+                                .pretendardStyle(
+                                    .semiBold,
+                                    size: 18,
+                                    color: Colors.grey900)
                                 .lineLimit(2)
                                 .multilineTextAlignment(.center)
                             Spacer()
                         }
                     }
+                Spacer()
+                    .frame(height: 16)
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(alignment: .top, spacing: 30) {
                         Text("목표")
@@ -80,7 +87,7 @@ struct PaymentCompletedView: View {
                 )
                 Spacer()
                 Button {
-                    store.send(.startButtonTapped)
+                    store.send(.view(.startButtonTapped))
                 } label: {
                     Text("목표 시작하기")
                         .pretendardStyle(
