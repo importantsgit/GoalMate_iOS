@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import Data
 import FeatureSignUp
 import SwiftUI
 import TCACoordinators
@@ -15,6 +16,7 @@ struct AppCoordinator {
     // MARK: - Coordinator 작성
     @Reducer(state: .equatable)
     public enum Screen {
+        case main(MainFeature)
         case signUp(SignUpCoordinator)
     }
 
@@ -25,7 +27,7 @@ struct AppCoordinator {
 
         init(
             appDelegate: AppDelegateReducer.State = AppDelegateReducer.State(),
-            routes: [Route<Screen.State>] = [.root(.signUp(.init()))]
+            routes: [Route<Screen.State>] = [.root(.main(.init()), embedInNavigationView: true)]
         ) {
             self.appDelegate = appDelegate
             self.routes = routes
@@ -50,6 +52,21 @@ struct AppCoordinator {
         }
         Reduce { state, action in
             switch action {
+            case .router(.routeAction(
+                _,
+                action: .main(.delegate(.showLogin)))):
+                state.routes.push(.signUp(.init()))
+                return .none
+            case .router(.routeAction(
+                _,
+                action: .main(.delegate(.showSignUp)))):
+                state.routes.push(.signUp(.init()))
+                return .none
+            case .router(.routeAction(
+                _,
+                action: .signUp(.coordinatorFinished))):
+                state.routes.pop()
+                return .none
             case .appDelegate:
                 return .none
             case .router:
@@ -58,6 +75,7 @@ struct AppCoordinator {
                 return .none
             }
         }
+        .dependency(\.authClient, .testValue)
     }
 }
 
@@ -69,6 +87,8 @@ struct AppCoordinatorView: View {
             switch screen.case {
             case let .signUp(store):
                 SignUpCoordinatorView(store: store)
+            case let .main(store):
+                MainView(store: store)
             }
         }
     }
