@@ -41,7 +41,7 @@ struct NicknameEditView: View {
                     .frame(height: 16)
                 textField
                 Spacer()
-                    .frame(height: 80)
+                    .frame(height: 18)
                 RoundedButton(
                     buttonType: FilledStyle(backgroundColor: Colors.primary),
                     height: 54,

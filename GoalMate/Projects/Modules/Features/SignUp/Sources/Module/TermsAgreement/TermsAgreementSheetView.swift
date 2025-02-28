@@ -11,9 +11,8 @@ import SwiftUI
 import Utils
 
 public struct TermsAgreementSheetView: View {
+    @Environment(\.safeAreaInsets) var safeAreaInsets
     @Perception.Bindable var store: StoreOf<TermsAgreementFeature>
-    // obseravable framework 알아야함
-    // 선언해줄테니까 써라 16.0 이하 /
     public init(store: StoreOf<TermsAgreementFeature>) {
         self.store = store
     }
@@ -144,6 +143,7 @@ public struct TermsAgreementSheetView: View {
                 }
             }
             .padding(.horizontal, 20)
+            .padding(.bottom, safeAreaInsets.bottom)
         }
     }
 }
@@ -169,7 +169,6 @@ public struct TermsAgreementSheetView: View {
                 }
             )
         )
-        .presentationDetents([.height(340)])
-        .presentationCornerRadius(30)
+        .customSheet(heights: [340], radius: 30, corners: [.topLeft, .topRight])
     }
 }

@@ -25,7 +25,7 @@ public struct ProfileCoordinatorView: View {
                 case let .nicknameEdit(store):
                     NicknameEditView(store: store)
                         .customSheet(
-                            heights: [280],
+                            heights: [230],
                             radius: 30,
                             corners: [.topLeft, .topRight]
                         )

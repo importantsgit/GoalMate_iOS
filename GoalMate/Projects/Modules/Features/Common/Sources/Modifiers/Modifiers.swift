@@ -32,6 +32,7 @@ struct LoadingModifier: ViewModifier {
     }
 }
 
+// 해당 RoundSheetModifier 시, 켄텐츠에 ignoresSafeArea가 적용됨으로 safeAreaInsets 적용 필요
 struct RoundSheetModifier: ViewModifier {
     var heights: [CGFloat]
     var radius: CGFloat
@@ -48,12 +49,18 @@ struct RoundSheetModifier: ViewModifier {
     }
 
     func body(content: Content) -> some View {
-        content
-            .modifier(SheetModifier(heights: heights))
-            .padding(.bottom, safeAreaInsets.bottom)
-            .background(Color.white)
+        ZStack {
+            Color.white
+            // Round 값이 적용된 배경
             .modifier(CornerRoundedModifier(radius: radius, corners: corners))
-            .ignoresSafeArea(.all, edges: .bottom)
+            content
+            // 키보드의 SafeArea는 무시하지 않음 (컨텐츠는 키보드에 영향을 받아야 함)
+                .ignoresSafeArea(.keyboard, edges: .bottom)
+        }
+        // 기존 배경을 제거한 Sheet View
+        .modifier(SheetModifier(heights: heights))
+        // 베경은 SafeArea를 무시함 (하단 부분이 비어 보이지 않게 하기 위함)
+        .ignoresSafeArea(.all, edges: .bottom)
     }
 }
 
