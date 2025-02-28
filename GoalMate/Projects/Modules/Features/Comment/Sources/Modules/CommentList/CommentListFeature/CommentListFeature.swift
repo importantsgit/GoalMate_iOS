@@ -16,23 +16,21 @@ public struct CommentListFeature {
     public struct State: Equatable {
         public let id: UUID
         public var isLoading: Bool
+        var isScrollFetching: Bool
         var didFailToLoad: Bool
         var isLogin: Bool
-        var toastState: ToastState  
-        var totalCount: Int
-        var currentPage: Int
-        var hasMorePages: Bool
-        var commentRoomList: [CommentRoom]
+        var toastState: ToastState
+        var pagingationState: PaginationState
+        var commentRoomList: IdentifiedArrayOf<CommentRoomCell>
         public init() {
             self.id = UUID()
             self.isLoading = true
+            self.isScrollFetching = false
             self.didFailToLoad = false
             self.isLogin = true
             self.toastState = .hide
             self.commentRoomList = []
-            self.totalCount = 0
-            self.currentPage = 1
-            self.hasMorePages = true
+            self.pagingationState = .init()
         }
     }
     public enum Action: BindableAction {
@@ -44,6 +42,7 @@ public struct CommentListFeature {
     }
     public enum ViewCyclingAction {
         case onAppear
+        case onDisappear
     }
     public enum ViewAction {
         case chatRoomButtonTapped(Int, String?, String?)
@@ -82,10 +81,12 @@ public struct CommentListFeature {
 }
 
 extension CommentListFeature {
+    public enum PublisherID {
+        case throttle
+    }
     public enum FetchCommentRoomResult {
-    case success([CommentRoom], Bool)
+    case success([CommentRoomCell], Bool)
     case networkError
     case failed
     }
 }
-
