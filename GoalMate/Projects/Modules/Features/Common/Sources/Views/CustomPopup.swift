@@ -42,6 +42,8 @@ public struct CustomPopup<Content: View>: View {
                     }
                 VStack(spacing: 20) {
                     content
+                        .lineSpacing(4)
+                        .multilineTextAlignment(.center)
                         .padding(.horizontal, 16)
                         .padding(.top, 46)
                         .padding(.bottom, 16)
