@@ -13,6 +13,7 @@ extension CommentDetailFeature {
     func reduce(into state: inout State, action: ViewCyclingAction) -> Effect<Action> {
         switch action {
         case .onAppear:
+            state.pagingationState = .init()
             state.isLoading = true
             return .send(.feature(.fetchCommentDetail))
         }
@@ -23,8 +24,7 @@ extension CommentDetailFeature {
             state.isLoading = true
             return .send(.feature(.fetchCommentDetail))
         case .onLoadMore:
-            guard state.hasMorePages else { return .none }
-            state.isScrollFetching = true
+            guard state.pagingationState.hasMorePages else { return .none }
             return .send(.feature(.fetchCommentDetail))
         case .backButtonTapped:
             return .send(.delegate(.closeView))
@@ -64,11 +64,13 @@ extension CommentDetailFeature {
     func reduce(into state: inout State, action: FeatureAction) -> Effect<Action> {
         switch action {
         case .fetchCommentDetail:
-            return .run { [currentPage = state.currentPage, roomId = state.roomId] send in
+            state.isScrollFetching = true
+            return .run { [currentPage = state.pagingationState.currentPage, roomId = state.roomId] send in
                 do {
                     let response = try await menteeClient.fetchCommentDetail(
                         currentPage, roomId
                     )
+                    print("response: \(response)")
                     await send(
                         .feature(
                             .checkFetchCommentDetailResponse(
@@ -78,11 +80,13 @@ extension CommentDetailFeature {
                                 ))
                         )
                     )
-                } catch is NetworkError {
+                } catch let error as NetworkError {
+                    print("error: \(error)")
                     await send(.feature(
                             .checkFetchCommentDetailResponse(.networkError))
                     )
                 } catch {
+                    print("error: \(error)")
                     await send(.feature(
                         .checkFetchCommentDetailResponse(.failed)))
                 }
@@ -90,10 +94,10 @@ extension CommentDetailFeature {
         case let .checkFetchCommentDetailResponse(result):
             switch result {
             case let .success(comments, hasNext):
-                state.comments += comments
-                state.totalCount += comments.count
-                state.currentPage += 1
-                state.hasMorePages = hasNext
+                state.comments.append(contentsOf: comments)
+                state.pagingationState.totalCount += comments.count
+                state.pagingationState.currentPage += 1
+                state.pagingationState.hasMorePages = hasNext
             case .networkError:
                 state.didFailToLoad = true
             case .failed:

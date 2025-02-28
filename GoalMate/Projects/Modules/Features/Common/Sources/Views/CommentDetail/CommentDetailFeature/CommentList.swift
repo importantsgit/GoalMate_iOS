@@ -9,21 +9,22 @@ import ComposableArchitecture
 import Data
 import SwiftUI
 import UIKit
+import Utils
 
 struct CommentList: UIViewRepresentable {
     let comments: IdentifiedArrayOf<CommentContent>
-    let startDate: Date
+    let endDate: Date
     let onLoadMore: () -> Void
     let onLongPress: (CommentContent, (CGFloat, CGFloat)) -> Void
-    
+
     init(
         comments: IdentifiedArrayOf<CommentContent>,
-        startDate: Date,
+        endDate: Date,
         onLoadMore: @escaping () -> Void,
         onLongPress: @escaping (CommentContent, (CGFloat, CGFloat)) -> Void
     ) {
         self.comments = comments
-        self.startDate = startDate
+        self.endDate = endDate
         self.onLoadMore = onLoadMore
         self.onLongPress = onLongPress
     }
@@ -31,7 +32,7 @@ struct CommentList: UIViewRepresentable {
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
-    
+
     func makeUIView(context: Context) -> UITableView {
         let tableView = UITableView(frame: .zero, style: .grouped)
         tableView.delegate = context.coordinator
@@ -54,7 +55,6 @@ struct CommentList: UIViewRepresentable {
     class Coordinator: NSObject, UITableViewDelegate, UITableViewDataSource {
         var parent: CommentList
         var isLoadingMore = false
-        
         init(_ parent: CommentList) {
             self.parent = parent
         }
@@ -76,10 +76,14 @@ struct CommentList: UIViewRepresentable {
                 if indexPath.row + 1 < parent.comments.count {
                     let belowComment = parent.comments[indexPath.row + 1]
                     if let belowCommentDate = belowComment.commentedAt {
-                        let currentDate = currentCommentDate.toDate(format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-                        let belowDate = belowCommentDate.toDate(format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-                        
-                        shouldShowDate = !Calendar.current.isDate(currentDate, inSameDayAs: belowDate)
+                        let currentDate = currentCommentDate
+                            .parseAndDisplayDate().toDate()
+                        let belowDate = belowCommentDate
+                            .parseAndDisplayDate().toDate()
+                        shouldShowDate = !Calendar.current.isDate(
+                            currentDate,
+                            inSameDayAs: belowDate
+                        )
                     } else {
                         shouldShowDate = true
                     }
@@ -87,13 +91,15 @@ struct CommentList: UIViewRepresentable {
                     shouldShowDate = true
                 }
             }
-            cell.configure(with: comment, startDate: parent.startDate, showDateStack: shouldShowDate)
+            cell.configure(
+                with: comment,
+                endDate: parent.endDate,
+                showDateStack: shouldShowDate)
             cell.transform = CGAffineTransform(rotationAngle: .pi)
             cell.onLongPress = { [weak self] (minY, maxY) in
                 guard let self = self else { return }
                 self.parent.onLongPress(comment, (minY, maxY))
             }
-            
             if indexPath.row == parent.comments.count - 3 {
                 parent.onLoadMore()
             }
@@ -121,18 +127,17 @@ class CommentCell: UITableViewCell {
     private var bubbleTrailingConstraint: NSLayoutConstraint?
     private var longPressGesture: UILongPressGestureRecognizer!
     var onLongPress: ((CGFloat, CGFloat) -> Void)?
-    
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         self.writerRole = .mentor
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupUI()
         setupGestures()
     }
-    
+
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
+
     private func setupGestures() {
         longPressGesture = UILongPressGestureRecognizer(
             target: self,
@@ -140,7 +145,7 @@ class CommentCell: UITableViewCell {
         longPressGesture.minimumPressDuration = 0.3
         bubbleView.addGestureRecognizer(longPressGesture)
     }
-    
+
     private func setupUI() {
         backgroundColor = .clear
         selectionStyle = .none
@@ -157,12 +162,11 @@ class CommentCell: UITableViewCell {
                 equalTo: contentView.trailingAnchor, constant: -16)
         ])
         bubbleView.translatesAutoresizingMaskIntoConstraints = false
-        bubbleView.layer.cornerRadius = 12
+        bubbleView.layer.cornerRadius = 24
         containerView.addSubview(bubbleView)
         messageLabel.translatesAutoresizingMaskIntoConstraints = false
         messageLabel.numberOfLines = 0
         messageLabel.font = IFont.Pretendard.regular.value.font(size: 16)
-        messageLabel.textColor = Asset.Assets.Grey.grey700.color
         bubbleView.addSubview(messageLabel)
         NSLayoutConstraint.activate([
             messageLabel.topAnchor.constraint(
@@ -182,12 +186,12 @@ class CommentCell: UITableViewCell {
         dateLabel.font = IFont.Pretendard.medium.value.font(size: 14)
         dateLabel.textColor = Asset.Assets.Grey.grey700.color
         dateStackView.addArrangedSubview(dateLabel)
-        dplusLabelView.backgroundColor = Asset.Assets.Primary.primary700.color
+        dplusLabelView.backgroundColor = UIColor(hex: "FFE223")
         dplusLabelView.translatesAutoresizingMaskIntoConstraints = false
         dplusLabelView.layer.cornerRadius = 4
         dplusLabelView.clipsToBounds = true
         dplusLabel.font = IFont.Pretendard.semiBold.value.font(size: 12)
-        dplusLabel.textColor = .white
+        dplusLabel.textColor = Asset.Assets.Grey.grey800.color
         dplusLabel.textAlignment = .center
         dplusLabel.translatesAutoresizingMaskIntoConstraints = false
         dplusLabel.textAlignment = .center
@@ -222,7 +226,7 @@ class CommentCell: UITableViewCell {
         ])
     }
     
-    func configure(with comment: CommentContent, startDate: Date, showDateStack: Bool = false) {
+    func configure(with comment: CommentContent, endDate: Date, showDateStack: Bool = false) {
         self.writerRole = comment.writerRole ?? .mentor
         messageLabel.text = comment.comment
         bubbleLeadingConstraint?.isActive = false
@@ -234,25 +238,26 @@ class CommentCell: UITableViewCell {
         containerBottomConstraint?.isActive = false
         
         if comment.writerRole == .mentor {
+            messageLabel.textColor = Asset.Assets.Grey.grey700.color
             bubbleView.backgroundColor = Asset.Assets.Grey.grey50.color
             bubbleLeadingConstraint?.isActive = true
             containerBottomConstraint?.constant = -44
-            
-            if let commentedAt = comment.commentedAt, showDateStack {
+            if let commentedAt = comment.commentedAt,
+                showDateStack {
                 dateStackView.isHidden = false
-                let text = commentedAt.convertDateString(
-                    fromFormat: "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
+                dplusLabel.text = ""
+                let text = commentedAt
+                    .parseAndDisplayDate()
+                    .convertDateString(
+                    fromFormat: "yyyy-MM-dd",
                     toFormat: "yyyy년 M월 dd일"
                 )
                 dateLabel.text = text
-                let date = commentedAt.toDate(format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-                var calendar = Calendar(identifier: .gregorian)
-                calendar.locale = Locale(identifier: "ko_KR")
-                let currentDate = calendar.startOfDay(for: startDate)
-                let startDate = calendar.startOfDay(for: date)
-                let components = calendar.dateComponents([.day], from: startDate, to: currentDate)
-                let dplus = components.day ?? 0
-                dplusLabel.text = "D+\(dplus)"
+                let date = commentedAt
+                    .parseAndDisplayDate()
+                let dDay = date.calculateDday(
+                    endDate: endDate.getString(format: "yyyy-MM-dd"))
+                dplusLabel.text = "\(dDay)"
                 stackViewTopConstraint?.isActive = true
                 stackViewCenterXConstraint?.isActive = true
                 stackToBubbleConstraint?.isActive = true
@@ -261,24 +266,25 @@ class CommentCell: UITableViewCell {
                 bubbleTopConstraint?.isActive = true
             }
         } else {
-            bubbleView.backgroundColor = UIColor(hex: "FBFFF5")
+            messageLabel.textColor = Asset.Assets.Grey.grey900.color
+            bubbleView.backgroundColor = Asset.Assets.Primary.primary600.color
             bubbleTrailingConstraint?.isActive = true
             containerBottomConstraint?.constant = -16
             if let commentedAt = comment.commentedAt, showDateStack {
                 dateStackView.isHidden = false
-                let text = commentedAt.convertDateString(
-                    fromFormat: "yyyy-MM-dd'T'HH:mm:ss.SSSZ",
+                dplusLabel.text = ""
+                let text = commentedAt
+                    .parseAndDisplayDate()
+                    .convertDateString(
+                    fromFormat: "yyyy-MM-dd",
                     toFormat: "yyyy년 M월 dd일"
                 )
                 dateLabel.text = text
-                let date = commentedAt.toDate(format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ")
-                var calendar = Calendar(identifier: .gregorian)
-                calendar.locale = Locale(identifier: "ko_KR")
-                let currentDate = calendar.startOfDay(for: startDate)
-                let startDate = calendar.startOfDay(for: date)
-                let components = calendar.dateComponents([.day], from: startDate, to: currentDate)
-                let dplus = components.day ?? 0
-                dplusLabel.text = "D+\(dplus)"
+                let date = commentedAt
+                    .parseAndDisplayDate()
+                let dDay = date.calculateDday(
+                    endDate: endDate.getString(format: "yyyy-MM-dd"))
+                dplusLabel.text = "\(dDay)"
                 stackViewTopConstraint?.isActive = true
                 stackViewCenterXConstraint?.isActive = true
                 stackToBubbleConstraint?.isActive = true
@@ -310,7 +316,6 @@ class CommentCell: UITableViewCell {
             }
         }
     }
-
     override func prepareForReuse() {
         super.prepareForReuse()
         messageLabel.text = nil

@@ -57,9 +57,9 @@ public struct CommentDetailView: View {
                             // Comments List
                             CommentList(
                                 comments: store.comments,
-                                startDate: store.startDate
+                                endDate: store.endDate
                             ) {
-                                if store.hasMorePages &&
+                                if store.pagingationState.hasMorePages &&
                                     store.isScrollFetching == false {
                                     store.send(.view(.onLoadMore))
                                 }
@@ -250,6 +250,7 @@ public struct CommentDetailView: View {
                 size: 16,
                 color: Colors.grey900)
             .lineLimit(1...30)
+            .lineSpacing(2)
             .frame(maxWidth: .infinity, minHeight: 24)
             .padding(.horizontal, 10)
             .padding(.vertical, 8)
@@ -323,14 +324,6 @@ public struct CommentDetailView: View {
             return store.input.isEmpty ? Colors.grey200 : Colors.primary
         }
     }
-
-    func calculateDplus(fromDate: Date) -> Int {
-        let calendar = Calendar.current
-        let currentDate = calendar.startOfDay(for: store.startDate)
-        let startDate = calendar.startOfDay(for: fromDate)
-        let components = calendar.dateComponents([.day], from: startDate, to: currentDate)
-        return components.day ?? 0
-    }
 }
 
 fileprivate struct CommentPopupView: View {
@@ -348,7 +341,7 @@ fileprivate struct CommentPopupView: View {
                             .pretendard(.regular, size: 14, color: Colors.grey900)
                             .padding(.leading, 13)
                             .frame(maxWidth: .infinity, alignment: .leading)
-                            .frame(height: 49)
+                            .frame(height: 39)
                         Rectangle()
                             .fill(Color(hex: "E7E7E7"))
                             .frame(height: 1)
@@ -386,7 +379,7 @@ extension View {
     CommentDetailView(
         store: Store(
             initialState: CommentDetailFeature.State.init(
-                roomId: 10, title: "sad", startDate: "2025-02-22T17:52:07.893Z"),
+                roomId: 10, title: "sad", endDate: "2025-02-22T17:52:07.893Z"),
             reducer: {
                 withDependencies {
                     $0.calendar = .current

@@ -17,7 +17,7 @@ public struct CommentDetailFeature {
         public let id: UUID
         let roomId: Int
         let title: String
-        let startDate: Date
+        let endDate: Date
         var isLoading: Bool
         var isScrollFetching: Bool
         var isShowPopup: Bool
@@ -27,15 +27,13 @@ public struct CommentDetailFeature {
         var input: String = ""
         var isShowEditPopup: EditPopupState
         var isUpdateMode: UpdateCommentState
-        var totalCount: Int
-        var currentPage: Int
-        var hasMorePages: Bool
+        var pagingationState: PaginationState
         var toastState: ToastState
         var comments: IdentifiedArrayOf<CommentContent>
         public init(
             roomId: Int,
             title: String?,
-            startDate: String?
+            endDate: String?
         ) {
             self.id = UUID()
             self.roomId = roomId
@@ -44,22 +42,20 @@ public struct CommentDetailFeature {
             self.isScrollFetching = false
             self.didFailToLoad = false
             self.isShowPopup = false
-            self.totalCount = 0
-            self.currentPage = 1
-            self.hasMorePages = true
+            self.pagingationState = .init()
             self.comments = []
             self.isShowEditPopup = .dismiss
             self.isUpdatingComment = false
             self.isUpdateMode = .idle
             self.toastState = .hide
             self.isMessageProcessing = false
-            if let startDate {
-                let date = startDate.toDate(
-                    format: "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+            if let endDate {
+                let date = endDate.toDate(
+                    format: "yyyy-MM-dd"
                 )
-                self.startDate = date
+                self.endDate = date
             } else {
-                self.startDate = Date()
+                self.endDate = Date()
             }
         }
     }
@@ -113,9 +109,8 @@ public struct CommentDetailFeature {
             case let .delegate(action):
                 return reduce(into: &state, action: action)
             case let .inputText(text):
-                guard text.count < 300
-                else { return .none }
-                    state.input = text
+                let limitedText = String(text.prefix(300))
+                state.input = limitedText
                 return .none
             case let .dismissPopup(isShow):
                 state.isShowPopup = isShow
