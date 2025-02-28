@@ -52,8 +52,11 @@ public struct GoalDetailView: View {
                                     .padding(.horizontal, 20)
                                 GoalDescriptionView(store: store)
                             }
-                            Spacer()
-                                .frame(height: 120)
+                            if store.content?.isParticipated == false {
+                                Spacer()
+                                    .frame(height: 130)
+                            }
+
                         }
                     }
                     .scrollIndicators(.hidden)
@@ -103,12 +106,13 @@ private extension GoalDetailView {
     var pageView: some View {
         WithPerceptionTracking {
             Group {
-                if let content = store.content {
+                if let content = store.content,
+                   content.thumbnailImages.isEmpty == false {
                     let thumbnailImages = content.thumbnailImages.sorted { $0.id < $1.id }
                     TabView(selection: $store.currentPage) {
-                        ForEach(thumbnailImages) { thumbnail in
+                        ForEach(Array(thumbnailImages.enumerated()), id: \.offset) { content in
                             Group {
-                                if let imageURL = thumbnail.imageUrl {
+                                if let imageURL = content.element.imageUrl {
                                     AsyncImage(
                                         url: URL(string: imageURL)
                                     ) { phase in
@@ -126,6 +130,7 @@ private extension GoalDetailView {
                                         case .failure:
                                             Images.placeholder
                                                 .resizable()
+                                                .aspectRatio(contentMode: .fill)
                                         @unknown default:
                                             Rectangle()
                                                 .fill(.black)
@@ -134,9 +139,10 @@ private extension GoalDetailView {
                                 } else {
                                     Images.placeholder
                                         .resizable()
+                                        .aspectRatio(contentMode: .fill)
                                 }
                             }
-                            .tag(thumbnail.id)
+                            .tag(content.offset)
                             .background(Colors.grey200)
                         }
                     }
@@ -164,7 +170,8 @@ private extension GoalDetailView {
                         }
                     }
                 } else {
-                    Colors.grey200
+                    Images.placeholder
+                        .resizable()
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -478,32 +485,35 @@ fileprivate struct BottomButtonView: View {
     let store: StoreOf<GoalDetailFeature>
     var body: some View {
         WithPerceptionTracking {
+            let goalStatus = store.content?.goalStatus ?? .open
+            let iaClosed = goalStatus == .closed
             VStack(spacing: 10) {
-                HStack(spacing: 4) {
-                    Images.bell
-                        .renderingMode(.template)
-                        .resized(length: 16)
-                        .foregroundStyle(Colors.grey800)
-                    let remainingCapacity =
-                        (store.content?.participantsLimit ?? 0) -
-                        (store.content?.currentParticipants ?? 0)
-                    Text("참여 가능한 자리가 \(remainingCapacity)자리 남았어요")
-                        .pretendardStyle(
-                            .regular,
-                            size: 12,
-                            color: Colors.grey900
-                        )
+                if iaClosed == false {
+                    HStack(spacing: 4) {
+                        Images.bell
+                            .renderingMode(.template)
+                            .resized(length: 16)
+                            .foregroundStyle(Colors.grey800)
+                        let remainingCapacity =
+                            (store.content?.participantsLimit ?? 0) -
+                            (store.content?.currentParticipants ?? 0)
+                        Text("참여 가능한 자리가 \(remainingCapacity)자리 남았어요")
+                            .pretendardStyle(
+                                .regular,
+                                size: 12,
+                                color: Colors.grey900
+                            )
+                    }
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 12)
+                    .background(.white)
+                    .clipShape(.rect(cornerRadius: 20))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 20)
+                            .stroke(Colors.grey500, lineWidth: 1)
+                    )
                 }
-                .padding(.vertical, 10)
-                .padding(.horizontal, 12)
-                .background(.white)
-                .clipShape(.rect(cornerRadius: 20))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 20)
-                        .stroke(Colors.grey500, lineWidth: 1)
-                )
-                let goalStatus = store.content?.goalStatus ?? .open
-                let iaClosed = goalStatus == .closed
+
                 Button {
                     if store.isLogin {
                         store.send(.view(.startButtonTapped))
@@ -511,7 +521,7 @@ fileprivate struct BottomButtonView: View {
                         store.send(.view(.loginButtonTapped))
                     }
                 } label: {
-                    Text(store.isLogin ?
+                    Text(store.isLogin || iaClosed ?
                             "목표 시작하기" :
                             "지금 로그인하러 가기"
                     )
