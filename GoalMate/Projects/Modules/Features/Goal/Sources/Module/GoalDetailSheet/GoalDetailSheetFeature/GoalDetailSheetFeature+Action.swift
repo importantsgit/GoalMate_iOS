@@ -19,11 +19,16 @@ extension GoalDetailSheetFeature {
         case .purchaseButtonTapped:
             return .run { [content = state.content] send in
                 do {
-                    try await menteeClient.joinGoal(goalId: content.contentId)
+                    let joinGoalInfo = try await menteeClient.joinGoal(goalId: content.contentId)
+                    var newContent = content
+                    newContent.setJoinGoalInfo(
+                        menteeGoalId: joinGoalInfo.menteeGoalId,
+                        commentRoomId: joinGoalInfo.commentRoomId
+                    )
                     await send(
                         .feature(
                             .checkPurchaseResponse(
-                                .success(content)
+                                .success(newContent)
                             )
                         )
                     )
@@ -43,6 +48,7 @@ extension GoalDetailSheetFeature {
                         }
                         await send(
                             .feature(.checkPurchaseResponse(.failed(message))))
+                        return
                     }
                     await send(.feature(.checkPurchaseResponse(.networkError)))
                 }
