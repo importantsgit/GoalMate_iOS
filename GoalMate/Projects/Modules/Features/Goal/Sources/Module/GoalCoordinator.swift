@@ -36,6 +36,11 @@ public struct GoalCoordinatorView: View {
                         )
                 case let .paymentCompleted(store):
                     PaymentCompletedView(store: store)
+                case let .myGoalDetail(store):
+                    MyGoalDetailView(store: store)
+
+                case let .commentDetail(store):
+                    CommentDetailView(store: store)
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
@@ -53,6 +58,8 @@ public struct GoalCoordinator {
         case goalDetail(GoalDetailFeature)
         case goalPurchaseSheet(GoalDetailSheetFeature)
         case paymentCompleted(PaymentCompletedFeature)
+        case myGoalDetail(MyGoalDetailFeature)
+        case commentDetail(CommentDetailFeature)
     }
 
     @ObservableState
@@ -120,10 +127,10 @@ public struct GoalCoordinator {
                         .init(
                             content: .init(
                                 contentId: content.id,
-                                title: content.details.title,
-                                mentor: content.details.mentor,
-                                originalPrice: content.originalPrice,
-                                discountedPrice: content.discountedPrice
+                                title: content.title ?? "",
+                                mentor: content.mentorName ?? "",
+                                originalPrice: 0, // content.originalPrice,
+                                discountedPrice: 0 // content.discountedPrice
                             )
                         )
                     )
@@ -132,6 +139,7 @@ public struct GoalCoordinator {
             case let .router(.routeAction(
                 _,
                 action: .goalPurchaseSheet(.delegate(.finishPurchase(content))))):
+                print("content: \(content)")
                 return Effect.routeWithDelaysIfUnsupported(state.routes, action: \.router) {
                     $0.dismiss()
                     $0.push(.paymentCompleted(
@@ -140,7 +148,9 @@ public struct GoalCoordinator {
                             title: content.title,
                             mentor: content.mentor,
                             originalPrice: content.originalPrice,
-                            discountedPrice: content.discountedPrice
+                            discountedPrice: content.discountedPrice,
+                            menteeGoalId: content.menteeGoalId,
+                            commentRoomId: content.commentRoomId
                         )))
                     )
                 }
@@ -154,14 +164,45 @@ public struct GoalCoordinator {
                     action: .goalDetail(.feature(.showToast(message))))))
             case .router(.routeAction(
                 _,
-                action: .paymentCompleted(.backButtonTapped))):
+                action: .paymentCompleted(.delegate(.closeView)))):
                 state.routes.pop()
+                return .none
+            case let .router(.routeAction(
+                _,
+                action: .paymentCompleted(
+                    .delegate(.showMyGoalDetail(contentId))))):
+                print("contented: \(contentId)")
+                return Effect.routeWithDelaysIfUnsupported(
+                    state.routes, action: \.router, scheduler: .main) {
+                    $0.pop()
+                    $0.push(.myGoalDetail(
+                        .init(menteeGoalId: contentId)))
+                }
+            case .router(.routeAction(
+                _,
+                action: .myGoalDetail(.delegate(.closeView)))):
+                state.routes.pop()
+                return .none
+            case let .router(.routeAction(
+                _,
+                action: .myGoalDetail(.delegate(
+                    .showComment(roomId, title, endDate))))):
+                state.routes.push(
+                    .commentDetail(.init(
+                        roomId: roomId,
+                        title: title,
+                        endDate: endDate)))
+                return .none
+            case let .router(.routeAction(
+                _,
+                action: .myGoalDetail(.delegate(.showGoalDetail(contentId))))):
+                state.routes.push(.goalDetail(.init(contentId: contentId)))
                 return .none
             case .router(.routeAction(
                 _,
-                action: .paymentCompleted(.startButtonTapped))):
-                state.routes.popToRoot()
-                return .send(.delegate(.showMyGoal))
+                action: .commentDetail(.delegate(.closeView)))):
+                state.routes.pop()
+                return .none
             default: return .none
             }
         }
@@ -179,6 +220,10 @@ extension GoalCoordinator.Screen.State: Identifiable {
     case let .goalPurchaseSheet(state):
         state.id
     case let .paymentCompleted(state):
+        state.id
+    case let .myGoalDetail(state):
+        state.id
+    case let .commentDetail(state):
         state.id
     }
   }
