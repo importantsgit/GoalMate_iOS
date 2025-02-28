@@ -181,7 +181,7 @@ public struct GoalCoordinator {
             case .router(.routeAction(
                 _,
                 action: .myGoalDetail(.delegate(.closeView)))):
-                state.routes.pop()
+                state.routes.popToRoot()
                 return .none
             case let .router(.routeAction(
                 _,
