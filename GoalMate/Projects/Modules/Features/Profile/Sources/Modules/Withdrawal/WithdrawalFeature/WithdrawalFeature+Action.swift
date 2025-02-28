@@ -53,7 +53,7 @@ extension WithdrawalFeature {
         case let .checkWithdrawalResponse(result):
             switch result {
             case .success:
-                return .send(.feature(.finish))
+                return .send(.delegate(.closeView))
             case .failure:
                 state.toastState = .display(
                     "네트워크에 문제가 발생했습니다."
@@ -62,8 +62,6 @@ extension WithdrawalFeature {
             return .none
         case let .updateKeyboardHeight(height):
             state.keyboardHeight = height
-            return .none
-        case .finish:
             return .none
         }
     }

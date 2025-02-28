@@ -59,7 +59,6 @@ public struct WithdrawalFeature {
         case checkWithdrawalResponse(
             Result<Void, WithdrawalSubmitError>
         )
-        case finish
     }
     public enum DelegateAction {
         case closeView
