@@ -226,8 +226,23 @@ class CommentCell: UITableViewCell {
         ])
     }
     
-    func configure(with comment: CommentContent, endDate: Date, showDateStack: Bool = false) {
+    func configure(
+        with comment: CommentContent,
+        endDate: Date,
+        showDateStack: Bool = false) {
         self.writerRole = comment.writerRole ?? .mentor
+        if let commentText = comment.comment {
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.lineSpacing = messageLabel.font.lineHeight * 0.3
+            let attributes: [NSAttributedString.Key: Any] = [
+                .paragraphStyle: paragraphStyle
+            ]
+            messageLabel.attributedText = NSAttributedString(
+                string: commentText,
+                attributes: attributes)
+        } else {
+            messageLabel.text = nil
+        }
         messageLabel.text = comment.comment
         bubbleLeadingConstraint?.isActive = false
         bubbleTrailingConstraint?.isActive = false
@@ -236,7 +251,6 @@ class CommentCell: UITableViewCell {
         stackToBubbleConstraint?.isActive = false
         stackViewCenterXConstraint?.isActive = false
         containerBottomConstraint?.isActive = false
-        
         if comment.writerRole == .mentor {
             messageLabel.textColor = Asset.Assets.Grey.grey700.color
             bubbleView.backgroundColor = Asset.Assets.Grey.grey50.color
@@ -319,6 +333,7 @@ class CommentCell: UITableViewCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         messageLabel.text = nil
+        messageLabel.attributedText = nil
         dateLabel.text = nil
         dplusLabel.text = nil
         dateStackView.isHidden = true
