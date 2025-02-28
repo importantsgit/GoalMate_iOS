@@ -108,9 +108,9 @@ public struct MyGoalCoordinator {
             case let .router(.routeAction(
                 _,
                 action: .myGoalDetail(.delegate(
-                    .showComment(commentRoomId, title, startDate))))):
+                    .showComment(commentRoomId, title, endDate))))):
                 state.routes.push(.commentDetail(
-                    .init(roomId: commentRoomId, title: title, startDate: startDate)))
+                    .init(roomId: commentRoomId, title: title, endDate: endDate)))
                 return .none
             case .router(.routeAction(
                 _,
@@ -122,7 +122,7 @@ public struct MyGoalCoordinator {
                 action: .myGoalDetail(.delegate(.showGoalDetail(contentId))))):
                 state.routes.push(
                     .goalDetail(.init(
-                        contentId: contentId, isShowButton: false)))
+                        contentId: contentId)))
                 return .none
             case .router(.routeAction(
                 _,
@@ -137,9 +137,9 @@ public struct MyGoalCoordinator {
             case let .router(.routeAction(
                 _,
                 action: .myGoalCompletion(
-                    .delegate(.showComment(commentRoomId, title, startDate))))):
+                    .delegate(.showComment(commentRoomId, title, endDate))))):
                 state.routes.push(.commentDetail(
-                    .init(roomId: commentRoomId, title: title, startDate: startDate)))
+                    .init(roomId: commentRoomId, title: title, endDate: endDate)))
                 return .none
             case .router(.routeAction(
                 _,
@@ -152,7 +152,7 @@ public struct MyGoalCoordinator {
                 action: .myGoalCompletion(.delegate(.showGoalDetail(contentId))))):
                 state.routes.push(
                     .goalDetail(.init(
-                        contentId: contentId, isShowButton: false)))
+                        contentId: contentId)))
                 return .none
             case .router(.routeAction(
                 _,

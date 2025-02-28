@@ -1,6 +1,6 @@
 //
 //  MyGoalDetailFeature+Action.swift
-//  FeatureMyGoal
+//  FeatureCommon
 //
 //  Created by Importants on 2/20/25.
 //
@@ -79,7 +79,7 @@ extension MyGoalDetailFeature {
             guard let content = state.content
             else { return .none }
             return .send(.delegate(
-                .showComment(content.commentRoomId, content.title, content.startDate)))
+                .showComment(content.commentRoomId, content.title, content.endDate)))
         }
     }
     func reduce(into state: inout State, action: CalendarAction) -> Effect<Action> {
@@ -109,11 +109,13 @@ extension MyGoalDetailFeature {
                     await send(
                         .feature(.checkFetchMyGoalDetailResponse(.success(response)))
                     )
-                } catch is NetworkError {
+                } catch let error as NetworkError {
+                    print(error.localizedDescription)
                     await send(
                         .feature(.checkFetchMyGoalDetailResponse(.networkError))
                     )
                 } catch {
+                    print(error.localizedDescription)
                     await send(
                         .feature(.checkFetchMyGoalDetailResponse(.failed))
                     )

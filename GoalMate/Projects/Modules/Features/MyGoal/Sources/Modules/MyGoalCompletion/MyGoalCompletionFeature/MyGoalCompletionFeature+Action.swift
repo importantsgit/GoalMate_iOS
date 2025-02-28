@@ -23,7 +23,7 @@ extension MyGoalCompletionFeature {
         case .mentorCommentButtonTapped:
             guard let content = state.content else { return .none }
             return .send(.delegate(
-                .showComment(content.commentRoomId, content.title, content.startDate)))
+                .showComment(content.commentRoomId, content.title, content.endDate)))
         case .moreDetailButtonTapped:
             guard let content = state.content else { return .none }
             return .send(.delegate(.showGoalDetail(content.goalId)))

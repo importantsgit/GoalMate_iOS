@@ -1,13 +1,12 @@
 //
 //  MyGoalDetailFeature.swift
-//  FeatureMyGoal
+//  FeatureCommon
 //
 //  Created by 이재훈 on 1/21/25.
 //
 
 import ComposableArchitecture
 import Data
-import FeatureCommon
 import Foundation
 
 @Reducer

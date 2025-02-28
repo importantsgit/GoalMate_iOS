@@ -78,9 +78,9 @@ public struct CommentCoordinator {
             case let .router(.routeAction(
                 _,
                 action: .commentList(.delegate(
-                    .showCommentDetail(roomId, title, startDate))))):
+                    .showCommentDetail(roomId, title, endDate))))):
                 state.routes.push(.commentDetail(.init(
-                    roomId: roomId, title: title, startDate: startDate)))
+                    roomId: roomId, title: title, endDate: endDate)))
                 return .send(.delegate(.setTabbarVisibility(state.routes.count == 1)))
             case .router(.routeAction(
                 _,
