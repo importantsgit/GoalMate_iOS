@@ -122,6 +122,7 @@ extension SignUpFeature {
     func reduce(into state: inout State, action: FeatureAction) -> Effect<Action> {
         switch action {
         case let .checkAuthenticationResponse(result):
+            state.isLoading = false
             switch result {
             case let .success(type):
                 switch type {
@@ -135,7 +136,6 @@ extension SignUpFeature {
             case .failed:
                 state.toastState = .display("인증이 실패했습니다.")
             }
-            state.isLoading = false
             return .none
         case let .checkDuplicateResponse(result):
             switch result {
