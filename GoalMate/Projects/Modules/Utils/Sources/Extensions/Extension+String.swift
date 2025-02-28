@@ -33,4 +33,26 @@ public extension String {
         formatter.calendar = Calendar.current
         return formatter.date(from: self) ?? Date()
     }
+
+    func calculateDday(endDate: String) -> String {
+        let calendar = Calendar.current
+        let currentDate = calendar.startOfDay(for: self.toDate())
+        let endDateObj = endDate.toDate(format: "yyyy-MM-dd")
+        let components = calendar.dateComponents([.day], from: currentDate, to: endDateObj)
+        let days = components.day ?? 0
+        return "D-\(days)"  // 숫자만 반환
+    }
+    
+    func parseAndDisplayDate() -> String {
+        let isoFormatter = ISO8601DateFormatter()
+        isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        guard let date = isoFormatter.date(from: self) else {
+            return "날짜 오류"
+        }
+        let displayFormatter = DateFormatter()
+        displayFormatter.dateFormat = "yyyy-MM-dd"
+        displayFormatter.locale = Locale(identifier: "ko_KR")
+        displayFormatter.timeZone = TimeZone.current
+        return displayFormatter.string(from: date)
+    }
 }
