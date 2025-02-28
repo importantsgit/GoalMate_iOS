@@ -9,6 +9,9 @@ import Foundation
 
 public struct GetNewCommentsCountsResponseDTO: Codable {
     let newCommentsCount: Int
+    enum CodingKeys: String, CodingKey {
+        case newCommentsCount = "new_comments_count"
+    }
 }
 
 public struct FecthCommentRoomsResponseDTO: Codable {
