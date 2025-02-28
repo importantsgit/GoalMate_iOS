@@ -22,33 +22,38 @@ struct SignUpView: View {
             VStack(spacing: 0) {
                 NavigationBar(
                     leftContent: {
-                        Button {
-                            store.send(.auth(.backButtonTapped))
-                        } label: {
-                            VStack {
-                                Images.back
-                                    .resized(length: 24)
+                        if store.pageType == .signUp {
+                            Button {
+                                store.send(.auth(.backButtonTapped))
+                            } label: {
+                                VStack {
+                                    Images.backX
+                                        .resized(length: 24)
+                                }
+                                .padding(.all, 12)
                             }
-                            .padding(.all, 12)
                         }
                     }
                 )
                 .frame(height: 64)
-                Spacer()
-                    .frame(height: 86)
-                SignUpProcessView(processType: $store.pageType)
-                if store.pageType == .signUp {
-                    authView
-                        .opacity(store.pageType == .signUp ? 1 : 0)
-                } else if store.pageType == .nickname {
-                    nicknameView
-                        .opacity(store.pageType == .nickname ? 1 : 0)
-                } else {
-                    signUpSuccessView
-                        .opacity(store.pageType == .complete ? 1 : 0)
+                .padding(.horizontal, 4)
+                VStack(spacing: 0) {
+                    Spacer()
+                        .frame(height: 86)
+                    SignUpProcessView(processType: $store.pageType)
+                    if store.pageType == .signUp {
+                        authView
+                            .opacity(store.pageType == .signUp ? 1 : 0)
+                    } else if store.pageType == .nickname {
+                        nicknameView
+                            .opacity(store.pageType == .nickname ? 1 : 0)
+                    } else {
+                        signUpSuccessView
+                            .opacity(store.pageType == .complete ? 1 : 0)
+                    }
                 }
+                .setMargin()
             }
-            .setMargin()
             .loading(isLoading: store.isLoading)
             .onAppear {
                 store.send(.viewCycling(.onAppear))

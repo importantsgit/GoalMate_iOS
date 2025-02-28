@@ -17,6 +17,7 @@ public extension Images {
     static let myPage = Asset.Assets.myPage.swiftUIImage
     static let placeholder = Asset.Assets.placeholder.swiftUIImage
     static let back = Asset.Assets.back.swiftUIImage
+    static let backX = Asset.Assets.backX.swiftUIImage
     static let bell = Asset.Assets.bell.swiftUIImage
     static let comingSoon = Asset.Assets.comingSoon.swiftUIImage
     static let paymentCompleted = Asset.Assets.paymentCompleted.swiftUIImage
