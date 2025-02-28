@@ -248,7 +248,7 @@ fileprivate struct TitleView: View {
                     remainingCapacity: remainingCapacity,
                     currentParticipants: currentParticipants,
                     size: .large,
-                    isExpired: isExpired == .closed
+                    isExpired: isExpired == .closed || remainingCapacity == 0
                 )
                 .overlay {
                     if store.isLoading {
@@ -256,7 +256,8 @@ fileprivate struct TitleView: View {
                             .fill(Colors.grey200)
                     }
                 }
-                if store.content?.isClosingSoon ?? false {
+                if store.content?.isClosingSoon ?? false &&
+                   remainingCapacity != 0 {
                     TagView(
                         title: "마감임박",
                         backgroundColor: Colors.secondaryY700
@@ -485,8 +486,11 @@ fileprivate struct BottomButtonView: View {
     let store: StoreOf<GoalDetailFeature>
     var body: some View {
         WithPerceptionTracking {
+            let remainingCapacity =
+                (store.content?.participantsLimit ?? 0) -
+                (store.content?.currentParticipants ?? 0)
             let goalStatus = store.content?.goalStatus ?? .open
-            let iaClosed = goalStatus == .closed
+            let iaClosed = goalStatus == .closed || remainingCapacity == 0
             VStack(spacing: 10) {
                 if iaClosed == false {
                     HStack(spacing: 4) {
@@ -494,9 +498,6 @@ fileprivate struct BottomButtonView: View {
                             .renderingMode(.template)
                             .resized(length: 16)
                             .foregroundStyle(Colors.grey800)
-                        let remainingCapacity =
-                            (store.content?.participantsLimit ?? 0) -
-                            (store.content?.currentParticipants ?? 0)
                         Text("참여 가능한 자리가 \(remainingCapacity)자리 남았어요")
                             .pretendardStyle(
                                 .regular,

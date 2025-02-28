@@ -169,6 +169,9 @@ struct GoalListView: View {
                          .clipShape(.rect(cornerRadius: 4))
                  }
 
+                let remainingCapacity =
+                (content.participantsLimit ?? 0) -
+                (content.currentParticipants ?? 0)
                 VStack(alignment: .leading, spacing: 8) {
                     Text((content.title ?? "").splitCharacters())
                         .lineLimit(2)
@@ -182,9 +185,10 @@ struct GoalListView: View {
                             (content.currentParticipants ?? 0),
                         currentParticipants: content.currentParticipants ?? 0,
                         size: .small,
-                        isExpired: content.goalStatus == .closed
+                        isExpired: content.goalStatus == .closed ||
+                                   remainingCapacity == 0
                     )
-                    if content.isClosingSoon ?? false {
+                    if content.isClosingSoon ?? false && remainingCapacity != 0 {
                         TagView(
                             title: "마감임박",
                             backgroundColor: Colors.secondaryY700
