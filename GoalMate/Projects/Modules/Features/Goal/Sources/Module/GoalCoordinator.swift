@@ -182,7 +182,7 @@ public struct GoalCoordinator {
                 _,
                 action: .myGoalDetail(.delegate(.closeView)))):
                 state.routes.popToRoot()
-                return .none
+                return .send(.delegate(.setTabbarVisibility(state.routes.count == 1)))
             case let .router(.routeAction(
                 _,
                 action: .myGoalDetail(.delegate(
