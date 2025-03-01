@@ -19,7 +19,7 @@ extension Project {
                 // App
                     .target(
                         name: config.name,
-                        destinations: .iOS,
+                        destinations: [.iPhone, .macWithiPadDesign],
                         product: config.product,
                         bundleId: "$(APP_IDENTIFIER)",
                         deploymentTargets: config.deploymentTargets,
