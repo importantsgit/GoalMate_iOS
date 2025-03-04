@@ -78,18 +78,20 @@ extension SignUpFeature {
             }
         case .submitButtonTapped:
             state.isLoading = true
-            if state.nicknameFormState.inputText.isEmpty {
-                let hasDefaultNickname = state.nicknameFormState
-                    .defaultNickname.isEmpty == false
-                let defaultValue = hasDefaultNickname ?
-                    state.nicknameFormState.defaultNickname :
-                    "멘티"
-                return .send(.feature(.nicknameSubmitted(.success(defaultValue))))
+            let defaultName = state.nicknameFormState.defaultNickname
+            let input = state.nicknameFormState.inputText
+            // 인풋이 없고 랜덤 닉네임이 있는 경우
+            if input.isEmpty && defaultName.isEmpty == false {
+                return .send(.feature(.nicknameSubmitted(.success(defaultName))))
             }
-            return .run { [nickname = state.nicknameFormState.inputText] send in
+            // 인풋이 있고, 랜덤 닉네임과 인풋이 같을 경우
+            if input.isEmpty == false && defaultName == input {
+                return .send(.feature(.nicknameSubmitted(.success(defaultName))))
+            }
+            return .run { [input] send in
                 do {
-                    try await menteeClient.setNickname(nickname)
-                    await send(.feature(.nicknameSubmitted(.success(nickname))))
+                    try await menteeClient.setNickname(input)
+                    await send(.feature(.nicknameSubmitted(.success(input))))
                 } catch let error as NetworkError {
                     // 네트워크 오류 시 error 처리
                     if case let .statusCodeError(code) = error,
