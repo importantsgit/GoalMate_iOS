@@ -38,12 +38,13 @@ public struct TermsAgreementSheetView: View {
                 } label: {
                     HStack(spacing: 8) {
                         Rectangle()
-                            .fill(store.isAllTermsAgreed ?
+                            .frame(width: 24, height: 24)
+                            .tint(store.isAllTermsAgreed ?
                                     Colors.primary :
                                     Colors.grey200
                             )
-                            .frame(width: 24, height: 24)
                             .clipShape(.rect(cornerRadius: 4))
+                            .frame(width: 28, height: 28)
                             .overlay {
                                 if store.isAllTermsAgreed {
                                     Images.check
@@ -56,75 +57,35 @@ public struct TermsAgreementSheetView: View {
                 }
                 Spacer()
                     .frame(height: 16)
-                VStack(spacing: 12) {
-                    HStack {
-                        Button {
+                VStack(spacing: 8) {
+                    AgreementRowView(
+                        title: "이용약관에 동의합니다. (필수)",
+                        isChecked: store.isServiceTermsAgreed,
+                        onToggle: {
                             store.send(.view(.termsOfServiceButtonTapped))
-                        } label: {
-                            HStack(spacing: 8) {
-                                Images.check
-                                    .resizable()
-                                    .renderingMode(.template)
-                                    .tint(store.isServiceTermsAgreed ?
-                                            Colors.grey900 :
-                                            Colors.grey200)
-                                    .frame(width: 16, height: 16)
-                                Text("이용약관에 동의합니다. (필수)")
-                                    .pretendardStyle(.regular, size: 16)
-                            }
-                        }
-                        Spacer()
-                        Button {
+                        },
+                        onLinkTap: {
                             store.send(.view(.openTermsOfServiceView))
-                        } label: {
-                            Image(systemName: "chevron.right")
-                                .resized(length: 10)
-                                .foregroundStyle(Colors.grey600)
                         }
-                    }
-                    HStack {
-                        Button {
+                    )
+                    AgreementRowView(
+                        title: "개인정보 처리 방침에 동의합니다. (필수)",
+                        isChecked: store.isPrivacyPolicyAgreed,
+                        onToggle: {
                             store.send(.view(.privacyPolicyAgreeButtonTapped))
-                        } label: {
-                            HStack(spacing: 8) {
-                                Images.check
-                                    .resizable()
-                                    .renderingMode(.template)
-                                    .tint(store.isPrivacyPolicyAgreed ?
-                                            Colors.grey900 :
-                                            Colors.grey200)
-                                    .frame(width: 16, height: 16)
-                                Text("개인정보 처리 방침에 동의합니다. (필수)")
-                                    .pretendardStyle(.regular, size: 16)
-                            }
-                        }
-                        Spacer()
-                        Button {
+                        },
+                        onLinkTap: {
                             store.send(.view(.openPrivacyPolicyAgreeView))
-                        } label: {
-                            Image(systemName: "chevron.right")
-                                .resized(length: 10)
-                                .foregroundStyle(Colors.grey600)
                         }
-                    }
-                    HStack {
-                        Button {
+                    )
+                    AgreementRowView(
+                        title: "만 14세 이상입니다. (필수)",
+                        isChecked: store.isAtLeastFourteenYearsOld,
+                        onToggle: {
                             store.send(.view(.ageVerificationButtonTapped))
-                        } label: {
-                            HStack(spacing: 8) {
-                                Images.check
-                                    .resizable()
-                                    .renderingMode(.template)
-                                    .tint(store.isAtLeastFourteenYearsOld ?
-                                            Colors.grey900 :
-                                            Colors.grey200)
-                                    .frame(width: 16, height: 16)
-                                Text("만 14세 이상입니다. (필수)")
-                                    .pretendardStyle(.regular, size: 16)
-                            }
-                        }
-                        Spacer()
-                    }
+                        },
+                        onLinkTap: nil
+                    )
                 }
                 Spacer()
                 RoundedButton(
@@ -169,6 +130,44 @@ public struct TermsAgreementSheetView: View {
                 }
             )
         )
-        .customSheet(heights: [340], radius: 30, corners: [.topLeft, .topRight])
+        .customSheet(heights: [389], radius: 30, corners: [.topLeft, .topRight])
+    }
+}
+
+fileprivate struct AgreementRowView: View {
+    let title: String
+    let isChecked: Bool
+    var onToggle: () -> Void
+    var onLinkTap: (() -> Void)?
+    var body: some View {
+        HStack {
+            Button {
+                onToggle()
+            } label: {
+                HStack(spacing: 8) {
+                    Images.check
+                        .resizable()
+                        .renderingMode(.template)
+                        .frame(width: 16, height: 16)
+                        .tint(isChecked ?
+                                Colors.grey900 :
+                                Colors.grey200)
+                        .frame(width: 28, height: 28)
+                    Text(title)
+                        .pretendardStyle(.regular, size: 16)
+                }
+            }
+            Spacer()
+            if let onLinkTap {
+                Button {
+                    onLinkTap()
+                } label: {
+                    Image(systemName: "chevron.right")
+                        .resized(length: 10)
+                        .foregroundStyle(Colors.grey600)
+                        .frame(width: 32, height: 32)
+                }
+            }
+        }
     }
 }
