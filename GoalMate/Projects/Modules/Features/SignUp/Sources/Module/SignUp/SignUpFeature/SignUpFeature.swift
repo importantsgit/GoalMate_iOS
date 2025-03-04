@@ -68,6 +68,7 @@ public struct SignUpFeature {
         case feature(FeatureAction)
         case delegate(DelegateAction)
         case binding(BindingAction<State>)
+        case nicknameTextInputted(String)
     }
     public enum ViewCyclingAction {
         case onAppear
@@ -77,7 +78,6 @@ public struct SignUpFeature {
         case backButtonTapped
     }
     public enum NicknameAction {
-        case nicknameTextInputted(String)
         case duplicateCheckButtonTapped
         case submitButtonTapped
     }
@@ -85,6 +85,8 @@ public struct SignUpFeature {
         case finishButtonTapped
     }
     public enum FeatureAction {
+        case getNickname
+        case checkGetNicknameResponse(GetNicknameResult)
         case checkAuthenticationResponse(AuthenticationResult)
         case checkDuplicateResponse(NicknameCheckResult)
         case nicknameSubmitted(NicknameSubmitResult)
@@ -97,7 +99,7 @@ public struct SignUpFeature {
     }
     @Dependency(\.authClient) var authClient
     @Dependency(\.environmentClient) var environmentClient
-    @Dependency(\.nicknameClient) var nicknameClient
+    @Dependency(\.menteeClient) var menteeClient
     public var body: some Reducer<State, Action> {
         BindingReducer()
         Reduce { state, action in
@@ -115,6 +117,15 @@ public struct SignUpFeature {
             case let .delegate(action):
                 return reduce(into: &state, action: action)
             case .binding:
+                return .none
+            case let .nicknameTextInputted(input):
+                state.nicknameFormState.inputText = input
+                let isValidNickname = (2...5 ~= input.count)
+                state.nicknameFormState.validationState = isValidNickname ?
+                    .idle :
+                    .invalid
+                state.nicknameFormState.isDuplicateCheckEnabled = isValidNickname
+                state.nicknameFormState.isSubmitEnabled = false
                 return .none
             }
         }

@@ -39,6 +39,11 @@ extension SignUpFeature {
             }
         }
     }
+    public enum GetNicknameResult {
+        case success(String)
+        case networkError
+        case failed
+    }
     public enum SignUpProvider {
         case apple
         case kakao

@@ -46,30 +46,16 @@ extension SignUpFeature {
                     await send(.feature(.checkAuthenticationResponse(.failed)))
                 }
             }
-        default: return .none
         }
     }
     // MARK: Nickname
     func reduce(into state: inout State, action: NicknameAction) -> Effect<Action> {
         switch action {
-        case .nicknameTextInputted(let text):
-            print("text: \(text)")
-            guard state.nicknameFormState.inputText != text
-            else { return .none }
-            state.nicknameFormState.inputText = text
-            let isValidNickname = (2...5 ~= text.count)
-            print("isValid??: \(isValidNickname)")
-            state.nicknameFormState.validationState = isValidNickname ?
-                .idle :
-                .invalid
-            state.nicknameFormState.isDuplicateCheckEnabled = isValidNickname
-            state.nicknameFormState.isSubmitEnabled = false
-            return .none
         case .duplicateCheckButtonTapped:
             state.isLoading = true
             return .run { [nickname = state.nicknameFormState.inputText] send in
                 do {
-                    let isUniqueNickname = try await nicknameClient.isUniqueNickname(nickname)
+                    let isUniqueNickname = try await menteeClient.isUniqueNickname(nickname)
                     await send(
                         .feature(
                             .checkDuplicateResponse(
@@ -94,7 +80,7 @@ extension SignUpFeature {
             state.isLoading = true
             return .run { [nickname = state.nicknameFormState.inputText] send in
                 do {
-                    try await nicknameClient.setNickname(nickname)
+                    try await menteeClient.setNickname(nickname)
                     await send(.feature(.nicknameSubmitted(.success(nickname))))
                 } catch let error as NetworkError {
                     // 네트워크 오류 시 error 처리
@@ -121,6 +107,31 @@ extension SignUpFeature {
     // MARK: Feature
     func reduce(into state: inout State, action: FeatureAction) -> Effect<Action> {
         switch action {
+        case .getNickname:
+            state.isLoading = true
+            return .run { send in
+                do {
+                    let response = try await menteeClient.fetchMenteeInfo()
+                    guard let nickname = response.name
+                    else {
+                        await send(.feature(.checkGetNicknameResponse(.failed)))
+                        return
+                    }
+                    await send(.feature(.checkGetNicknameResponse(.success(nickname))))
+                } catch is NetworkError {
+                    await send(.feature(.checkGetNicknameResponse(.networkError)))
+                } catch {
+                    await send(.feature(.checkGetNicknameResponse(.failed)))
+                }
+            }
+        case let .checkGetNicknameResponse(result):
+            state.isLoading = false
+            switch result {
+            case let .success(nickname):
+                return .send(.nicknameTextInputted(nickname))
+            case .networkError, .failed:
+                return .none
+            }
         case let .checkAuthenticationResponse(result):
             state.isLoading = false
             switch result {
@@ -176,7 +187,7 @@ extension SignUpFeature {
         switch action {
         case .termsAgreementCompleted:
             state.pageType = .nickname
-            return .none
+            return .send(.feature(.getNickname))
         default: return .none
         }
     }

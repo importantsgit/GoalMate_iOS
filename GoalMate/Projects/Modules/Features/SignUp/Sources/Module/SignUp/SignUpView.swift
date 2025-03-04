@@ -177,10 +177,8 @@ public struct SignUpView: View {
                     HStack {
                         TextField(
                             "",
-                            text: .init(get: { store.nicknameFormState.inputText },
-                                      set: {
-                                          store.send(.nickname(.nicknameTextInputted($0)))
-                                      }),
+                            text: $store.nicknameFormState.inputText
+                                .sending(\.nicknameTextInputted),
                             prompt: Text("2~5글자 닉네임을 입력해주세요.")
                                 .foregroundColor(Colors.grey400)
                         )
