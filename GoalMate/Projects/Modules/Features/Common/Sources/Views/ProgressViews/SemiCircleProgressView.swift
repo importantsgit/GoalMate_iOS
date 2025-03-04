@@ -9,6 +9,7 @@ import ComposableArchitecture
 import SwiftUI
 
 public struct SemiCircleProgressView: View {
+    @State var isOnAppear: Bool
     var progress: Double
     let progressColor: Color
     let backgroundColor: Color
@@ -24,6 +25,7 @@ public struct SemiCircleProgressView: View {
         self.progressColor = progressColor
         self.backgroundColor = backgroundColor
         self.lineWidth = lineWidth
+        self.isOnAppear = false
     }
 
     public var body: some View {
@@ -42,7 +44,7 @@ public struct SemiCircleProgressView: View {
                         makeCirclePath(in: geometry)
                             .trim(
                                 from: 0,
-                                to: min(max(calculateProgress(progress), 0), 1)
+                                to: isOnAppear ? min(max(calculateProgress(progress), 0), 1) : 0
                             )
                             .stroke(
                                 progressColor,
@@ -62,7 +64,6 @@ public struct SemiCircleProgressView: View {
                 }
                 .aspectRatio(2/1, contentMode: .fit)
                 .frame(width: 200, height: 100)
-                .animation(.easeInOut, value: progress)
                 Text(text)
                     .pretendardStyle(
                         .medium,
@@ -71,13 +72,18 @@ public struct SemiCircleProgressView: View {
                     )
                     .frame(maxWidth: .infinity)
                     .frame(height: 45)
-                    .background(Colors.grey100)
+                    .background(.white)
                     .clipShape(.rect(cornerRadius: 14))
                     .overlay {
                         RoundedRectangle(cornerRadius: 14)
-                            .stroke(Colors.grey100, lineWidth: 1)
+                            .stroke(Color(hex: "f5f5f5"), lineWidth: 1)
+                    }
+                    .onAppear {
+                        isOnAppear = true
                     }
             }
+            .animation(.easeInOut, value: progress)
+            .animation(.easeInOut, value: isOnAppear)
         }
     }
 
