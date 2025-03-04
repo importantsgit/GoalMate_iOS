@@ -9,13 +9,17 @@ import ComposableArchitecture
 import FeatureCommon
 import SwiftUI
 
-struct SignUpView: View {
+public struct SignUpView: View {
     enum FocusableField: Hashable {
         case nickname
     }
     @Perception.Bindable var store: StoreOf<SignUpFeature>
     @FocusState private var focusedField: FocusableField?
     @State private var keyboardHeight: CGFloat = 0
+
+    public init(store: StoreOf<SignUpFeature>) {
+        self.store = store
+    }
 
     public var body: some View {
         WithPerceptionTracking {

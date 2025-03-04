@@ -10,14 +10,14 @@ import Foundation
 
 @Reducer
 public struct TermsAgreementFeature {
+    public init() {}
     @ObservableState
     public struct State: Equatable {
-        var id: UUID
+        public var id: UUID
         var isAllTermsAgreed: Bool
         var isServiceTermsAgreed: Bool        // 이용약관
         var isPrivacyPolicyAgreed: Bool       // 개인정보 처리방침
         var isAtLeastFourteenYearsOld: Bool   // 만 14세 이상
-        
         public init(
             id: UUID = UUID(),
             isAllTermsAgreed: Bool = false,

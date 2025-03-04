@@ -17,7 +17,7 @@ struct AppCoordinator {
     @Reducer(state: .equatable)
     public enum Screen {
         case main(MainFeature)
-        case signUp(SignUpCoordinator)
+        case signUp(SignUpDemoCoordinator)
     }
 
     @ObservableState
@@ -86,7 +86,7 @@ struct AppCoordinatorView: View {
         TCARouter(store.scope(state: \.routes, action: \.router)) { screen in
             switch screen.case {
             case let .signUp(store):
-                SignUpCoordinatorView(store: store)
+                SignUpDemoCoordinatorView(store: store)
             case let .main(store):
                 MainView(store: store)
             }

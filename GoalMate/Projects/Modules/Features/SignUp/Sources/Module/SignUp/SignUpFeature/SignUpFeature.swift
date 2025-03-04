@@ -14,9 +14,10 @@ import Utils
 
 @Reducer
 public struct SignUpFeature {
+    public init() {}
     @ObservableState
     public struct State: Equatable {
-        var id: UUID
+        public var id: UUID
         // 페이지 상태
         var pageType: SignUpProcessType
         var isLoading: Bool

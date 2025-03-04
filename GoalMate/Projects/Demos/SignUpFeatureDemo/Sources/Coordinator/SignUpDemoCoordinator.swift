@@ -1,18 +1,21 @@
 //
 //  SignUpCoordinator.swift
-//  SignUp
+//  DemoSignUpFeature
 //
-//  Created by Importants on 1/8/25.
+//  Created by 이재훈 on 3/4/25.
 //
 
 import ComposableArchitecture
+import FeatureCommon
+import FeatureSignUp
+import Data
 import SwiftUI
 import TCACoordinators
 
-public struct SignUpCoordinatorView: View {
-    let store: StoreOf<SignUpCoordinator>
+public struct SignUpDemoCoordinatorView: View {
+    let store: StoreOf<SignUpDemoCoordinator>
 
-    public init(store: StoreOf<SignUpCoordinator>) {
+    public init(store: StoreOf<SignUpDemoCoordinator>) {
         self.store = store
     }
 
@@ -34,7 +37,7 @@ public struct SignUpCoordinatorView: View {
 }
 
 @Reducer
-public struct SignUpCoordinator {
+public struct SignUpDemoCoordinator {
     public init() {}
     @Reducer(state: .equatable)
     public enum Screen {
@@ -63,6 +66,9 @@ public struct SignUpCoordinator {
 
     public var body: some Reducer<State, Action> {
         self.core
+            .dependency(\.authClient, .previewValue)
+            .dependency(\.menteeClient, .previewValue)
+            .dependency(\.goalClient, .previewValue)
     }
 
     @ReducerBuilder<State, Action>
@@ -94,7 +100,7 @@ public struct SignUpCoordinator {
     }
 }
 
-extension SignUpCoordinator.Screen.State: Identifiable {
+extension SignUpDemoCoordinator.Screen.State: Identifiable {
     public var id: UUID {
     switch self {
     case let .signUp(state):
