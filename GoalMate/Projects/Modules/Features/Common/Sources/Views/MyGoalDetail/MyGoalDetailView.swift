@@ -264,8 +264,16 @@ public struct MyGoalDetailView: View {
                             .pretendard(.semiBold, size: 16, color: Colors.grey900)
                             .padding(.vertical, 6)
                         Spacer()
-                        if Calendar.current.isDateInToday(store.selectedDate) {
-                            let isTimeOver = store.remainingTime <= 0
+                        // 과거가 아니라면 타이머 노출
+                        if store.isContentLoading == false,
+                           Calendar.current.compare(
+                            store.selectedDate,
+                            to: Date(),
+                            toGranularity: .day
+                        ) != .orderedDescending {
+                            let isTimeOver = Calendar.current.isDateInToday(
+                                                store.selectedDate) == false ||
+                                            store.remainingTime <= 0
                             HStack(spacing: 4) {
                                 Text(isTimeOver ?
                                         "time over" :
@@ -279,17 +287,20 @@ public struct MyGoalDetailView: View {
                                             Colors.error :
                                             Colors.grey700
                                     )
-                                Text("남았어요")
-                                    .pretendard(
-                                        .regular,
-                                        size: 12,
-                                        color:
-                                            store.remainingTime <= 30 * 60 &&
-                                            isTimeOver == false ?
-                                            Colors.error :
-                                            Colors.grey700
-                                    )
+                                if isTimeOver == false {
+                                    Text("남았어요")
+                                        .pretendard(
+                                            .regular,
+                                            size: 12,
+                                            color:
+                                                store.remainingTime <= 30 * 60 &&
+                                                isTimeOver == false ?
+                                                Colors.error :
+                                                Colors.grey700
+                                        )
+                                }
                             }
+                            .monospacedDigit()
                             .padding(.horizontal, 16)
                             .padding(.vertical, 8)
                             .background(
