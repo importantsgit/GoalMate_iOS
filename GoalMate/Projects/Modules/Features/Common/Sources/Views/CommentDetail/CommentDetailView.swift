@@ -52,6 +52,9 @@ public struct CommentDetailView: View {
                         }
                     )
                     .frame(height: 64)
+                    .onTapGesture {
+                        hideKeyboard()
+                    }
                     VStack(spacing: 0) {
                         ZStack {
                             // Comments List
@@ -72,6 +75,9 @@ public struct CommentDetailView: View {
                                     (commentTop < 80 ?
                                             .bottom(commentBottom) :
                                             .top(commentTop-80)))))
+                            }
+                            .onTapGesture {
+                                hideKeyboard()
                             }
                             if store.isLoading == false &&
                                store.comments.isEmpty {
@@ -261,8 +267,8 @@ public struct CommentDetailView: View {
             .lineLimit(1...30)
             .lineSpacing(2)
             .frame(maxWidth: .infinity, minHeight: 24)
-            .padding(.horizontal, 10)
-            .padding(.vertical, 8)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
             .background(
                 RoundedRectangle(cornerRadius: 30)
                     .stroke(Colors.grey300, lineWidth: 2)
@@ -369,7 +375,7 @@ fileprivate struct CommentPopupView: View {
             }
             .frame(width: 238)
             .background(.white)
-            .clipShape(.rect(cornerRadius: 20))
+            .clipShape(.rect(cornerRadius: 14))
             .shadow(color: .black.opacity(0.1), radius: 30)
             .padding(.trailing, 20)
         }
