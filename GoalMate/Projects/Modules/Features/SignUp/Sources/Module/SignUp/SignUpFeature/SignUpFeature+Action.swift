@@ -150,7 +150,7 @@ extension SignUpFeature {
             return .none
         case let .checkDuplicateResponse(result):
             switch result {
-            case let .success(nickname):
+            case .success(_):
                 state.nicknameFormState.isDuplicateCheckEnabled = false
                 state.nicknameFormState.isSubmitEnabled = true
                 state.nicknameFormState.validationState = .valid
