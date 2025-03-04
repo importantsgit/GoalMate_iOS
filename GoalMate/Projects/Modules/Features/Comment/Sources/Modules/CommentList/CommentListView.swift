@@ -155,49 +155,51 @@ public struct CommentListView: View {
                                     }
                                 }
                                 .aspectRatio(contentMode: .fill)
-                                .frame(width: 70, height: 70)
+                                .frame(width: 64, height: 64)
                                 .clipShape(.circle)
                             } else {
                                 Circle()
                                     .fill(Colors.grey100)
-                                    .frame(width: 70, height: 70)
+                                    .frame(width: 64, height: 64)
                             }
                             Spacer()
                                 .frame(width: 12)
-                            VStack(alignment: .leading) {
-                                HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                HStack(spacing: 8) {
                                     Text(content.roomInfo.mentorName ?? "")
                                         .pretendardStyle(
                                             .medium,
                                             size: 18,
                                             color: Colors.grey900
                                         )
-                                    Text(isExpired ? "진행완료" : "진행중")
-                                        .pretendardStyle(
-                                            .medium,
-                                            size: 13,
-                                            color: isExpired ?
-                                                Colors.grey500 :
-                                                Colors.grey900
-                                        )
-                                    Text(isExpired ?
-                                            "done" :
-                                            content.dDay)
-                                        .pretendardStyle(
-                                            .semiBold,
-                                            size: 12,
-                                            color: isExpired ?
-                                                    .white :
-                                                Colors.grey800
-                                        )
-                                        .padding(.horizontal, 4)
-                                        .padding(.vertical, 2)
-                                        .background(
-                                            isExpired ?
-                                                Colors.secondaryP :
-                                                Colors.secondaryY
-                                        )
-                                        .clipShape(.rect(cornerRadius: 4))
+                                    HStack(spacing: 4) {
+                                        Text(isExpired ? "진행완료" : "진행중")
+                                            .pretendardStyle(
+                                                .medium,
+                                                size: 13,
+                                                color: isExpired ?
+                                                    Colors.grey500 :
+                                                    Colors.grey900
+                                            )
+                                        Text(isExpired ?
+                                                "done" :
+                                                content.dDay)
+                                            .pretendardStyle(
+                                                .semiBold,
+                                                size: 12,
+                                                color: isExpired ?
+                                                        .white :
+                                                    Colors.grey800
+                                            )
+                                            .padding(.horizontal, 4)
+                                            .padding(.vertical, 2)
+                                            .background(
+                                                isExpired ?
+                                                    Colors.secondaryP :
+                                                    Colors.secondaryY
+                                            )
+                                            .clipShape(.rect(cornerRadius: 4))
+                                    }
                                 }
                                 Text(content.roomInfo
                                     .menteeGoalTitle?.splitCharacters() ?? "")
@@ -206,6 +208,7 @@ public struct CommentListView: View {
                                         size: 14,
                                         color: Colors.grey800
                                     )
+                                    .lineLimit(2)
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                             Spacer()
