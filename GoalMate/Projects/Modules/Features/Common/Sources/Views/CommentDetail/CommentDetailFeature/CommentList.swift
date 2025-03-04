@@ -162,7 +162,7 @@ class CommentCell: UITableViewCell {
                 equalTo: contentView.trailingAnchor, constant: -16)
         ])
         bubbleView.translatesAutoresizingMaskIntoConstraints = false
-        bubbleView.layer.cornerRadius = 24
+        bubbleView.layer.cornerRadius = 20
         containerView.addSubview(bubbleView)
         messageLabel.translatesAutoresizingMaskIntoConstraints = false
         messageLabel.numberOfLines = 0
@@ -170,13 +170,13 @@ class CommentCell: UITableViewCell {
         bubbleView.addSubview(messageLabel)
         NSLayoutConstraint.activate([
             messageLabel.topAnchor.constraint(
-                equalTo: bubbleView.topAnchor, constant: 20),
+                equalTo: bubbleView.topAnchor, constant: 10),
             messageLabel.leadingAnchor.constraint(
                 equalTo: bubbleView.leadingAnchor, constant: 20),
             messageLabel.trailingAnchor.constraint(
                 equalTo: bubbleView.trailingAnchor, constant: -20),
             messageLabel.bottomAnchor.constraint(
-                equalTo: bubbleView.bottomAnchor, constant: -20)
+                equalTo: bubbleView.bottomAnchor, constant: -10)
         ])
         dateStackView.translatesAutoresizingMaskIntoConstraints = false
         dateStackView.axis = .horizontal
@@ -225,7 +225,7 @@ class CommentCell: UITableViewCell {
                 equalTo: dplusLabelView.bottomAnchor, constant: -2)
         ])
     }
-    
+
     func configure(
         with comment: CommentContent,
         endDate: Date,
