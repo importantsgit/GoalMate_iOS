@@ -84,7 +84,7 @@ public struct NicknameEditFeature {
     }
     @Dependency(\.authClient) var authClient
     @Dependency(\.environmentClient) var environmentClient
-    @Dependency(\.nicknameClient) var nicknameClient
+    @Dependency(\.menteeClient) var menteeClient
     public var body: some Reducer<State, Action> {
         BindingReducer()
         Reduce { state, action in

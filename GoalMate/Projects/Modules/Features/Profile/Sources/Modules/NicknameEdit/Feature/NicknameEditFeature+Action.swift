@@ -30,7 +30,7 @@ extension NicknameEditFeature {
             state.isLoading = true
             return .run { [nickname = state.inputText] send in
                 do {
-                    let isUniqueNickname = try await nicknameClient.isUniqueNickname(nickname)
+                    let isUniqueNickname = try await menteeClient.isUniqueNickname(nickname)
                     await send(
                         .feature(
                             .checkDuplicateResponse(
@@ -55,7 +55,7 @@ extension NicknameEditFeature {
             state.isLoading = true
             return .run { [nickname = state.inputText] send in
                 do {
-                    try await nicknameClient.setNickname(nickname)
+                    try await menteeClient.setNickname(nickname)
                     await send(.feature(.nicknameSubmitted(.success(nickname))))
                 } catch let error as NetworkError {
                     // 네트워크 오류 시 error 처리
