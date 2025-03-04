@@ -76,12 +76,13 @@ public struct CommentDetailView: View {
                             if store.isLoading == false &&
                                store.comments.isEmpty {
                                 Spacer()
-                                Text("오늘 해야 할 일을 진행하며 생긴\n고민과 질문을 남기고 멘토 코멘트를 받아보세요:)")
+                                Text("오늘의 고민과 질문을 남기고\n멘토 코멘트를 받아보세요:)")
                                     .pretendardStyle(
                                         .regular,
                                         size: 16,
                                         color: Colors.grey900
                                     )
+                                    .lineSpacing(4)
                                     .multilineTextAlignment(.center)
                                 Spacer()
                             }
