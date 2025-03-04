@@ -402,6 +402,12 @@ public struct MyGoalDetailView: View {
                                     }
                                     if todo.isShowTip {
                                         Text(todo.mentorTip ?? "")
+                                            .pretendard(
+                                                .medium,
+                                                size: 14,
+                                                color: Colors.grey800
+                                            )
+                                            .lineSpacing(4)
                                             .frame(
                                                 maxWidth: .infinity,
                                                 minHeight: 14,
