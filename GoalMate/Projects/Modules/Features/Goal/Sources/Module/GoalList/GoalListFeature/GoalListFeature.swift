@@ -61,6 +61,7 @@ public struct GoalListFeature {
     }
     @Dependency(\.goalClient) var goalClient
     public var body: some Reducer<State, Action> {
+        BindingReducer()
         Reduce { state, action in
             switch action {
             case let .viewCycling(action):
@@ -76,6 +77,5 @@ public struct GoalListFeature {
 
             }
         }
-        BindingReducer()
     }
 }

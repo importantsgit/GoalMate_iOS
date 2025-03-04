@@ -41,6 +41,7 @@ public struct PaymentCompletedFeature {
     }
 
     public var body: some Reducer<State, Action> {
+        BindingReducer()
         Reduce { state, action in
             switch action {
             case let .view(action):
@@ -51,7 +52,6 @@ public struct PaymentCompletedFeature {
                 return .none
             }
         }
-        BindingReducer()
     }
 }
 

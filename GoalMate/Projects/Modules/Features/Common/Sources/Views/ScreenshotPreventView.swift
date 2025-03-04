@@ -15,16 +15,13 @@ struct ScreenshotPreventView<Content: View>: View {
     init(@ViewBuilder content: @escaping () -> Content) {
         self.content = content()
     }
-    
     /// View Properties
     @State private var hostingController: UIHostingController<Content>?
-    
     var body: some View {
         _ScreenshotPreventHelper(hostingController: $hostingController)
             .overlay {
                 GeometryReader {
                     let size = $0.size
-                    
                     Color.clear
                         .preference(key: SizeKey.self, value: size)
                         .onPreferenceChange(SizeKey.self, perform: { value in

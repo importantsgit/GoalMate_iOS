@@ -82,6 +82,5 @@ public struct WithdrawalFeature {
                 return .none
             }
         }
-        BindingReducer()
     }
 }
