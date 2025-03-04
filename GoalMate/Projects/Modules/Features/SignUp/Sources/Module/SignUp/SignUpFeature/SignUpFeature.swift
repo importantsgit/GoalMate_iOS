@@ -129,17 +129,20 @@ public struct SignUpFeature {
                 if (input.isEmpty == false && state.nicknameFormState.defaultNickname == input) ||
                    (input.isEmpty && state.nicknameFormState.defaultNickname.isEmpty == false) {
                     state.nicknameFormState.isDuplicateCheckEnabled = false
-                    state.nicknameFormState.validationState = .idle
+                    state.nicknameFormState.validationState = input.isEmpty ? .idle : .editing
                     state.nicknameFormState.isSubmitEnabled = true
                 } else if 2...5 ~= input.count {
                     // 값이 입력된 경우
                     state.nicknameFormState.isDuplicateCheckEnabled = true
-                    state.nicknameFormState.validationState = .idle
+                    state.nicknameFormState.validationState = .editing
                     state.nicknameFormState.isSubmitEnabled = false
                 } else {
                     // 그 외의 경우
+                    let isEmptyDefaultNickname = state.nicknameFormState.defaultNickname.isEmpty
+                    let isEmptyInput = input.isEmpty
                     state.nicknameFormState.isDuplicateCheckEnabled = false
-                    state.nicknameFormState.validationState = .invalid
+                    state.nicknameFormState.validationState =
+                        isEmptyInput && isEmptyDefaultNickname ? .idle : .invalid
                     state.nicknameFormState.isSubmitEnabled = false
                 }
                 return .none

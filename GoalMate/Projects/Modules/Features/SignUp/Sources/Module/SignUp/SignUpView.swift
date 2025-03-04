@@ -123,15 +123,11 @@ public struct SignUpView: View {
         WithPerceptionTracking {
             VStack(spacing: 0) {
                 Spacer()
-                    .frame(height: 120)
-                VStack(spacing: 4) {
-                    Text("앞으로 어떻게 불러드릴까요?")
-                        .pretendard(.semiBold, size: 18, color: .black)
-                    Text("2~5글자 닉네임을 입력해주세요.")
-                        .pretendard(.medium, size: 14, color: Colors.grey700)
-                }
+                    .frame(height: 68)
+                Text("앞으로 어떻게 불러드릴까요?")
+                    .pretendard(.semiBold, size: 18, color: .black)
                 Spacer()
-                    .frame(height: 28)
+                    .frame(height: 54)
                 textField
                 Spacer()
                 if store.keyboardHeight != 0 {
@@ -171,12 +167,7 @@ public struct SignUpView: View {
                     RoundedRectangle(cornerRadius: 22)
                         .stroke(lineWidth: 1)
                         .foregroundStyle(
-                            error ?
-                            Colors.error :
-                                (state == .valid ?
-                                 Colors.focused :
-                                    Colors.grey400
-                                )
+                            store.nicknameFormState.validationState.color
                         )
                     HStack {
                         TextField(
@@ -186,13 +177,12 @@ public struct SignUpView: View {
                             prompt: Text(store.nicknameFormState.defaultNickname)
                                 .foregroundColor(Colors.grey400)
                         )
-                        .pretendard(.regular, size: 16, color: error ?
-                                    Colors.error :
-                                       (store.nicknameFormState.validationState == .valid ?
-                                         Colors.focused :
-                                            Colors.grey900
-                                        ))
-//                        .font(.system(size: 16, weight: .regular))
+                        .pretendard(
+                            .regular,
+                            size: 16,
+                            color: store.nicknameFormState
+                                .validationState.textColor
+                        )
                         .labelsHidden()
                         .focused($focusedField, equals: .nickname)
                         Button {
@@ -220,19 +210,17 @@ public struct SignUpView: View {
                     .padding(.vertical, 10)
                 }
                 .frame(height: 44)
-                if state != .idle {
+                if state != .editing {
                     HStack {
-                        HStack {
-                            Text(state.message)
-                                .pretendard(
-                                    .regular,
-                                    size: 14,
-                                    color: error ?
-                                    Colors.error :
-                                        Colors.focused
-                                )
-                            Spacer()
-                        }
+                        Text(state.message)
+                            .pretendard(
+                                .regular,
+                                size: 14,
+                                color:
+                                    store.nicknameFormState.validationState.messageColor
+                            )
+                            .padding(.horizontal, 16)
+                        Spacer()
                     }
                 }
             }

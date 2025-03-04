@@ -6,7 +6,9 @@
 //
 
 import Data
+import FeatureCommon
 import Foundation
+import SwiftUI
 
 extension SignUpFeature {
     public enum AuthenticationResult {
@@ -50,12 +52,15 @@ extension SignUpFeature {
     }
     public enum TextFieldState {
         case idle
+        case editing
         case duplicate
         case invalid
         case valid
         public var message: String {
             switch self {
             case .idle:
+                return "2~5글자 닉네임을 입력해주세요"
+            case .editing:
                 return ""
             case .duplicate:
                 return "이미 있는 닉네임이에요 :("
@@ -63,6 +68,36 @@ extension SignUpFeature {
                 return "2~5글자 닉네임을 입력해주세요."
             case .valid:
                 return "사용 가능한 닉네임이에요 :)"
+            }
+        }
+        public var color: Color {
+            switch self {
+            case .duplicate, .invalid:
+                return Colors.error
+            case .valid:
+                return Colors.focused
+            default :
+                return Colors.grey400
+            }
+        }
+        public var textColor: Color {
+            switch self {
+            case .duplicate, .invalid:
+                return Colors.error
+            case .valid:
+                return Colors.focused
+            default :
+                return Colors.grey900
+            }
+        }
+        public var messageColor: Color {
+            switch self {
+            case .duplicate, .invalid:
+                return Colors.error
+            case .valid:
+                return Colors.focused
+            default :
+                return Colors.grey600
             }
         }
     }
