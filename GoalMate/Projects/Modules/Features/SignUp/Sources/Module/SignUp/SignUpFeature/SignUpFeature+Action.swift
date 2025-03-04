@@ -78,6 +78,14 @@ extension SignUpFeature {
             }
         case .submitButtonTapped:
             state.isLoading = true
+            if state.nicknameFormState.inputText.isEmpty {
+                let hasDefaultNickname = state.nicknameFormState
+                    .defaultNickname.isEmpty == false
+                let defaultValue = hasDefaultNickname ?
+                    state.nicknameFormState.defaultNickname :
+                    "멘티"
+                return .send(.feature(.nicknameSubmitted(.success(defaultValue))))
+            }
             return .run { [nickname = state.nicknameFormState.inputText] send in
                 do {
                     try await menteeClient.setNickname(nickname)
@@ -128,7 +136,8 @@ extension SignUpFeature {
             state.isLoading = false
             switch result {
             case let .success(nickname):
-                return .send(.nicknameTextInputted(nickname))
+                 state.nicknameFormState.defaultNickname = nickname
+                return .none
             case .networkError, .failed:
                 return .none
             }
@@ -168,7 +177,7 @@ extension SignUpFeature {
         case let .nicknameSubmitted(result):
             switch result {
             case let .success(nickname):
-                state.nickname = state.nicknameFormState.inputText
+                state.nickname = nickname
                 state.pageType = .complete
             case .networkError:
                 state.toastState = .display("네트워크에 문제가 발생했습니다.")

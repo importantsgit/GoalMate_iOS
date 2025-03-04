@@ -124,10 +124,14 @@ public struct SignUpView: View {
             VStack(spacing: 0) {
                 Spacer()
                     .frame(height: 120)
-                Text("앞으로 어떻게 불러드릴까요?")
-                    .pretendard(.semiBold, size: 18, color: .black)
+                VStack(spacing: 4) {
+                    Text("앞으로 어떻게 불러드릴까요?")
+                        .pretendard(.semiBold, size: 18, color: .black)
+                    Text("2~5글자 닉네임을 입력해주세요.")
+                        .pretendard(.medium, size: 14, color: Colors.grey700)
+                }
                 Spacer()
-                    .frame(height: 44)
+                    .frame(height: 28)
                 textField
                 Spacer()
                 if store.keyboardHeight != 0 {
@@ -179,7 +183,7 @@ public struct SignUpView: View {
                             "",
                             text: $store.nicknameFormState.inputText
                                 .sending(\.nicknameTextInputted),
-                            prompt: Text("2~5글자 닉네임을 입력해주세요.")
+                            prompt: Text(store.nicknameFormState.defaultNickname)
                                 .foregroundColor(Colors.grey400)
                         )
                         .pretendard(.regular, size: 16, color: error ?

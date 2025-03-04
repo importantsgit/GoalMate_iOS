@@ -30,6 +30,7 @@ public struct SignUpFeature {
         var nickname: String // 닉네임
         public struct NicknameFormState: Equatable {
             var inputText: String
+            var defaultNickname: String
             var validationState: TextFieldState
             var isSubmitEnabled: Bool
             var isDuplicateCheckEnabled: Bool
@@ -39,6 +40,7 @@ public struct SignUpFeature {
                 isDuplicateCheckEnabled: Bool = false
             ) {
                 self.inputText = ""
+                self.defaultNickname = ""
                 self.validationState = validationState
                 self.isSubmitEnabled = isSubmitEnabled
                 self.isDuplicateCheckEnabled = isDuplicateCheckEnabled
@@ -119,13 +121,27 @@ public struct SignUpFeature {
             case .binding:
                 return .none
             case let .nicknameTextInputted(input):
+                guard state.isLoading == false &&
+                      state.nicknameFormState.inputText != input
+                else { return .none }
                 state.nicknameFormState.inputText = input
-                let isValidNickname = (2...5 ~= input.count)
-                state.nicknameFormState.validationState = isValidNickname ?
-                    .idle :
-                    .invalid
-                state.nicknameFormState.isDuplicateCheckEnabled = isValidNickname
-                state.nicknameFormState.isSubmitEnabled = false
+                // 인풋이 존재하면서 랜덤 닉네임과 인풋이 같을 경우 || 인풋이 없으면서 랜덤 닉네임이 있는 경우
+                if (input.isEmpty == false && state.nicknameFormState.defaultNickname == input) ||
+                   (input.isEmpty && state.nicknameFormState.defaultNickname.isEmpty == false) {
+                    state.nicknameFormState.isDuplicateCheckEnabled = false
+                    state.nicknameFormState.validationState = .idle
+                    state.nicknameFormState.isSubmitEnabled = true
+                } else if 2...5 ~= input.count {
+                    // 값이 입력된 경우
+                    state.nicknameFormState.isDuplicateCheckEnabled = true
+                    state.nicknameFormState.validationState = .idle
+                    state.nicknameFormState.isSubmitEnabled = false
+                } else {
+                    // 그 외의 경우
+                    state.nicknameFormState.isDuplicateCheckEnabled = false
+                    state.nicknameFormState.validationState = .invalid
+                    state.nicknameFormState.isSubmitEnabled = false
+                }
                 return .none
             }
         }
