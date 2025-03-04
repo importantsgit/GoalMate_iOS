@@ -11,16 +11,6 @@ import SwiftUI
 import Utils
 
 public struct CommentDetailView: View {
-    // 높이 추적을 위한 PreferenceKey
-    private struct TextEditorHeightKey: PreferenceKey {
-        static var defaultValue: CGFloat = 0
-        static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-            value = nextValue()
-        }
-    }
-
-    // State 변수 추가
-    @State private var textEditorHeight: CGFloat = 300
     @Environment(\.safeAreaInsets) var safeAreaInsets
     @Perception.Bindable var store: StoreOf<CommentDetailFeature>
     public init(
@@ -53,7 +43,7 @@ public struct CommentDetailView: View {
                     )
                     .frame(height: 64)
                     .onTapGesture {
-                        hideKeyboard()
+                        store.send(.view(.hideKeyboard))
                     }
                     VStack(spacing: 0) {
                         ZStack {
@@ -77,7 +67,7 @@ public struct CommentDetailView: View {
                                             .top(commentTop-80)))))
                             }
                             .onTapGesture {
-                                hideKeyboard()
+                                store.send(.view(.hideKeyboard))
                             }
                             if store.isLoading == false &&
                                store.comments.isEmpty {
@@ -158,7 +148,8 @@ public struct CommentDetailView: View {
                     store.send(.viewCycling(.onAppear))
                 }
                 CustomPopup(
-                    isPresented: $store.isShowPopup.sending(\.dismissPopup),
+                    isPresented: $store.isShowLimitedSendingPopup
+                        .sending(\.dismissLimitedSendingPopup),
                     rightButtonTitle: "확인했어요",
                     leftAction: nil,
                     rightAction: {}
@@ -308,11 +299,21 @@ public struct CommentDetailView: View {
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 8)
+        .overlay {
+            if store.isSentCommentToday
+                && store.isUpdateMode == .idle {
+                Color.clear
+                    .contentShape(Rectangle())
+                    .onTapGesture {
+                        store.send(.view(.showLimitedSendingPopup))
+                    }
+            }
+        }
         .toolbar {
             ToolbarItemGroup(placement: .keyboard) {
                 Spacer()  // 오른쪽 정렬을 위한 Spacer
                 Button {
-                    hideKeyboard()
+                    store.send(.view(.hideKeyboard))
                 } label: {
                     Image(systemName: "chevron.down")
                         .foregroundStyle(.gray)
@@ -379,13 +380,6 @@ fileprivate struct CommentPopupView: View {
             .shadow(color: .black.opacity(0.1), radius: 30)
             .padding(.trailing, 20)
         }
-    }
-}
-
-extension View {
-    func hideKeyboard() {
-        UIApplication.shared.sendAction(
-            #selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
 

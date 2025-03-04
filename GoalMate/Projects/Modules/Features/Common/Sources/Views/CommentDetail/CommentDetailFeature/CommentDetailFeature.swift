@@ -20,11 +20,11 @@ public struct CommentDetailFeature {
         let endDate: Date
         var isLoading: Bool
         var isScrollFetching: Bool
-        var isShowPopup: Bool
-        var isUpdatingComment: Bool
+        var isShowLimitedSendingPopup: Bool
         var isMessageProcessing: Bool
         var didFailToLoad: Bool
         var input: String = ""
+        var isSentCommentToday: Bool
         var isShowEditPopup: EditPopupState
         var isUpdateMode: UpdateCommentState
         var pagingationState: PaginationState
@@ -41,11 +41,11 @@ public struct CommentDetailFeature {
             self.isLoading = true
             self.isScrollFetching = false
             self.didFailToLoad = false
-            self.isShowPopup = false
+            self.isShowLimitedSendingPopup = false
+            self.isSentCommentToday = false
             self.pagingationState = .init()
             self.comments = []
             self.isShowEditPopup = .dismiss
-            self.isUpdatingComment = false
             self.isUpdateMode = .idle
             self.toastState = .hide
             self.isMessageProcessing = false
@@ -66,7 +66,7 @@ public struct CommentDetailFeature {
         case delegate(DelegateAction)
         case binding(BindingAction<State>)
         case inputText(String)
-        case dismissPopup(Bool)
+        case dismissLimitedSendingPopup(Bool)
     }
     public enum ViewCyclingAction {
         case onAppear
@@ -81,6 +81,8 @@ public struct CommentDetailFeature {
         case editCommentButtonTapped(Int)
         case editCancelButtonTapped
         case deleteButtonTapped(Int)
+        case showLimitedSendingPopup
+        case hideKeyboard
     }
     public enum FeatureAction {
         case fetchCommentDetail
@@ -96,6 +98,7 @@ public struct CommentDetailFeature {
         case closeView
     }
     @Dependency(\.menteeClient) var menteeClient
+    @Dependency(\.environmentClient) var environmentClient
     public var body: some Reducer<State, Action> {
         BindingReducer()
         Reduce { state, action in
@@ -112,8 +115,8 @@ public struct CommentDetailFeature {
                 let limitedText = String(text.prefix(300))
                 state.input = limitedText
                 return .none
-            case let .dismissPopup(isShow):
-                state.isShowPopup = isShow
+            case let .dismissLimitedSendingPopup(isShow):
+                state.isShowLimitedSendingPopup = isShow
                 return .none
             case .binding:
                 return .none

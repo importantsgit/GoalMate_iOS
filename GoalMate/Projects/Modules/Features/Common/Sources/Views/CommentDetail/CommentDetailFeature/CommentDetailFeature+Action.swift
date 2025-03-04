@@ -7,6 +7,7 @@
 
 import ComposableArchitecture
 import Data
+import Foundation
 import Utils
 
 extension CommentDetailFeature {
@@ -20,6 +21,10 @@ extension CommentDetailFeature {
     }
     func reduce(into state: inout State, action: ViewAction) -> Effect<Action> {
         switch action {
+        case .hideKeyboard:
+            return .run { _ in
+                await environmentClient.dismissKeyboard()
+            }
         case .retryButtonTapped:
             state.isLoading = true
             return .send(.feature(.fetchCommentDetail))
@@ -55,17 +60,22 @@ extension CommentDetailFeature {
         case .editCancelButtonTapped:
             state.input = ""
             state.isUpdateMode = .idle
-            return .none
+            return .send(.view(.hideKeyboard))
         case let .deleteButtonTapped(commentId):
             state.isShowEditPopup = .dismiss
             return .send(.feature(.deleteMessage(commentId)))
+        case .showLimitedSendingPopup:
+            state.isShowLimitedSendingPopup = true
+            return .none
         }
     }
     func reduce(into state: inout State, action: FeatureAction) -> Effect<Action> {
         switch action {
         case .fetchCommentDetail:
             state.isScrollFetching = true
-            return .run { [currentPage = state.pagingationState.currentPage, roomId = state.roomId] send in
+            let currentPage = state.pagingationState.currentPage
+            let roomId = state.roomId
+            return .run { [currentPage, roomId] send in
                 do {
                     let response = try await menteeClient.fetchCommentDetail(
                         currentPage, roomId
@@ -94,6 +104,12 @@ extension CommentDetailFeature {
         case let .checkFetchCommentDetailResponse(result):
             switch result {
             case let .success(comments, hasNext):
+                // 오늘 날짜가 있는 경우 체크
+                state.isSentCommentToday = state.pagingationState.currentPage == 1 &&
+                   comments.contains(where: { comment in
+                        guard let date = comment.commentedAt?.toISODate() else { return false }
+                        return Calendar.current.isDateInToday(date)
+                    })
                 state.comments.append(contentsOf: comments)
                 state.pagingationState.totalCount += comments.count
                 state.pagingationState.currentPage += 1
@@ -141,10 +157,13 @@ extension CommentDetailFeature {
         case let .checkSubmitMessageResponse(result):
             switch result {
             case let .success(comment):
+                state.isSentCommentToday = true
                 state.comments.insert(comment, at: 0)
                 state.input = ""
+                state.isMessageProcessing = false
+                return .send(.view(.hideKeyboard))
             case .limitedsending:
-                state.isShowPopup = true
+                state.isShowLimitedSendingPopup = true
             case .networkError, .failed:
                 state.toastState = .display("수정하지 못했습니다.")
             }
@@ -180,6 +199,8 @@ extension CommentDetailFeature {
                 state.input = ""
                 state.isUpdateMode = .idle
                 state.comments[id: comment.id] = comment
+                state.isMessageProcessing = false
+                return .send(.view(.hideKeyboard))
             case .networkError, .failed:
                 state.toastState = .display("수정하지 못했습니다.")
             }
@@ -210,6 +231,13 @@ extension CommentDetailFeature {
         case let .checkDeleteMessageResponse(result):
             switch result {
             case let .success(commentId):
+                if let comment = state.comments[id: commentId],
+                   let commentedAt = comment.commentedAt,
+                   let date = commentedAt.toISODate(),
+                   Calendar.current.isDateInToday(date) {
+                    print(commentedAt, date.ISO8601Format(), date.getString())
+                    state.isSentCommentToday = false
+                }
                 state.comments.remove(id: commentId)
             case .networkError, .failed:
                 state.toastState = .display("삭제하지 못했습니다.")

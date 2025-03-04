@@ -42,13 +42,15 @@ public extension String {
         let days = components.day ?? 0
         return "D-\(days)"  // 숫자만 반환
     }
-    
-    func parseAndDisplayDate() -> String {
+    func toISODate() -> Date? {
         let isoFormatter = ISO8601DateFormatter()
         isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
-        guard let date = isoFormatter.date(from: self) else {
-            return "날짜 오류"
-        }
+        return isoFormatter.date(from: self)
+    }
+    
+    func formatISODateString() -> String {
+        guard let date = self.toISODate()
+        else { return "" }
         let displayFormatter = DateFormatter()
         displayFormatter.dateFormat = "yyyy-MM-dd"
         displayFormatter.locale = Locale(identifier: "ko_KR")

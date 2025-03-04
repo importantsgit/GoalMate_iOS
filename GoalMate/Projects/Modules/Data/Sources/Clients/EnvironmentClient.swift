@@ -13,6 +13,7 @@ import UIKit
 public struct EnvironmentClient {
     public let observeKeyboardHeight: () -> AsyncStream<CGFloat>
     public let observeCapture: () -> AsyncStream<MediaType>
+    public let dismissKeyboard: () async -> Void
 }
 
 // MARK: - DependencyKey
@@ -62,6 +63,17 @@ extension EnvironmentClient: DependencyKey {
                         notificationCenter.removeObserver(captureVideo)
                     }
                 }
+            },
+            dismissKeyboard: {
+                _ = await MainActor.run {
+                    UIApplication.shared.sendAction(
+                        #selector(
+                            UIResponder.resignFirstResponder),
+                            to: nil,
+                            from: nil,
+                            for: nil
+                    )
+                }
             }
         )
     }()
@@ -79,7 +91,7 @@ extension EnvironmentClient: DependencyKey {
                     continuation.yield(.photo)
                     continuation.finish()
                 }
-            }
+            }, dismissKeyboard: {}
         )
     }()
 }
@@ -94,7 +106,6 @@ public extension DependencyValues {
 public enum MediaType {
     case photo
     case video(Bool)
-    
     var value: String {
         switch self {
         case .photo: return "PHOTO"

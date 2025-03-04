@@ -77,9 +77,9 @@ struct CommentList: UIViewRepresentable {
                     let belowComment = parent.comments[indexPath.row + 1]
                     if let belowCommentDate = belowComment.commentedAt {
                         let currentDate = currentCommentDate
-                            .parseAndDisplayDate().toDate()
+                            .toISODate() ?? Date()
                         let belowDate = belowCommentDate
-                            .parseAndDisplayDate().toDate()
+                            .toISODate() ?? Date()
                         shouldShowDate = !Calendar.current.isDate(
                             currentDate,
                             inSameDayAs: belowDate
@@ -261,14 +261,14 @@ class CommentCell: UITableViewCell {
                 dateStackView.isHidden = false
                 dplusLabel.text = ""
                 let text = commentedAt
-                    .parseAndDisplayDate()
+                    .formatISODateString()
                     .convertDateString(
                     fromFormat: "yyyy-MM-dd",
                     toFormat: "yyyy년 M월 dd일"
                 )
                 dateLabel.text = text
                 let date = commentedAt
-                    .parseAndDisplayDate()
+                    .formatISODateString()
                 let dDay = date.calculateDday(
                     endDate: endDate.getString(format: "yyyy-MM-dd"))
                 dplusLabel.text = "\(dDay)"
@@ -288,14 +288,14 @@ class CommentCell: UITableViewCell {
                 dateStackView.isHidden = false
                 dplusLabel.text = ""
                 let text = commentedAt
-                    .parseAndDisplayDate()
+                    .formatISODateString()
                     .convertDateString(
                     fromFormat: "yyyy-MM-dd",
                     toFormat: "yyyy년 M월 dd일"
                 )
                 dateLabel.text = text
                 let date = commentedAt
-                    .parseAndDisplayDate()
+                    .formatISODateString()
                 let dDay = date.calculateDday(
                     endDate: endDate.getString(format: "yyyy-MM-dd"))
                 dplusLabel.text = "\(dDay)"
