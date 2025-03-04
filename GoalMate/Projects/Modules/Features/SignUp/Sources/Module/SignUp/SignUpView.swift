@@ -43,7 +43,7 @@ public struct SignUpView: View {
                 .padding(.horizontal, 4)
                 VStack(spacing: 0) {
                     Spacer()
-                        .frame(height: 86)
+                        .frame(height: 18)
                     SignUpProcessView(processType: $store.pageType)
                     if store.pageType == .signUp {
                         authView
