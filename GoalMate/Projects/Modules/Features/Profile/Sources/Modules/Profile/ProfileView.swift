@@ -22,7 +22,10 @@ public struct ProfileView: View {
                     NavigationBar(
                         leftContent: {
                             Text("마이페이지")
-                                .pretendardStyle(.semiBold, size: 20, color: Colors.grey900)
+                                .pretendardStyle(
+                                    .semiBold,
+                                    size: 20,
+                                    color: Colors.grey900)
                         }
                     )
                     .frame(height: 64)
@@ -109,7 +112,10 @@ public struct ProfileView: View {
                                             )
                                             .pretendard(.semiBold, size: 20, color: Colors.grey900)
                                             Text("진행중")
-                                                .pretendard(.regular, size: 14, color: Colors.grey800)
+                                                .pretendard(
+                                                    .regular,
+                                                    size: 14,
+                                                    color: Colors.grey800)
                                         }
                                         Spacer()
                                         Rectangle()
@@ -122,7 +128,10 @@ public struct ProfileView: View {
                                             )
                                             .pretendard(.semiBold, size: 20, color: Colors.grey900)
                                             Text("진행완료")
-                                                .pretendard(.regular, size: 14, color: Colors.grey800)
+                                                .pretendard(
+                                                    .regular,
+                                                    size: 14,
+                                                    color: Colors.grey800)
                                         }
                                         Spacer()
                                     }
@@ -194,7 +203,10 @@ public struct ProfileView: View {
                                 }
                             }
                         }
+                        Spacer()
+                            .frame(height: 150)
                     }
+                    .scrollIndicators(.hidden)
                     .loadingFailure(didFailToLoad: store.didFailToLoad) {
                         store.send(.view(.retryButtonTapped))
                     }
