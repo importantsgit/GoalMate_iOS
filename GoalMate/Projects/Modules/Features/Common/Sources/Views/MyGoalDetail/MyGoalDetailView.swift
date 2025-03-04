@@ -740,8 +740,10 @@ struct DateCell: View {
                let progress = progress,
                progress.dailyTodoCount > 0,
                Calendar.current.compare(
-                date, to: Date(), toGranularity: .day
-               ) != .orderedDescending {
+                date,
+                to: Date(),
+                toGranularity: .day
+               ) == .orderedAscending {
                 CircularProgressView(
                     progress:
                         (Double(progress.completedDailyTodoCount) /
