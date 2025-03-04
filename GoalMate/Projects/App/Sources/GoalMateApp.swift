@@ -38,14 +38,13 @@ final class AppDelegate: NSObject, UIApplicationDelegate {
         self.store.send(.appDelegate(.didFinishLaunching))
         return true
     }
-    
+
     func application(
         _ application: UIApplication,
         didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
     ) {
         //      self.store.send(.appDelegate(.didRegisterForRemoteNotifications(.success(deviceToken))))
     }
-    
     func application(
         _ application: UIApplication,
         didFailToRegisterForRemoteNotificationsWithError error: Error
