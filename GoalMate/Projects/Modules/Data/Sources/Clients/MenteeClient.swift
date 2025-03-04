@@ -12,6 +12,8 @@ import Utils
 
 @DependencyClient
 public struct MenteeClient {
+    public var setNickname: (String) async throws -> Void
+    public var isUniqueNickname: (String) async throws -> Bool
     public var fetchMenteeInfo: () async throws -> FetchMenteeInfoResponseDTO.Response
     public var joinGoal: (_ goalId: Int) async throws -> JoinGoalInfo
     public var hasRemainingTodos: () async throws -> Bool
@@ -71,6 +73,32 @@ extension MenteeClient: DependencyKey {
             }
         }
         return .init(
+            setNickname: { nickname in
+                try await executeWithTokenValidation { accessToken in
+                    let requestDTO = SetNicknameRequestDTO(name: nickname)
+                    let endpoint = APIEndpoints.setNicknameEndpoint(
+                        with: requestDTO,
+                        accessToken: accessToken
+                    )
+                    let result = try await networkClient.asyncRequest(with: endpoint)
+                    await dataStorageClient.setUserInfo(
+                        .init(nickname: nickname)
+                    )
+                }
+            },
+            isUniqueNickname: { nickname in
+                try await executeWithTokenValidation { accessToken in
+                    let requestDTO = CheckNicknameRequestDTO(name: nickname)
+                    let endpoint = APIEndpoints.checkNicknameEndpoint(
+                        with: requestDTO,
+                        accessToken: accessToken
+                    )
+                    let response = try await networkClient.asyncRequest(with: endpoint)
+                    guard let data = response.data
+                    else { throw NetworkError.emptyData }
+                    return data.isAvailable
+                }
+            },
             fetchMenteeInfo: {
                 try await executeWithTokenValidation { accessToken in
                     let endpoint = try APIEndpoints.fetchMenteeInfoEndpoint(
@@ -250,6 +278,11 @@ extension MenteeClient: DependencyKey {
     }
 
     public static var testValue = MenteeClient(
+        setNickname: { _ in return },
+        isUniqueNickname: { _ in
+            try await Task.sleep(nanoseconds: 1_000_000_000)
+            return true
+        },
         fetchMenteeInfo: { FetchMenteeInfoResponseDTO.dummy.data!
         },
         joinGoal: { _ in
@@ -364,6 +397,11 @@ extension MenteeClient: DependencyKey {
             return resultText
         }
         return .init(
+            setNickname: { _ in return },
+            isUniqueNickname: { _ in
+                try await Task.sleep(nanoseconds: 1_000_000_000)
+                return true
+            },
             fetchMenteeInfo: {
                 try await Task.sleep(nanoseconds: 2_000_000_000)
                 return FetchMenteeInfoResponseDTO.dummy.data!
