@@ -305,7 +305,7 @@ fileprivate struct GoalDescriptionView: View {
                                     let startDateString = currentDate.getString()
                                     let endDate = Calendar.current.date(
                                         byAdding: .day,
-                                        value: period,
+                                        value: period-1,
                                         to: currentDate) ?? currentDate
                                     let endDateString = endDate.getString()
                                     Text("\(startDateString)에 시작해서")
