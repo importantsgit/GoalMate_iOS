@@ -160,8 +160,6 @@ public struct SignUpView: View {
     var textField: some View {
         WithPerceptionTracking {
             let state = store.nicknameFormState.validationState
-            let error = state == .duplicate ||
-                        state == .invalid
             VStack(spacing: 10) {
                 ZStack {
                     RoundedRectangle(cornerRadius: 22)

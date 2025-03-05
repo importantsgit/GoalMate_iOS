@@ -31,9 +31,9 @@ extension SignUpFeature {
             return .run { [provider] send in
                 do {
                     let result = try await
-                        (provider == .apple ?
-                         authClient.loginWithApple() :
-                            authClient.loginWithKakao())
+                    (provider == .apple ?
+                     authClient.loginWithApple() :
+                        authClient.loginWithKakao())
                     switch result {
                     case .signIn: // 로그인 성공
                         await send(.feature(.checkAuthenticationResponse(.success(.signIn))))
@@ -60,7 +60,7 @@ extension SignUpFeature {
                         .feature(
                             .checkDuplicateResponse(
                                 isUniqueNickname ?
-                                        .success(nickname) :
+                                    .success(nickname) :
                                         .duplicateName
                             )
                         )
@@ -138,7 +138,8 @@ extension SignUpFeature {
             state.isLoading = false
             switch result {
             case let .success(nickname):
-                 state.nicknameFormState.defaultNickname = nickname
+                state.nicknameFormState.defaultNickname = nickname
+                state.nicknameFormState.isSubmitEnabled = true
                 return .none
             case .networkError, .failed:
                 return .none
