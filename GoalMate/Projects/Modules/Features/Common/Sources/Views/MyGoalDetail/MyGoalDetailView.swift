@@ -116,10 +116,10 @@ public struct MyGoalDetailView: View {
                         store.send(.view(.retryButtonTapped))
                     }
                     .animation(
-                        .easeInOut(duration: 0.2),
+                        .easeInOut(duration: 0.1),
                         value: isShowContent)
                     .animation(
-                        .easeInOut(duration: 0.2),
+                        .easeInOut(duration: 0.1),
                         value: store.isLoadingWhenDayTapped)
                 }
             }
@@ -196,7 +196,7 @@ public struct MyGoalDetailView: View {
                     .frame(height: 56)
             }
             Spacer()
-                .frame(height: 20)
+                .frame(height: 30)
             HStack {
                 RoundedRectangle(cornerRadius: 8)
                     .fill(Colors.grey200)
@@ -257,10 +257,13 @@ public struct MyGoalDetailView: View {
     @ViewBuilder
     var todoView: some View {
         WithPerceptionTracking {
+            let selectedDate = store.selectedDate
+            let isToday = Calendar.current.isDateInToday(selectedDate)
+            let dateString = isToday ? "오늘" : selectedDate.getString(format: "M월 dd일")
             VStack(spacing: 24) {
                 VStack(spacing: 15) {
                     HStack {
-                        Text("오늘 해야 할 일")
+                        Text("\(dateString) 해야 할 일")
                             .pretendard(.semiBold, size: 16, color: Colors.grey900)
                             .padding(.vertical, 6)
                         Spacer()
@@ -445,13 +448,16 @@ public struct MyGoalDetailView: View {
     @ViewBuilder
     var goalProgressView: some View {
         WithPerceptionTracking {
+            let selectedDate = store.selectedDate
+            let isToday = Calendar.current.isDateInToday(selectedDate)
+            let dateString = isToday ? "오늘" : selectedDate.getString(format: "M월 dd일")
             if let menteeGoal = store.content {
                 VStack(spacing: 29) {
                     VStack(spacing: 44) {
                         if store.todos.isEmpty == false {
                             VStack(spacing: 24) {
                                 VStack(spacing: 8) {
-                                    Text("오늘 진척율")
+                                    Text("\(dateString) 진척율")
                                         .pretendardStyle(
                                             .semiBold,
                                             size: 16,
