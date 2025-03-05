@@ -1,23 +1,30 @@
 # Goalmate (골메이트)
 
-(이미지 들어갈 공간)
+![Group 61](https://github.com/user-attachments/assets/57240528-757f-4fa2-b9f1-1ae3c0e4da50)
 
-## 1. 프로젝트 설명
+
+
+## 프로젝트 설명
 이미 목표를 이룬 멘토가 매일 해야 할 일과 실행 방법을 알려줍니다. <br>
 멘토와 함께 하루하루 차근차근 나아가며 목표를 이뤄보세요!<br>
 
-[골메이트, 이런 분들께 추천합니다.]
+[골메이트, 이런 분들께 추천합니다.]<br>
 목표를 세웠지만 막막함을 느껴 멘토를 찾고 계신 분<br>
 목표를 달성하고 싶지만 어디서부터 시작해야 할지 모르는 분<br>
 목표를 향해 나아가고 있지만, 올바른 방향인지 확신이 없는 분<br>
 목표 달성을 위해 전문적인 멘토의 조언이 필요한 분<br>
 
-[목표 달성을 위한 맞춤 가이드]
+[목표 달성을 위한 맞춤 가이드]<br>
 오늘의 할 일 제공 – 목표 달성을 위한 단계별 과제를 수행하세요.<br>
 멘토의 팁 제공 – 멘토가 전하는 실전 팁으로 더욱 효과적으로 목표에 도달하세요.<br>
+<br>
+<br>
+<br>
+<img src="https://github.com/user-attachments/assets/b765195c-0e4a-4abb-b45a-9e79e9a52cc2" style="width: 100px; height: 100px; border-radius: 10px;"/>
+<br>
 
-### 앱스토어 URL
-[Goalmate 다운로드](https://apps.apple.com/kr/app/%EA%B3%A8%EB%A9%94%EC%9D%B4%ED%8A%B8/id6741704150)
+### App Store
+[Goalmate 보러가기](https://apps.apple.com/kr/app/%EA%B3%A8%EB%A9%94%EC%9D%B4%ED%8A%B8/id6741704150)
 
 ---
 
