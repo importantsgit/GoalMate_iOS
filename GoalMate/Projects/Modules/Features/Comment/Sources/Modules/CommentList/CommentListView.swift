@@ -21,7 +21,7 @@ public struct CommentListView: View {
                             .pretendardStyle(.semiBold, size: 20, color: Colors.grey900)
                     }
                 )
-                .frame(height: 64)
+                .frame(height: 52)
                 ZStack {
                     commentListView
                     if store.isLoading == false &&

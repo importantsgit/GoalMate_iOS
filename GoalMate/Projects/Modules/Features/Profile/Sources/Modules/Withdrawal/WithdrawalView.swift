@@ -29,7 +29,7 @@ public struct WithdrawalView: View {
                         } label: {
                             Images.back
                                 .resized(length: 24)
-                                .frame(width: 48, height: 48)
+                                .padding(.all, 12)
                         }
                     },
                     centerContent: {
@@ -37,7 +37,8 @@ public struct WithdrawalView: View {
                             .pretendardStyle(.semiBold, size: 20, color: Colors.grey900)
                     }
                 )
-                .frame(height: 64)
+                .frame(height: 52)
+                .padding(.horizontal, 4)
                 VStack(spacing: 0) {
                     VStack(alignment: .leading, spacing: 0) {
                         Spacer()

@@ -19,16 +19,14 @@ struct PaymentCompletedView: View {
                         Button {
                             store.send(.view(.backButtonTapped))
                         } label: {
-                            VStack {
-                                Images.back
-                                    .resized(length: 24)
-                            }
-                            .padding(.all, 12)
+                            Images.back
+                                .resized(length: 24)
+                                .padding(.all, 12)
                         }
                     }
                 )
-                .frame(height: 64)
-                .padding(.leading, 4)
+                .frame(height: 52)
+                .padding(.horizontal, 4)
                 VStack(spacing: 0) {
                     Spacer()
                         .frame(height: 32)
@@ -105,7 +103,6 @@ struct PaymentCompletedView: View {
                 }
                 .setMargin()
             }
-            
         }
     }
 }

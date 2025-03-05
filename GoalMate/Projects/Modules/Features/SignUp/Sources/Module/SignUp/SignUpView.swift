@@ -30,16 +30,14 @@ public struct SignUpView: View {
                             Button {
                                 store.send(.auth(.backButtonTapped))
                             } label: {
-                                VStack {
-                                    Images.backX
-                                        .resized(length: 24)
-                                }
-                                .padding(.all, 12)
+                                Images.backX
+                                    .resized(length: 24)
+                                    .padding(.all, 12)
                             }
                         }
                     }
                 )
-                .frame(height: 64)
+                .frame(height: 52)
                 .padding(.horizontal, 4)
                 VStack(spacing: 0) {
                     Spacer()

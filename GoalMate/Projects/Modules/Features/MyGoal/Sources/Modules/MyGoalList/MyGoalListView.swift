@@ -22,10 +22,13 @@ public struct MyGoalListView: View {
                 NavigationBar(
                     leftContent: {
                         Text("나의 목표")
-                            .pretendardStyle(.semiBold, size: 20, color: Colors.grey900)
+                            .pretendardStyle(
+                                .semiBold,
+                                size: 20,
+                                color: Colors.grey900)
                     }
                 )
-                .frame(height: 64)
+                .frame(height: 52)
                 ZStack {
                     myGoalListView
                     if store.isLoading == false &&

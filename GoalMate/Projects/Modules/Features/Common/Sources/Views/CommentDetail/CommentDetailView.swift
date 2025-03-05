@@ -29,9 +29,8 @@ public struct CommentDetailView: View {
                             } label: {
                                 Images.back
                                     .resized(length: 24)
-                                    .frame(width: 48, height: 48)
+                                    .padding(.all, 12)
                             }
-                            .padding(.leading, 4)
                         },
                         centerContent: {
                             Text(store.title)
@@ -41,7 +40,8 @@ public struct CommentDetailView: View {
                                 .frame(width: 300)
                         }
                     )
-                    .frame(height: 64)
+                    .frame(height: 52)
+                    .padding(.horizontal, 4)
                     .onTapGesture {
                         store.send(.view(.hideKeyboard))
                     }

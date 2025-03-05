@@ -18,17 +18,15 @@ public struct GoalDetailView: View {
     public var body: some View {
         WithPerceptionTracking {
             ZStack(alignment: .bottom) {
-                VStack {
+                VStack(spacing: 0) {
                     NavigationBar(
                         leftContent: {
                             Button {
                                 store.send(.view(.backButtonTapped))
                             } label: {
-                                VStack {
-                                    Images.back
-                                        .resized(length: 24)
-                                }
-                                .padding(.all, 12)
+                                Images.back
+                                    .resized(length: 24)
+                                    .padding(.all, 12)
                             }
                         },
                         centerContent: {
@@ -40,8 +38,8 @@ public struct GoalDetailView: View {
                                 )
                         }
                     )
-                    .padding(.leading, 4)
-                    .frame(height: 64)
+                    .frame(height: 52)
+                    .padding(.horizontal, 4)
                     ScrollView(.vertical) {
                         VStack(spacing: 0) {
                             pageView

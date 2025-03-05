@@ -27,7 +27,7 @@ public struct MyGoalDetailView: View {
                             } label: {
                                 Images.back
                                     .resized(length: 24)
-                                    .frame(width: 48, height: 48)
+                                    .padding(.all, 12)
                             }
                         },
                         centerContent: {
@@ -38,7 +38,8 @@ public struct MyGoalDetailView: View {
                                 .frame(width: 300)
                         }
                     )
-                    .frame(height: 64)
+                    .frame(height: 52)
+                    .padding(.horizontal, 4)
                     let isShowContent = store.content != nil
                     ZStack(alignment: .bottom) {
                         if isShowContent {

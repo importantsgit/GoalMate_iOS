@@ -13,7 +13,7 @@ public struct MyGoalCompletionView: View {
     @Perception.Bindable var store: StoreOf<MyGoalCompletionFeature>
     public var body: some View {
         WithPerceptionTracking {
-            VStack {
+            VStack(spacing: 0) {
                 NavigationBar(
                     leftContent: {
                         Button {
@@ -33,8 +33,8 @@ public struct MyGoalCompletionView: View {
                             )
                     }
                 )
-                .frame(height: 64)
-                .padding(.leading, 4)
+                .frame(height: 52)
+                .padding(.horizontal, 4)
                 Group {
                     ZStack(alignment: .bottom) {
                         ScrollView {

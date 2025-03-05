@@ -18,16 +18,16 @@ struct GoalListView: View {
     }
     var body: some View {
         WithPerceptionTracking {
-            VStack {
+            VStack(spacing: 0) {
                 NavigationBar(
                     leftContent: {
                         Images.logoSub
                             .resizable()
                             .aspectRatio(contentMode: .fill)
                             .frame(width: 88, height: 24)
-                            .padding(.vertical, 14)
                     }
                 )
+                .frame(height: 52)
                 .padding(.horizontal, 20)
                 ZStack {
                     goalListView

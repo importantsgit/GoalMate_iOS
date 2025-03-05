@@ -28,7 +28,7 @@ public struct ProfileView: View {
                                     color: Colors.grey900)
                         }
                     )
-                    .frame(height: 64)
+                    .frame(height: 52)
                     ScrollView {
                         Spacer()
                             .frame(height: 16)
