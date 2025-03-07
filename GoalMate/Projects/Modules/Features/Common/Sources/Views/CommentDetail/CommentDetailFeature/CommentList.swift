@@ -251,7 +251,8 @@ class CommentCell: UITableViewCell {
         stackToBubbleConstraint?.isActive = false
         stackViewCenterXConstraint?.isActive = false
         containerBottomConstraint?.isActive = false
-        if comment.writerRole == .mentor {
+            
+        if [.mentor, .admin].contains(comment.writerRole) {
             messageLabel.textColor = Asset.Assets.Grey.grey700.color
             bubbleView.backgroundColor = Asset.Assets.Grey.grey50.color
             bubbleLeadingConstraint?.isActive = true
