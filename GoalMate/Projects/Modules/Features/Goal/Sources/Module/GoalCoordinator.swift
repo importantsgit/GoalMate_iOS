@@ -172,12 +172,9 @@ public struct GoalCoordinator {
                 action: .paymentCompleted(
                     .delegate(.showMyGoalDetail(contentId))))):
                 print("contented: \(contentId)")
-                return Effect.routeWithDelaysIfUnsupported(
-                    state.routes, action: \.router, scheduler: .main) {
-                    $0.pop()
-                    $0.push(.myGoalDetail(
-                        .init(menteeGoalId: contentId)))
-                }
+                state.routes.push(.myGoalDetail(
+                    .init(menteeGoalId: contentId)))
+                return .none
             case .router(.routeAction(
                 _,
                 action: .myGoalDetail(.delegate(.closeView)))):
