@@ -13,15 +13,12 @@ import Foundation
 
 @Reducer
 public struct GoalListFeature {
-    public enum FetchError: Error {
-        case networkError
-        case emptyData
-    }
     public init() {}
     @ObservableState
     public struct State: Equatable {
         public let id: UUID
         var isLoading: Bool
+        var isRefreshing: Bool
         var isScrollFetching: Bool
         var didFailToLoad: Bool
         var goalContents: IdentifiedArrayOf<Goal>
@@ -31,6 +28,7 @@ public struct GoalListFeature {
         ) {
             self.id = UUID()
             self.isLoading = true
+            self.isRefreshing = false
             self.isScrollFetching = false
             self.didFailToLoad = false
             self.goalContents = []
@@ -49,6 +47,7 @@ public struct GoalListFeature {
     }
     public enum ViewAction {
         case onLoadMore
+        case refreshGoalList
         case contentTapped(Int)
         case retryButtonTapped
     }

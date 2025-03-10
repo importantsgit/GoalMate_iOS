@@ -92,6 +92,9 @@ public struct MyGoalListView: View {
                     Spacer()
                         .frame(height: 105)
                 }
+                .refreshable {
+                    store.send(.view(.refreshMyGoalList))
+                }
                 .scrollIndicators(.hidden)
             }
         }
@@ -216,7 +219,8 @@ fileprivate struct MyGoalContentItem: View {
                             size: 13,
                             color: isExpired ? Colors.grey500 : Colors.grey900
                         )
-                    let dDay = Date().toString().calculateDday(endDate: content.endDate ?? "")
+                    let dDay = Date().toString()
+                        .calculateDday(endDate: content.endDate ?? "")
                     Text(isExpired ?
                             "done" :
                             dDay)

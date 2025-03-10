@@ -16,6 +16,7 @@ public struct CommentListFeature {
     public struct State: Equatable {
         public let id: UUID
         public var isLoading: Bool
+        var isRefreshing: Bool
         var isScrollFetching: Bool
         var didFailToLoad: Bool
         var isLogin: Bool
@@ -25,6 +26,7 @@ public struct CommentListFeature {
         public init() {
             self.id = UUID()
             self.isLoading = true
+            self.isRefreshing = false
             self.isScrollFetching = false
             self.didFailToLoad = false
             self.isLogin = true
@@ -45,6 +47,7 @@ public struct CommentListFeature {
         case onDisappear
     }
     public enum ViewAction {
+        case refreshCommentList
         case chatRoomButtonTapped(Int, String?, String?)
         case retryButtonTapped
         case showMoreButtonTapped

@@ -235,6 +235,9 @@ public struct CommentListView: View {
             Spacer()
                 .frame(height: 105)
         }
+        .refreshable {
+            store.send(.view(.refreshCommentList))
+        }
         .scrollIndicators(.hidden)
     }
 }

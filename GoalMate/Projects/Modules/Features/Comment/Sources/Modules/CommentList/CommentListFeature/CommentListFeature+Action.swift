@@ -34,6 +34,10 @@ extension CommentListFeature {
     }
     func reduce(into state: inout State, action: ViewAction) -> Effect<Action> {
         switch action {
+        case .refreshCommentList:
+            state.isRefreshing = true
+            state.pagingationState = .init()
+            return .send(.feature(.fetchCommentRooms))
         case let .chatRoomButtonTapped(roomId, title, endDate):
             return .send(.delegate(
                 .showCommentDetail(roomId, title, endDate)))
@@ -79,7 +83,9 @@ extension CommentListFeature {
                         .checkFetchCommentRoomsResult(
                             .success(
                                 cellModels,
-                                response.page.hasNext ?? false))))
+                                response.page.hasNext ?? false))),
+                               animation: .easeInOut(duration: 0.2)
+                    )
                 } catch is NetworkError {
                     await send(.feature(
                         .checkFetchCommentRoomsResult(.networkError)))
@@ -91,6 +97,9 @@ extension CommentListFeature {
         case let .checkFetchCommentRoomsResult(result):
             switch result {
             case let .success(commentRooms, hasNext):
+                if state.isRefreshing {
+                    state.commentRoomList.removeAll()
+                }
                 state.commentRoomList.append(contentsOf: commentRooms)
                 state.pagingationState.totalCount += commentRooms.count
                 state.pagingationState.currentPage += 1
@@ -101,6 +110,7 @@ extension CommentListFeature {
                  }
             }
             state.isLoading = false
+            state.isRefreshing = false
             state.isScrollFetching = false
             return .none
         case .loginFailed:

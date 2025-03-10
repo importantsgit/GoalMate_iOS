@@ -79,13 +79,17 @@ struct GoalListView: View {
                         }
                     }
                 }
-                if store.isScrollFetching {
+                if store.isScrollFetching &&
+                   store.isRefreshing == false {
                     ProgressView()
                         .progressViewStyle(.circular)
                         .scaleEffect(1.7, anchor: .center)
                 }
                 Spacer()
                     .frame(height: 105)
+            }
+            .refreshable {
+                store.send(.view(.refreshGoalList))
             }
             .scrollIndicators(.hidden)
         }

@@ -23,6 +23,10 @@ extension GoalListFeature {
     // MARK: View
     func reduce(into state: inout State, action: ViewAction) -> Effect<Action> {
         switch action {
+        case .refreshGoalList:
+            state.isRefreshing = true
+            state.pagingationState = .init()
+            return .send(.feature(.fetchGoals))
         case .retryButtonTapped:
             state.isLoading = true
             state.didFailToLoad = false
@@ -53,7 +57,8 @@ extension GoalListFeature {
                                     response.goals,
                                     response.page?.hasNext ?? false
                                 )
-                            )))
+                            )),
+                               animation: .easeInOut(duration: 0.2))
                 } catch is NetworkError {
                     await send(
                         .feature(.checkFetchGoalListResponse(.networkError))
@@ -67,6 +72,9 @@ extension GoalListFeature {
         case let .checkFetchGoalListResponse(result):
             switch result {
             case let .success(contents, hasNext):
+                if state.isRefreshing {
+                    state.goalContents.removeAll()
+                }
                 state.goalContents.append(contentsOf: contents)
                 state.pagingationState.totalCount += contents.count
                 state.pagingationState.currentPage += 1
@@ -77,6 +85,7 @@ extension GoalListFeature {
                 }
             }
             state.isLoading = false
+            state.isRefreshing = false
             state.isScrollFetching = false
             return .none
         }

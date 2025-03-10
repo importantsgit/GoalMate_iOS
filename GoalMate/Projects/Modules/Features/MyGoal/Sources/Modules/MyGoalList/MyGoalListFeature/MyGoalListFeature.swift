@@ -18,6 +18,7 @@ public struct MyGoalListFeature {
         public let id: UUID
         var isLogin: Bool
         var isLoading: Bool
+        var isRefreshing: Bool
         var isScrollFetching: Bool
         var didFailToLoad: Bool
         var pagingationState: PaginationState
@@ -28,6 +29,7 @@ public struct MyGoalListFeature {
             self.id = UUID()
             self.isLogin = true
             self.isLoading = true
+            self.isRefreshing = false
             self.isScrollFetching = false
             self.didFailToLoad = false
             self.myGoalList = myGoalList
@@ -46,6 +48,7 @@ public struct MyGoalListFeature {
         case onDisappear
     }
     public enum ViewAction {
+        case refreshMyGoalList
         case onLoadMore
         case showMoreButtonTapped
         case buttonTapped(ButtonType)
