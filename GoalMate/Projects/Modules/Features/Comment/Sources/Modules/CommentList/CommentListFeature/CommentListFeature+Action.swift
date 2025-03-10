@@ -62,7 +62,8 @@ extension CommentListFeature {
             return .run { [currentPage = state.pagingationState.currentPage] send in
                 do {
                     let response = try await menteeClient.fetchCommentRooms(currentPage)
-                    let cellModels = try await withThrowingTaskGroup(of: CommentRoomCell.self) { group in
+                    let cellModels = try await withThrowingTaskGroup(
+                        of: CommentRoomCell.self) { group in
                         for commentRoom in response.commentRooms {
                             group.addTask {
                                 .init(roomInfo: commentRoom)

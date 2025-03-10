@@ -30,6 +30,7 @@ public struct CommentListView: View {
                     }
                     if store.isLoading {
                         skeletonView
+                            .opacity(0.7)
                             .transition(.opacity)
                     }
                 }
@@ -50,43 +51,30 @@ public struct CommentListView: View {
     @ViewBuilder
     var skeletonView: some View {
         VStack {
-            Spacer()
-                .frame(height: 16)
-            HStack {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Colors.grey200)
-                    .frame(width: 100, height: 20)
-                Spacer()
+            ForEach(0..<3) { _ in
+                HStack(spacing: 0) {
+                    Circle()
+                        .fill(Colors.grey400)
+                        .frame(width: 64, height: 64)
+                    Spacer()
+                        .frame(width: 12)
+                    VStack(alignment: .leading, spacing: 2) {
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Colors.grey400)
+                            .frame(width: 120, height: 22)
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(Colors.grey400)
+                            .frame(height: 16)
+                    }
+                    Spacer()
+                        .frame(width: 12)
+                    Spacer()
+                        .frame(width: 12, height: 12)
+                        .padding(6)
+                }
             }
-            Spacer()
-                .frame(height: 20)
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Colors.grey200)
-                .frame(height: 118)
-            Spacer()
-                .frame(height: 56)
-            Spacer()
-                .frame(height: 20)
-            HStack {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Colors.grey200)
-                    .frame(width: 100, height: 20)
-                Spacer()
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Colors.grey200)
-                    .frame(width: 100, height: 30)
-            }
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Colors.grey200)
-                .frame(height: 150)
-            Spacer()
-                .frame(height: 20)
-            RoundedRectangle(cornerRadius: 8)
-                .fill(Colors.grey200)
-                .frame(height: 118)
             Spacer()
         }
-        .padding(.horizontal, 20)
         .background(.white)
     }
 
@@ -209,6 +197,7 @@ public struct CommentListView: View {
                                         color: Colors.grey800
                                     )
                                     .lineLimit(2)
+                                    .multilineTextAlignment(.leading)
                             }
                             .frame(maxWidth: .infinity, alignment: .leading)
                             Spacer()
