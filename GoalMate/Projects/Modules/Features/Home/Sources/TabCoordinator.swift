@@ -13,6 +13,7 @@ import FeatureMyGoal
 import FeatureProfile
 import SwiftUI
 import TCACoordinators
+import Utils
 
 @Reducer
 public struct TabCoordinator {
@@ -106,6 +107,7 @@ public struct TabCoordinator {
             case let .profile(action):
                 return reduce(into: &state, action: action)
             case let .tabbarButtonTapped(tab):
+                HapticManager.impact(style: .selection)
                 state.selectedTab = tab
                 return .none
             case .binding:

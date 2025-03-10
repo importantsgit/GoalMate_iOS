@@ -52,7 +52,7 @@ extension MyGoalDetailFeature {
                 state.isShowOutdatePopup = true
                 return .none
             }
-            HapticManager.impact(style: .selection)
+            HapticManager.impact(style: .success)
             state.isTodoLoading = true
             let todoStatus: TodoStatus = (status == .completed ? .todo : .completed)
             return .run { [todoId, menteeGoalId = state.menteeGoalId, todoStatus] send in
