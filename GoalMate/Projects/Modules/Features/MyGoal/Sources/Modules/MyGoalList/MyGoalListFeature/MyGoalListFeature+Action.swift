@@ -13,6 +13,11 @@ extension MyGoalListFeature {
     func reduce(into state: inout State, action: ViewCyclingAction) -> Effect<Action> {
         switch action {
         case .onAppear:
+            state.isLoading = true
+            state.isLogin = true
+            state.didFailToLoad = false
+            state.myGoalList = []
+            state.pagingationState = .init()
             return .run { send in
                 guard try await authClient.checkLoginStatus()
                 else {
@@ -24,10 +29,6 @@ extension MyGoalListFeature {
             }
         case .onDisappear:
             state.isLoading = true
-            state.isLogin = true
-            state.didFailToLoad = false
-            state.myGoalList = []
-            state.pagingationState = .init()
             return .none
         }
     }
@@ -76,8 +77,7 @@ extension MyGoalListFeature {
                         .feature(
                             .checkFetchMyGoalResponse(
                                 .success(list, response.page?.hasNext ?? false))
-                        ),
-                        animation: .easeInOut(duration: 0.2)
+                        )
                     )
                 } catch let error as NetworkError {
                     if case let .statusCodeError(code) = error,

@@ -23,14 +23,15 @@ public struct CommentListView: View {
                 )
                 .frame(height: 52)
                 ZStack {
-                    commentListView
+                    if store.isLoading == false {
+                        commentListView
+                    }
                     if store.isLoading == false &&
                         (store.isLogin == false || store.commentRoomList.isEmpty) {
                         emptyCommentView
                     }
                     if store.isLoading {
                         skeletonView
-                            .opacity(0.7)
                             .transition(.opacity)
                     }
                 }
@@ -54,16 +55,16 @@ public struct CommentListView: View {
             ForEach(0..<3) { _ in
                 HStack(spacing: 0) {
                     Circle()
-                        .fill(Colors.grey400)
+                        .fill(Colors.grey200)
                         .frame(width: 64, height: 64)
                     Spacer()
                         .frame(width: 12)
                     VStack(alignment: .leading, spacing: 2) {
                         RoundedRectangle(cornerRadius: 4)
-                            .fill(Colors.grey400)
+                            .fill(Colors.grey200)
                             .frame(width: 120, height: 22)
                         RoundedRectangle(cornerRadius: 4)
-                            .fill(Colors.grey400)
+                            .fill(Colors.grey200)
                             .frame(height: 16)
                     }
                     Spacer()

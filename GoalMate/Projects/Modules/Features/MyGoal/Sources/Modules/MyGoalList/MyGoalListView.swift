@@ -30,7 +30,9 @@ public struct MyGoalListView: View {
                 )
                 .frame(height: 52)
                 ZStack {
-                    myGoalListView
+                    if store.isLoading == false {
+                        myGoalListView
+                    }
                     if store.isLoading == false &&
                        (store.isLogin == false || store.myGoalList.isEmpty) {
                         emptyMyGoalView
@@ -52,7 +54,7 @@ public struct MyGoalListView: View {
                 store.send(.viewCycling(.onAppear))
             }
             .onDisappear {
-                store.send(.viewCycling(.onDisappear))
+                 store.send(.viewCycling(.onDisappear))
             }
         }
     }

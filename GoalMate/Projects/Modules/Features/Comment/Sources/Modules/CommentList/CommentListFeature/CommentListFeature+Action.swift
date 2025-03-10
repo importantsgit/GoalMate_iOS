@@ -13,6 +13,12 @@ extension CommentListFeature {
     func reduce(into state: inout State, action: ViewCyclingAction) -> Effect<Action> {
         switch action {
         case .onAppear:
+            state.isLoading = true
+            state.isLogin = true
+            state.isScrollFetching = false
+            state.didFailToLoad = false
+            state.commentRoomList = []
+            state.pagingationState = .init()
             return .run { send in
                 guard try await authClient.checkLoginStatus()
                 else {
@@ -24,11 +30,6 @@ extension CommentListFeature {
             }
         case .onDisappear:
             state.isLoading = true
-            state.isLogin = true
-            state.isScrollFetching = false
-            state.didFailToLoad = false
-            state.commentRoomList = []
-            state.pagingationState = .init()
             return .none
         }
     }
@@ -83,8 +84,7 @@ extension CommentListFeature {
                         .checkFetchCommentRoomsResult(
                             .success(
                                 cellModels,
-                                response.page.hasNext ?? false))),
-                               animation: .easeInOut(duration: 0.2)
+                                response.page.hasNext ?? false)))
                     )
                 } catch is NetworkError {
                     await send(.feature(
