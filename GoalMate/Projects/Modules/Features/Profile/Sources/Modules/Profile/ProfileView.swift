@@ -87,6 +87,8 @@ public struct ProfileView: View {
                                 if store.isLoading {
                                     RoundedRectangle(cornerRadius: 24)
                                         .fill(Colors.grey200)
+                                        .transition(.asymmetric(
+                                            insertion: .identity, removal: .opacity))
                                 }
                             }
                             if store.isLogin {
@@ -101,6 +103,8 @@ public struct ProfileView: View {
                                             if store.isLoading {
                                                 RoundedRectangle(cornerRadius: 8)
                                                     .fill(Colors.grey200)
+                                                    .transition(.asymmetric(
+                                                        insertion: .identity, removal: .opacity))
                                             }
                                         }
                                         .frame(maxWidth: .infinity, alignment: .leading)
@@ -213,7 +217,7 @@ public struct ProfileView: View {
                 }
                 .padding(.horizontal, 20)
                 .animation(
-                    .easeInOut(duration: 0.3),
+                    .easeOut(duration: 0.3),
                     value: store.isLoading
                 )
                 CustomPopup(
