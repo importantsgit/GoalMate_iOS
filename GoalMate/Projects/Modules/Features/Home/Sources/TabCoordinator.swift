@@ -70,7 +70,8 @@ public struct TabCoordinator {
         case showLogin
     }
     public enum FeatureAction {
-        case checkRemainingTodo
+        case checkAllCounts
+        case getRemainingTodoCount
         case checkRemainingTodoResponse(Bool)
         case getNewCommentsCount
         case chekcNewCommentsCountResponse(Int)
@@ -107,9 +108,11 @@ public struct TabCoordinator {
             case let .profile(action):
                 return reduce(into: &state, action: action)
             case let .tabbarButtonTapped(tab):
+                guard state.selectedTab != tab
+                else { return .none }
                 HapticManager.impact(style: .selection)
                 state.selectedTab = tab
-                return .none
+                return .send(.feature(.checkAllCounts))
             case .binding:
                 return .none
             }

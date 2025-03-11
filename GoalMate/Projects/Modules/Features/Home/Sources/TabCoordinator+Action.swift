@@ -16,10 +16,7 @@ extension TabCoordinator {
     func reduce(into state: inout State, action: ViewCyclingAction) -> Effect<Action> {
         switch action {
         case .onAppear:
-            return .merge(
-                .send(.feature(.checkRemainingTodo)),
-                .send(.feature(.getNewCommentsCount))
-            )
+            return .send(.feature(.checkAllCounts))
         }
     }
     func reduce(into state: inout State, action: CoordinatorAction) -> Effect<Action> {
@@ -30,7 +27,12 @@ extension TabCoordinator {
     }
     func reduce(into state: inout State, action: FeatureAction) -> Effect<Action> {
         switch action {
-        case .checkRemainingTodo:
+        case .checkAllCounts:
+            return .merge(
+                .send(.feature(.getRemainingTodoCount)),
+                .send(.feature(.getNewCommentsCount))
+            )
+        case .getRemainingTodoCount:
             return .run { send in
                 do {
                     let hasRemainingTodos = try await menteeClient.hasRemainingTodos()
