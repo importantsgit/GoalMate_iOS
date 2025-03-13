@@ -106,10 +106,12 @@ extension CommentDetailFeature {
             case let .success(comments, hasNext):
                 // 오늘 날짜가 있는 경우 체크
                 state.isSentCommentToday = state.pagingationState.currentPage == 1 &&
-                   comments.contains(where: { comment in
-                        guard let date = comment.commentedAt?.toISODate() else { return false }
-                        return Calendar.current.isDateInToday(date)
-                    })
+                comments.contains(where: { comment in
+                    guard let date = comment.commentedAt?.toISODate(),
+                          Calendar.current.isDateInToday(date)
+                    else { return false }
+                    return comment.writerRole == .mentee
+                })
                 state.comments.append(contentsOf: comments)
                 state.pagingationState.totalCount += comments.count
                 state.pagingationState.currentPage += 1
