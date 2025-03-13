@@ -58,8 +58,8 @@ public struct CommentDetailView: View {
                                 }
                             } onLongPress: { (comment, points) in
                                 let minY = points.0, maxY = points.1
-                                let commentTop = minY - (safeAreaInsets.top + 64)
-                                let commentBottom = maxY - (safeAreaInsets.top + 64)
+                                let commentTop = minY - (safeAreaInsets.top + 52)
+                                let commentBottom = maxY - (safeAreaInsets.top + 52)
                                 store.send(.view(.showEditPopup(
                                     comment.id,
                                     (commentTop < 80 ?
