@@ -118,7 +118,7 @@ class CommentCell: UITableViewCell {
     private let dplusLabelView = UIView()
     private let dplusLabel = UILabel()
     private var writerRole: CommentContent.WriterRole
-    private var containerBottomConstraint: NSLayoutConstraint?
+    private var containerTopConstraint: NSLayoutConstraint?
     private var bubbleTopConstraint: NSLayoutConstraint?
     private var stackViewTopConstraint: NSLayoutConstraint?
     private var stackToBubbleConstraint: NSLayoutConstraint?
@@ -151,15 +151,15 @@ class CommentCell: UITableViewCell {
         selectionStyle = .none
         containerView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(containerView)
-        containerBottomConstraint = containerView.bottomAnchor.constraint(
-             equalTo: contentView.bottomAnchor, constant: -16)
+        containerTopConstraint = containerView.topAnchor.constraint(
+            equalTo: contentView.topAnchor)
         NSLayoutConstraint.activate([
-            containerView.topAnchor.constraint(
-                equalTo: contentView.topAnchor, constant: 16),
             containerView.leadingAnchor.constraint(
                 equalTo: contentView.leadingAnchor, constant: 16),
             containerView.trailingAnchor.constraint(
-                equalTo: contentView.trailingAnchor, constant: -16)
+                equalTo: contentView.trailingAnchor, constant: -16),
+            containerView.bottomAnchor.constraint(
+                equalTo: contentView.bottomAnchor)
         ])
         bubbleView.translatesAutoresizingMaskIntoConstraints = false
         bubbleView.layer.cornerRadius = 20
@@ -181,7 +181,7 @@ class CommentCell: UITableViewCell {
         dateStackView.translatesAutoresizingMaskIntoConstraints = false
         dateStackView.axis = .horizontal
         dateStackView.spacing = 6
-        dateStackView.alignment = .center
+        dateStackView.alignment = .fill
         containerView.addSubview(dateStackView)
         dateLabel.font = IFont.Pretendard.medium.value.font(size: 14)
         dateLabel.textColor = Asset.Assets.Grey.grey700.color
@@ -194,7 +194,6 @@ class CommentCell: UITableViewCell {
         dplusLabel.textColor = Asset.Assets.Grey.grey800.color
         dplusLabel.textAlignment = .center
         dplusLabel.translatesAutoresizingMaskIntoConstraints = false
-        dplusLabel.textAlignment = .center
         dplusLabelView.addSubview(dplusLabel)
         dateStackView.addArrangedSubview(dplusLabelView)
         stackViewTopConstraint = dateStackView.topAnchor.constraint(
@@ -209,20 +208,21 @@ class CommentCell: UITableViewCell {
             equalTo: containerView.leadingAnchor)
         bubbleTrailingConstraint = bubbleView.trailingAnchor.constraint(
             equalTo: containerView.trailingAnchor)
-        bubbleTopConstraint?.isActive = true
         NSLayoutConstraint.activate([
             bubbleView.bottomAnchor.constraint(
                 equalTo: containerView.bottomAnchor),
             bubbleView.widthAnchor.constraint(
                 lessThanOrEqualTo: containerView.widthAnchor, multiplier: 0.75),
-            dplusLabel.topAnchor.constraint(
-                equalTo: dplusLabelView.topAnchor, constant: 2),
+//            dplusLabel.topAnchor.constraint(
+//                equalTo: dplusLabelView.topAnchor, constant: 2),
+            dplusLabel.centerYAnchor.constraint(
+                equalTo: dplusLabelView.centerYAnchor),
             dplusLabel.leadingAnchor.constraint(
                 equalTo: dplusLabelView.leadingAnchor, constant: 4),
             dplusLabel.trailingAnchor.constraint(
                 equalTo: dplusLabelView.trailingAnchor, constant: -4),
-            dplusLabel.bottomAnchor.constraint(
-                equalTo: dplusLabelView.bottomAnchor, constant: -2)
+//            dplusLabel.bottomAnchor.constraint(
+//                equalTo: dplusLabelView.bottomAnchor, constant: -2)
         ])
     }
 
@@ -250,17 +250,24 @@ class CommentCell: UITableViewCell {
         stackViewTopConstraint?.isActive = false
         stackToBubbleConstraint?.isActive = false
         stackViewCenterXConstraint?.isActive = false
-        containerBottomConstraint?.isActive = false
-            
-        if [.mentor, .admin].contains(comment.writerRole) {
-            messageLabel.textColor = Asset.Assets.Grey.grey700.color
-            bubbleView.backgroundColor = Asset.Assets.Grey.grey50.color
-            bubbleLeadingConstraint?.isActive = true
-            containerBottomConstraint?.constant = -44
-            if let commentedAt = comment.commentedAt,
-                showDateStack {
+        containerTopConstraint?.isActive = false
+
+            if [.mentor, .admin].contains(comment.writerRole) {
+                messageLabel.textColor = Asset.Assets.Grey.grey700.color
+                bubbleView.backgroundColor = Asset.Assets.Grey.grey50.color
+                bubbleLeadingConstraint?.isActive = true
+                bubbleTrailingConstraint?.isActive = false
+            } else {
+                messageLabel.textColor = Asset.Assets.Grey.grey900.color
+                bubbleView.backgroundColor = Asset.Assets.Primary.primary600.color
+                bubbleLeadingConstraint?.isActive = false
+                bubbleTrailingConstraint?.isActive = true
+            }
+
+            if showDateStack,
+               let commentedAt = comment.commentedAt {
                 dateStackView.isHidden = false
-                dplusLabel.text = ""
+
                 let text = commentedAt
                     .formatISODateString()
                     .convertDateString(
@@ -268,48 +275,21 @@ class CommentCell: UITableViewCell {
                     toFormat: "yyyy년 M월 dd일"
                 )
                 dateLabel.text = text
-                let date = commentedAt
-                    .formatISODateString()
+                let date = commentedAt.formatISODateString()
                 let dDay = date.calculateDday(
                     endDate: endDate.getString(format: "yyyy-MM-dd"))
                 dplusLabel.text = "\(dDay)"
+
                 stackViewTopConstraint?.isActive = true
                 stackViewCenterXConstraint?.isActive = true
                 stackToBubbleConstraint?.isActive = true
+                containerTopConstraint?.constant = 44
             } else {
                 dateStackView.isHidden = true
                 bubbleTopConstraint?.isActive = true
+                containerTopConstraint?.constant = 16
             }
-        } else {
-            messageLabel.textColor = Asset.Assets.Grey.grey900.color
-            bubbleView.backgroundColor = Asset.Assets.Primary.primary600.color
-            bubbleTrailingConstraint?.isActive = true
-            containerBottomConstraint?.constant = -16
-            if let commentedAt = comment.commentedAt, showDateStack {
-                dateStackView.isHidden = false
-                dplusLabel.text = ""
-                let text = commentedAt
-                    .formatISODateString()
-                    .convertDateString(
-                    fromFormat: "yyyy-MM-dd",
-                    toFormat: "yyyy년 M월 dd일"
-                )
-                dateLabel.text = text
-                let date = commentedAt
-                    .formatISODateString()
-                let dDay = date.calculateDday(
-                    endDate: endDate.getString(format: "yyyy-MM-dd"))
-                dplusLabel.text = "\(dDay)"
-                stackViewTopConstraint?.isActive = true
-                stackViewCenterXConstraint?.isActive = true
-                stackToBubbleConstraint?.isActive = true
-            } else {
-                dateStackView.isHidden = true
-                bubbleTopConstraint?.isActive = true
-            }
-        }
-        containerBottomConstraint?.isActive = true
-        // 레이아웃 갱신
+        containerTopConstraint?.isActive = true
         setNeedsLayout()
         layoutIfNeeded()
     }
@@ -321,12 +301,9 @@ class CommentCell: UITableViewCell {
                 let cellRectInWindow = tableView.convert(cellFrame, to: window)
                 let minY = cellRectInWindow.minY
                 let maxY = cellRectInWindow.maxY
-                print(bubbleView.frame.height)
-                let containerTopPadding: CGFloat = 16
-                let dateStackHeight = dateStackView.frame.height
-                let dateStackBottomPadding: CGFloat = 16
+                let bubbleViewHeight = bubbleView.frame.height
                 let bubbleViewTopSpacing =
-                containerTopPadding + dateStackHeight + dateStackBottomPadding
+                cellRectInWindow.height - bubbleViewHeight
                 onLongPress?(minY + bubbleViewTopSpacing, maxY)
             }
         }
@@ -346,6 +323,6 @@ class CommentCell: UITableViewCell {
         stackViewTopConstraint?.isActive = false
         stackToBubbleConstraint?.isActive = false
         stackViewCenterXConstraint?.isActive = false
-        containerBottomConstraint?.isActive = false
+        containerTopConstraint?.isActive = false
     }
 }
