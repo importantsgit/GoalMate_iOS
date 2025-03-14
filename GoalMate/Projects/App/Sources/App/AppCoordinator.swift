@@ -108,6 +108,32 @@ extension AppCoordinator.Screen.State: Identifiable {
     }
 }
 
+/*
+ 중복되는 뷰를 추가로 push 시, 중복된 ID기 때문에 에러 발생할 수 있음
+ 뷰마다 고유한 ID를 가지도록 수정해야 함
+extension AppCoordinator.Screen.State: Identifiable {
+    var id: ID {
+        switch self {
+        case .signUp:
+            return .signUp
+        case .tab:
+            return .tab
+        case .intro:
+            return .intro
+        }
+    }
+    enum ID: Identifiable {
+        case signUp
+        case tab
+        case intro
+        
+        var id: ID {
+            return self
+        }
+    }
+}
+*/
+
 @available(iOS 17.0, *)
 #Preview {
     AppCoordinatorView(
