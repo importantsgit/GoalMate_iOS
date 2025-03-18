@@ -40,14 +40,14 @@ public extension String {
         let endDateObj = endDate.toDate(format: "yyyy-MM-dd")
         let components = calendar.dateComponents([.day], from: currentDate, to: endDateObj)
         let days = components.day ?? 0
-        return "D-\(days)"  // 숫자만 반환
+        return days >= 0 ? "D-\(days)" : "done"  // 숫자만 반환
     }
     func toISODate() -> Date? {
         let isoFormatter = ISO8601DateFormatter()
         isoFormatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         return isoFormatter.date(from: self)
     }
-    
+
     func formatISODateString() -> String {
         guard let date = self.toISODate()
         else { return "" }
