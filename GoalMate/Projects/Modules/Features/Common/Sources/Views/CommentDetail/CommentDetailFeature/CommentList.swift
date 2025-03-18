@@ -16,7 +16,6 @@ struct CommentList: UIViewRepresentable {
     let endDate: Date
     let onLoadMore: () -> Void
     let onLongPress: (CommentContent, (CGFloat, CGFloat)) -> Void
-
     init(
         comments: IdentifiedArrayOf<CommentContent>,
         endDate: Date,
@@ -28,11 +27,9 @@ struct CommentList: UIViewRepresentable {
         self.onLoadMore = onLoadMore
         self.onLongPress = onLongPress
     }
-
     func makeCoordinator() -> Coordinator {
         Coordinator(self)
     }
-
     func makeUIView(context: Context) -> UITableView {
         let tableView = UITableView(frame: .zero, style: .grouped)
         tableView.delegate = context.coordinator
@@ -46,19 +43,16 @@ struct CommentList: UIViewRepresentable {
         tableView.transform = CGAffineTransform(rotationAngle: .pi)
         return tableView
     }
-
     func updateUIView(_ tableView: UITableView, context: Context) {
         context.coordinator.parent = self
         tableView.reloadData()
     }
-
     class Coordinator: NSObject, UITableViewDelegate, UITableViewDataSource {
         var parent: CommentList
         var isLoadingMore = false
         init(_ parent: CommentList) {
             self.parent = parent
         }
-
         func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
             return parent.comments.count
         }
@@ -133,11 +127,9 @@ class CommentCell: UITableViewCell {
         setupUI()
         setupGestures()
     }
-
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-
     private func setupGestures() {
         longPressGesture = UILongPressGestureRecognizer(
             target: self,
@@ -145,7 +137,6 @@ class CommentCell: UITableViewCell {
         longPressGesture.minimumPressDuration = 0.3
         bubbleView.addGestureRecognizer(longPressGesture)
     }
-
     private func setupUI() {
         backgroundColor = .clear
         selectionStyle = .none
@@ -186,12 +177,10 @@ class CommentCell: UITableViewCell {
         dateLabel.font = IFont.Pretendard.medium.value.font(size: 14)
         dateLabel.textColor = Asset.Assets.Grey.grey700.color
         dateStackView.addArrangedSubview(dateLabel)
-        dplusLabelView.backgroundColor = UIColor(hex: "FFE223")
         dplusLabelView.translatesAutoresizingMaskIntoConstraints = false
         dplusLabelView.layer.cornerRadius = 4
         dplusLabelView.clipsToBounds = true
         dplusLabel.font = IFont.Pretendard.semiBold.value.font(size: 12)
-        dplusLabel.textColor = Asset.Assets.Grey.grey800.color
         dplusLabel.textAlignment = .center
         dplusLabel.translatesAutoresizingMaskIntoConstraints = false
         dplusLabelView.addSubview(dplusLabel)
@@ -213,45 +202,44 @@ class CommentCell: UITableViewCell {
                 equalTo: containerView.bottomAnchor),
             bubbleView.widthAnchor.constraint(
                 lessThanOrEqualTo: containerView.widthAnchor, multiplier: 0.75),
-//            dplusLabel.topAnchor.constraint(
-//                equalTo: dplusLabelView.topAnchor, constant: 2),
+            //            dplusLabel.topAnchor.constraint(
+            //                equalTo: dplusLabelView.topAnchor, constant: 2),
             dplusLabel.centerYAnchor.constraint(
                 equalTo: dplusLabelView.centerYAnchor),
             dplusLabel.leadingAnchor.constraint(
                 equalTo: dplusLabelView.leadingAnchor, constant: 4),
             dplusLabel.trailingAnchor.constraint(
                 equalTo: dplusLabelView.trailingAnchor, constant: -4),
-//            dplusLabel.bottomAnchor.constraint(
-//                equalTo: dplusLabelView.bottomAnchor, constant: -2)
+            //            dplusLabel.bottomAnchor.constraint(
+            //                equalTo: dplusLabelView.bottomAnchor, constant: -2)
         ])
     }
-
     func configure(
         with comment: CommentContent,
         endDate: Date,
         showDateStack: Bool = false) {
-        self.writerRole = comment.writerRole ?? .mentor
-        if let commentText = comment.comment {
-            let paragraphStyle = NSMutableParagraphStyle()
-            paragraphStyle.lineSpacing = messageLabel.font.lineHeight * 0.3
-            let attributes: [NSAttributedString.Key: Any] = [
-                .paragraphStyle: paragraphStyle
-            ]
-            messageLabel.attributedText = NSAttributedString(
-                string: commentText,
-                attributes: attributes)
-        } else {
-            messageLabel.text = nil
-        }
-        messageLabel.text = comment.comment
-        bubbleLeadingConstraint?.isActive = false
-        bubbleTrailingConstraint?.isActive = false
-        bubbleTopConstraint?.isActive = false
-        stackViewTopConstraint?.isActive = false
-        stackToBubbleConstraint?.isActive = false
-        stackViewCenterXConstraint?.isActive = false
-        containerTopConstraint?.isActive = false
-
+            self.writerRole = comment.writerRole ?? .mentor
+            if let commentText = comment.comment {
+                let paragraphStyle = NSMutableParagraphStyle()
+                paragraphStyle.lineSpacing = messageLabel.font.lineHeight * 0.3
+                let attributes: [NSAttributedString.Key: Any] = [
+                    .paragraphStyle: paragraphStyle
+                ]
+                messageLabel.attributedText = NSAttributedString(
+                    string: commentText,
+                    attributes: attributes)
+            } else {
+                messageLabel.text = nil
+            }
+            messageLabel.text = comment.comment
+            bubbleLeadingConstraint?.isActive = false
+            bubbleTrailingConstraint?.isActive = false
+            bubbleTopConstraint?.isActive = false
+            stackViewTopConstraint?.isActive = false
+            stackToBubbleConstraint?.isActive = false
+            stackViewCenterXConstraint?.isActive = false
+            containerTopConstraint?.isActive = false
+            
             if [.mentor, .admin].contains(comment.writerRole) {
                 messageLabel.textColor = Asset.Assets.Grey.grey700.color
                 bubbleView.backgroundColor = Asset.Assets.Grey.grey50.color
@@ -263,23 +251,29 @@ class CommentCell: UITableViewCell {
                 bubbleLeadingConstraint?.isActive = false
                 bubbleTrailingConstraint?.isActive = true
             }
-
             if showDateStack,
                let commentedAt = comment.commentedAt {
                 dateStackView.isHidden = false
-
                 let text = commentedAt
                     .formatISODateString()
                     .convertDateString(
-                    fromFormat: "yyyy-MM-dd",
-                    toFormat: "yyyy년 M월 dd일"
-                )
+                        fromFormat: "yyyy-MM-dd",
+                        toFormat: "yyyy년 M월 dd일"
+                    )
                 dateLabel.text = text
                 let date = commentedAt.formatISODateString()
-                let dDay = date.calculateDday(
-                    endDate: endDate.getString(format: "yyyy-MM-dd"))
-                dplusLabel.text = "\(dDay)"
-
+                if let commentDate = commentedAt.toISODate(),
+                   commentDate > endDate {
+                    dplusLabel.text = "done"
+                    dplusLabel.textColor = .white
+                    dplusLabelView.backgroundColor = Asset.Assets.SecondaryP.secondaryP.color
+                } else {
+                    let dDay = date.calculateDday(
+                        endDate: endDate.getString(format: "yyyy-MM-dd"))
+                    dplusLabel.text = "\(dDay)"
+                    dplusLabel.textColor = Asset.Assets.Grey.grey800.color
+                    dplusLabelView.backgroundColor = UIColor(hex: "FFE223")
+                }
                 stackViewTopConstraint?.isActive = true
                 stackViewCenterXConstraint?.isActive = true
                 stackToBubbleConstraint?.isActive = true
@@ -289,10 +283,10 @@ class CommentCell: UITableViewCell {
                 bubbleTopConstraint?.isActive = true
                 containerTopConstraint?.constant = 16
             }
-        containerTopConstraint?.isActive = true
-        setNeedsLayout()
-        layoutIfNeeded()
-    }
+            containerTopConstraint?.isActive = true
+            setNeedsLayout()
+            layoutIfNeeded()
+        }
     @objc private func handleLongPress(_ gestureRecognizer: UILongPressGestureRecognizer) {
         guard self.writerRole == .mentee else { return }
         if gestureRecognizer.state == .began {
