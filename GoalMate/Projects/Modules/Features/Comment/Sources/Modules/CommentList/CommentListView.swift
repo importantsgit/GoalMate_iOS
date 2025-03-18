@@ -39,9 +39,11 @@ public struct CommentListView: View {
                 .animation(
                     .easeOut(duration: 0.2),
                     value: store.isLoading)
+                .loadingFailure(didFailToLoad: store.didFailToLoad) {
+                    store.send(.view(.retryButtonTapped))
+                }
             }
             .padding(.horizontal, 20)
-
             .task {
                 store.send(.viewCycling(.onAppear))
             }
