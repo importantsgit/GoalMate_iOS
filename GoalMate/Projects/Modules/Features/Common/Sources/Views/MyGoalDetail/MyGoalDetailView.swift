@@ -102,15 +102,21 @@ public struct MyGoalDetailView: View {
                                         }
                                         .padding(.horizontal, 20)
                                     }
-                                } else {
+                                    .transition(.asymmetric(
+                                        insertion: .opacity, removal: .identity))
+                                }
+                                if store.isContentLoading {
                                     skeletonView
+                                        .transition(.asymmetric(
+                                            insertion: .identity, removal: .opacity))
                                 }
                             }
                             .scrollIndicators(.hidden)
                             bottomButtomView
                         } else {
                             skeletonView
-                                .transition(.opacity)
+                                .transition(.asymmetric(
+                                    insertion: .identity, removal: .opacity))
                         }
                     }
                     .loadingFailure(didFailToLoad: store.didFailToLoad) {
@@ -209,7 +215,7 @@ public struct MyGoalDetailView: View {
             }
             RoundedRectangle(cornerRadius: 8)
                 .fill(Colors.grey200)
-                .frame(height: 150)
+                .frame(height: 250)
             Spacer()
                 .frame(height: 20)
             RoundedRectangle(cornerRadius: 8)
