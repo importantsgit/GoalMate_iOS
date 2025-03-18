@@ -146,11 +146,18 @@ public struct ProfileView: View {
                                     .clipShape(.rect(cornerRadius: 24))
                                     .overlay {
                                         ZStack {
-                                            RoundedRectangle(cornerRadius: 24)
-                                                .stroke(Colors.primary200, lineWidth: 1)
                                             if store.isLoading {
                                                 RoundedRectangle(cornerRadius: 24)
                                                     .fill(Colors.grey200)
+                                                    .transition(.asymmetric(
+                                                        insertion: .identity, removal: .opacity))
+                                            } else {
+                                                RoundedRectangle(cornerRadius: 24)
+                                                    .stroke(
+                                                        Colors.primary200,
+                                                        lineWidth: 1)
+                                                    .transition(.asymmetric(
+                                                        insertion: .identity, removal: .opacity))
                                             }
                                         }
                                     }
@@ -277,6 +284,8 @@ fileprivate struct ListButton: View {
     var body: some View {
         WithPerceptionTracking {
             Button {
+                guard isLoading == false
+                else { return }
                 action()
             } label: {
                 Text(title)
@@ -285,6 +294,8 @@ fileprivate struct ListButton: View {
                         if isLoading {
                             RoundedRectangle(cornerRadius: 8)
                                 .fill(Colors.grey200)
+                                .transition(.asymmetric(
+                                    insertion: .identity, removal: .opacity))
                         }
                     }
                     .frame(height: 46)
