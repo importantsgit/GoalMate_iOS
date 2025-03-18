@@ -22,6 +22,7 @@ public struct MyGoalCompletionFeature {
         var didFailToLoad: Bool
         var toastState: ToastState
         var content: MenteeGoal?
+        var menteeName: String?
         public init(contentId: Int) {
             self.id = UUID()
             self.contentId = contentId
@@ -48,6 +49,8 @@ public struct MyGoalCompletionFeature {
         case nextGoalButtonTapped
     }
     public enum FeatureAction {
+        case fetchMenteeName
+        case checkMenteeNameResponse(String?)
         case fetchMyGoalCompletionContent
         case checkMyGoalCompletionResponse(FetchMyGoalCompletionResult)
     }

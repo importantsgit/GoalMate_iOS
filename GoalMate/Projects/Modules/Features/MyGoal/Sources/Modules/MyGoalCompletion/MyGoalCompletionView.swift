@@ -42,9 +42,12 @@ public struct MyGoalCompletionView: View {
                                 goalDetailView
                                 Spacer()
                                     .frame(height: 30)
-                                commentView
-                                Spacer()
-                                    .frame(height: 16)
+                                if store.content?.mentorLetter != nil {
+                                    commentView
+                                    Spacer()
+                                        .frame(height: 16)
+
+                                }
                                 Button {
                                     store.send(.view(.mentorCommentButtonTapped))
                                 } label: {
@@ -263,13 +266,13 @@ public struct MyGoalCompletionView: View {
     @ViewBuilder
     var commentView: some View {
         VStack(spacing: 16) {
-            Text("to. 김골메이트")
+            Text("to. \(store.menteeName ?? "")")
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .pretendard(.regular, size: 16, color: Colors.primary900)
-            Text("김골메이트님!\n30일동안 고생 많았어요~! 어떠셨어요? 조금 힘들었죠? 앞으로도 응원할게요!김골메이트님!".splitCharacters())
+            Text((store.content?.mentorLetter ?? "").splitCharacters())
                 .pretendardStyle(.regular, size: 15)
                 .lineSpacing(4)
-            Text("from. ANNA")
+            Text("from. \(store.content?.mentorName ?? "")")
                 .frame(maxWidth: .infinity, alignment: .trailing)
                 .pretendard(.regular, size: 16, color: Colors.primary900)
         }

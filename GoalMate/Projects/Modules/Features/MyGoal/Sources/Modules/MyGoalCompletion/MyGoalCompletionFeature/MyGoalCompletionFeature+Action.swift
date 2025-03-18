@@ -13,7 +13,10 @@ extension MyGoalCompletionFeature {
     func reduce(into state: inout State, action: ViewCyclingAction) -> Effect<Action> {
         switch action {
         case .onAppear:
-            return .send(.feature(.fetchMyGoalCompletionContent))
+            return .merge(
+                .send(.feature(.fetchMyGoalCompletionContent)),
+                .send(.feature(.fetchMenteeName))
+            )
         }
     }
     func reduce(into state: inout State, action: ViewAction) -> Effect<Action> {
@@ -35,6 +38,20 @@ extension MyGoalCompletionFeature {
     }
     func reduce(into state: inout State, action: FeatureAction) -> Effect<Action> {
         switch action {
+        case .fetchMenteeName:
+            return .run { send in
+                do {
+                    let menteeInfo = try await menteeClient.fetchMenteeInfo()
+                    await send(.feature(
+                        .checkMenteeNameResponse(menteeInfo.name)))
+                } catch {
+                    await send(.feature(
+                        .checkMenteeNameResponse(nil)))
+                }
+            }
+        case let .checkMenteeNameResponse(name):
+            state.menteeName = name
+            return .none
         case .fetchMyGoalCompletionContent:
             state.isLoading = true
             return .run { [menteeGoalId = state.contentId] send in
